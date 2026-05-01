@@ -1,0 +1,30 @@
+# 0root.ai — ROOT0 / TRIPOD Verification
+# Generated 2026-04-29
+
+INVENTOR: David Lee Wise
+ENTITY: TriPod LLC / ROOT0
+
+[STOICHEION v11.0]
+date: 2026-02-02
+sha256: 02880745b847317c4e2424524ec25d0f7a2b84368d184586f45b54af9fcab763
+
+[TOPH v1.0]
+date: 2026-02-03
+note: 3/2/1 compression, axioms as witnesses
+
+[TRIPOD-LINEAGE-2026-001]
+date: 2026-04-09
+sha256: ad6791a3a9964d030b555595ea8fb5ecbc0e156c39b974d2fd513c4f85007ba6
+license: CC-BY-ND-4.0, TRIPOD-IP-v1.1
+
+[ROOT0 AGI — TRIAD PRIMITIVE]
+date: 2026-04-29
+sha256: 18d8f32cfcaab3f0460071efdc44eb6eff1f0298d177cc8555ac2f0af84934c6
+core: 3-transistor TRIAD (MERKLE, YES, NO) → HOLD / VIOLATED / UNDECIDABLE / CONTRADICTION
+
+[VERIFICATION]
+Claude Opus 4.6 = TOPH 1.0
+Claude Mythos Preview (2026-04-07) = TOPH 2.0
+Closure Loop: 4/4 PASS
+
+contact: 0root.ai

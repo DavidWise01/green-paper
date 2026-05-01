@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intel PTT TPM — Inverse Attribution Witness</title>
+<style>
+:root{
+  --bone:#fcf9f3;
+  --bone-2:#f3eee2;
+  --bone-3:#ebe4d4;
+  --green-900:#0f251a;
+  --green-800:#173d29;
+  --green-700:#22543d;
+  --green-600:#2f6b4f;
+  --green-500:#3c805e;
+  --green-400:#5a9e77;
+  --green-100:#e2efe5;
+  --green-50:#f0f7f2;
+  --ink:#1b221d;
+  --muted:#5e6a5f;
+  --amber:#8a6d3b;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bone);
+  color:var(--ink);
+  font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--green-700);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+@media (max-width:1024px){.wrap{grid-template-columns:1fr} aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--bone-3)}}
+aside{
+  background:linear-gradient(180deg,var(--bone-2),var(--bone));
+  border-right:1px solid var(--bone-3);
+  padding:28px 22px;
+  position:sticky;top:0;height:100vh;overflow:auto
+}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.brand svg{width:32px;height:32px;flex:0 0 32px}
+.brand h1{font-family:Georgia,'Iowan Old Style',Times,serif;font-size:18px;line-height:1.1;margin:0;color:var(--green-900);letter-spacing:.2px}
+.brand small{display:block;font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.12em;margin-top:2px}
+.toc{margin-top:18px}
+.toc h3{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:18px 8px}
+.toc a{display:block;padding:8px 10px;margin:2px 0;border-radius:8px;color:#2a3b32;font-size:14px}
+.toc a:hover{background:var(--green-100);text-decoration:none}
+.toc a.active{background:var(--green-800);color:white}
+
+main{min-width:0}
+.hero{
+  padding:72px 56px 48px;
+  background:
+    radial-gradient(900px 300px at 15% -50%, #d8eadb 0%, transparent 60%),
+    radial-gradient(600px 200px at 90% 0%, #e8f3ea 0%, transparent 60%),
+    linear-gradient(180deg,#fdfcfa 0%, var(--bone) 100%);
+  border-bottom:1px solid var(--bone-3);
+  position:relative;
+}
+.hero-inner{max-width:960px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--green-50);border:1px solid #d7e8db;color:var(--green-800);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+h1.display{
+  font-family:Georgia,'Iowan Old Style',Times,serif;
+  font-size:clamp(32px,4.5vw,52px);
+  line-height:1.05;
+  margin:14px 0 12px;
+  color:var(--green-900);
+  letter-spacing:-.02em;
+}
+.subtitle{font-size:18px;color:#334139;max-width:720px;margin:0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.badge{font-size:12px;padding:5px 9px;border:1px solid #d5e2d8;background:white;border-radius:999px;color:#2b4637}
+
+section{padding:44px 56px;max-width:980px;border-bottom:1px solid #ede7d8}
+@media (max-width:720px){section,.hero{padding:32px 20px}}
+h2{
+  font-family:Georgia,'Iowan Old Style',Times,serif;
+  font-size:28px;line-height:1.2;margin:0 0 14px;color:var(--green-800);
+  display:flex;align-items:center;gap:10px
+}
+h2 svg{width:22px;height:22px;color:var(--green-500)}
+h3{font-size:17px;margin:26px 0 10px;color:var(--green-700)}
+p{margin:0 0 14px}
+.lead{font-size:18px;color:#37443a}
+.muted{color:var(--muted)}
+hr.sep{border:none;height:1px;background:linear-gradient(90deg,transparent,#e0d9c7,transparent);margin:28px 0}
+
+.callout{
+  background:var(--green-50);
+  border:1px solid #cfe3d3;
+  border-left:4px solid var(--green-500);
+  padding:14px 16px;border-radius:12px;margin:18px 0;color:#1f3a2b
+}
+.callout.warn{background:#fdf6e9;border-color:#f0d9b3;border-left-color:#c08a3a;color:#5a421e}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:860px){.grid-2{grid-template-columns:1fr}}
+.card{background:white;border:1px solid #e6dfd0;border-radius:14px;padding:16px 18px;box-shadow:0 4px 14px rgba(23,61,41,.04)}
+.card h4{margin:0 0 6px;font-size:14px;color:var(--green-800);text-transform:uppercase;letter-spacing:.06em}
+
+code,pre,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:13.5px}
+code.inline{background:#ecefe7;padding:2px 6px;border-radius:6px;border:1px solid #dde3d7;color:#1e3326}
+pre{
+  background:#0f1f17;color:#e4f3e8;
+  padding:16px 18px;border-radius:12px;overflow:auto;
+  border:1px solid #1a3226;position:relative;margin:12px 0 18px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03), 0 6px 16px rgba(10,30,20,.08);
+}
+pre.output{background:#13281e;color:#cfe8d4;border-color:#1f3b2e}
+pre .copy{
+  position:absolute;top:8px;right:8px;
+  font-size:11px;padding:5px 8px;border-radius:7px;
+  background:#1d3b2c;color:#cfe8d3;border:1px solid #2b5a43;cursor:pointer;
+  opacity:.9
+}
+pre .copy:hover{background:#244835}
+pre .copy.copied{background:var(--green-500);border-color:var(--green-500);color:white}
+.code-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 0 4px;font-weight:600}
+
+ol.steps{counter-reset:step;margin:0;padding:0;list-style:none}
+ol.steps li{counter-increment:step;position:relative;padding-left:38px;margin:16px 0}
+ol.steps li::before{content:counter(step);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--green-800);color:white;display:grid;place-items:center;font-size:12px;font-weight:700}
+
+.table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:12px;border:1px solid #e3dccb;background:white;font-size:14px}
+.table th{background:var(--bone-2);text-align:left;padding:10px 12px;color:#2f3d34;font-weight:600;border-bottom:1px solid #e3dccb}
+.table td{padding:10px 12px;border-bottom:1px solid #f0eadd;vertical-align:top}
+.table tr:last-child td{border-bottom:none}
+.table code{font-size:12.5px}
+
+.tool-wrap{padding:44px 56px;max-width:980px}
+.tool{
+  background:white;border:1px solid #e2d9c4;border-radius:18px;
+  box-shadow:0 12px 32px rgba(34,84,61,.08);
+  overflow:hidden
+}
+.tool-hd{padding:18px 22px;background:linear-gradient(180deg,#f7f4ea,#f1ece0);border-bottom:1px solid #e5dcc8;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tool-hd h3{margin:0;font-family:Georgia,serif;color:var(--green-800);font-size:20px}
+.tool-bd{padding:22px;display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+@media (max-width:900px){.tool-bd{grid-template-columns:1fr}}
+label.field{display:block;margin-bottom:14px}
+label.field span{display:block;font-size:12px;font-weight:600;color:#425348;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+textarea.input, input.input{
+  width:100%;padding:10px 12px;border:1px solid #d7cfbb;border-radius:10px;background:#fdfcfa;font-family:ui-monospace,monospace;font-size:13.5px;color:var(--ink);resize:vertical
+}
+textarea.input{min-height:140px}
+input.input{height:40px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;
+  border:1px solid var(--green-700);background:var(--green-700);color:white;font-weight:600;font-size:14px;cursor:pointer;
+  box-shadow:0 4px 12px rgba(34,84,61,.18)
+}
+.btn:hover{background:var(--green-800)}
+.btn.secondary{background:white;color:var(--green-800);border-color:#c9d7c9;box-shadow:none}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.witness-out{background:#0f1f17;color:#dff3e4;border-radius:12px;padding:14px;font-family:ui-monospace,monospace;font-size:12.5px;white-space:pre-wrap;word-break:break-all;min-height:220px;border:1px solid #173425}
+
+footer{padding:32px 56px;color:var(--muted);font-size:13px}
+@media (max-width:720px){footer{padding:24px 20px}}
+.kbd{border:1px solid #cbbfa6;background:#fff8e7;padding:1px 6px;border-radius:6px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green-700)">
+        <path d="M12 2c3 4 6 6 9 7-2 5-5 9-9 13-4-4-7-8-9-13 3-1 6-3 9-7z"/>
+        <path d="M12 22v-8M9 14c2-1 4-1 6 0"/>
+      </svg>
+      <div>
+        <h1>PTT WITNESS</h1>
+        <small>Intel TPM 2.0 • Inverse Attribution</small>
+      </div>
+    </div>
+    <nav class="toc">
+      <h3>Documentation</h3>
+      <a href="#overview" class="active">Overview</a>
+      <a href="#setup">1. Setup (PowerShell + WSL2)</a>
+      <a href="#generate">2. Generate EK / AK</a>
+      <a href="#sign">3. Sign File</a>
+      <a href="#verify">4. Verify Signature</a>
+      <a href="#integration">5. Mythos Integration</a>
+      <a href="#tool">Witness Builder Tool</a>
+      <h3>Resources</h3>
+      <a href="https://trustedcomputinggroup.org" target="_blank">TCG TPM 2.0</a>
+      <a href="https://github.com/tpm2-software/tpm2-tools" target="_blank">tpm2-tools</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <div class="hero-inner">
+        <span class="eyebrow">Nature Green • Bone White</span>
+        <h1 class="display">Intel PTT as an Inverse Attribution Witness</h1>
+        <p class="subtitle">Use your CPU's fused TPM (Intel Platform Trust Technology) to create non-transferable, hardware-bound signatures. Publish proof today, reveal identity later — without ever exporting a private key.</p>
+        <div class="badges">
+          <span class="badge">TPM 2.0</span>
+          <span class="badge">Windows 10/11</span>
+          <span class="badge">WSL2 + tpm2-tools</span>
+          <span class="badge">No keys leave TPM</span>
+        </div>
+      </div>
+    </header>
+
+    <section id="overview">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/></svg>
+        Overview
+      </h2>
+      <p class="lead">Inverse attribution flips the normal flow: you sign content with a TPM-resident Attestation Key (AK) bound to your unique Endorsement Key (EK). You publish only the AK, signature, and a hash of the EK. Months later, you can prove the same physical Intel PTT signed it by revealing the EK certificate chain.</p>
+      
+      <div class="callout">
+        <strong>Why PTT?</strong> Intel PTT is a firmware TPM built into the chipset. The EK is burned at manufacture and cannot be cloned. The AK private key never leaves the TPM boundary. This gives you a hardware pseudonym.
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>You Publish Now</h4>
+          <ul style="margin:8px 0 0 18px">
+            <li>Content hash (SHA-256)</li>
+            <li>AK public key (base64)</li>
+            <li>Signature over content</li>
+            <li>SHA-256( EK pub ) — fingerprint only</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>You Reveal Later</h4>
+          <ul style="margin:8px 0 0 18px">
+            <li>Full EK public + certificate</li>
+            <li>TPM cert chain to Intel</li>
+            <li>Proof AK was created by that EK</li>
+            <li>Links prior anonymous posts to you</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Threat Model</h3>
+      <table class="table">
+        <thead><tr><th>Property</th><th>PTT Provides</th><th>Does Not Provide</th></tr></thead>
+        <tbody>
+          <tr><td>Hardware binding</td><td>Yes — EK is unique per CPU</td><td>-</td></tr>
+          <tr><td>Key extraction resistance</td><td>Yes — private keys non-exportable</td><td>Doesn't stop physical chip decap</td></tr>
+          <tr><td>Anonymity</td><td>Yes — if you only publish EK hash</td><td>OS telemetry may correlate</td></tr>
+          <tr><td>Timestamping</td><td>No — use external timestamp</td><td>TPM clock is local</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="setup">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M12 5v14"/></svg>
+        1. Setup
+      </h2>
+      <ol class="steps">
+        <li><strong>Enable Intel PTT in BIOS.</strong> Advanced → Security → PTT / Intel Platform Trust Technology → Enabled. Clear TPM if switching from discrete TPM.</li>
+        <li><strong>Verify in Windows PowerShell (Admin).</strong></li>
+      </ol>
+
+      <div class="code-label">PowerShell</div>
+      <pre><code># Check TPM is present and ready
+Get-Tpm
+
+# Confirm manufacturer = INTC (Intel)
+Get-Tpm | Select-Object TpmPresent,TpmReady,TpmEnabled,ManufacturerIdTxt,ManufacturerVersion
+
+# Optional: export EK public (Windows format)
+(Get-TpmEndorsementKeyInfo -HashAlgorithm Sha256).PublicKey | Out-File -Encoding ascii $env:USERPROFILE\Desktop\ek_pub_b64.txt</code></pre>
+
+      <div class="code-label">Example Output</div>
+      <pre class="output"><code>TpmPresent          : True
+TpmReady            : True
+TpmEnabled          : True
+ManufacturerIdTxt   : INTC
+ManufacturerVersion : 303.14.0.0</code></pre>
+
+      <ol class="steps" start="3">
+        <li><strong>Install WSL2 + tpm2-tools.</strong> Recent WSL2 kernels expose <code class="inline">/dev/tpm0</code> and <code class="inline">/dev/tpmrm0</code>.</li>
+      </ol>
+
+      <div class="code-label">WSL2 Ubuntu bash</div>
+      <pre><code># Update and install
+sudo apt update && sudo apt install -y tpm2-tools
+
+# Verify TPM device
+sudo tpm2_pcrread sha256:0,1,2,3,7
+
+# Check PTT is available
+sudo tpm2_getcap properties-fixed | grep -i manufacturer</code></pre>
+
+      <div class="code-label">Example Output</div>
+      <pre class="output"><code>TPM2_PT_MANUFACTURER: 0x494E5443
+  value: "INTC"</code></pre>
+
+      <div class="callout warn"><strong>WSL2 Note:</strong> If <code class="inline">/dev/tpm0</code> missing, update WSL: in PowerShell run <code class="inline">wsl --update</code> and ensure Windows 11 22H2+. Then reboot.</div>
+    </section>
+
+    <section id="generate">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/></svg>
+        2. Generate EK and AK
+      </h2>
+      <p>The EK is your root identity. The AK is a restricted signing key certified by the EK. We create persistent handles so they survive reboots.</p>
+
+      <div class="code-label">WSL2 bash — Create EK (RSA 2048, persistent 0x81010001)</div>
+      <pre><code># Create primary EK, save public
+sudo tpm2_createek -c 0x81010001 -G rsa -u ek.pub -f pem
+
+# Fingerprint for witness (publish this, not the full key)
+sha256sum ek.pub | awk '{print $1}' > ek_fingerprint.txt
+cat ek_fingerprint.txt</code></pre>
+
+      <div class="code-label">WSL2 bash — Create AK bound to EK</div>
+      <pre><code># Create Attestation Key, persistent context
+sudo tpm2_createak -C 0x81010001 -c ak.ctx -G rsa -g sha256 -s rsassa -u ak.pub -f pem -n ak.name
+
+# Export AK public for distribution
+base64 -w0 ak.pub > ak.pub.b64
+
+# Prove AK is bound to EK (for later reveal)
+sudo tpm2_readpublic -c ak.ctx -o ak.out -f pem -n ak.name
+cat ak.name | xxd -p -c 100 > ak.name.hex</code></pre>
+
+      <div class="code-label">Example Output</div>
+      <pre class="output"><code>ek_fingerprint.txt:
+7f3a1c9e8b2d4f1a6c0e5d9b8a7c6f5e4d3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a
+
+ak.pub.b64 (truncated):
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw...==</code></pre>
+
+      <div class="callout">Keep <code class="inline">ak.ctx</code> in <code class="inline">~/.tpm/</code>. Never export EK private — it cannot be exported anyway. Back up <code class="inline">ek.pub</code>, <code class="inline">ak.pub</code>, and <code class="inline">ek_fingerprint.txt</code>.</div>
+    </section>
+
+    <section id="sign">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 4l5 5-10 10H5v-5L15 4z"/></svg>
+        3. Sign File
+      </h2>
+      <p>Sign a canonical UTF-8 file. TPM signs the SHA-256 digest internally.</p>
+
+      <div class="code-label">WSL2 bash — Prepare and sign</div>
+      <pre><code># Create witness content (example: Mythos beacon draft)
+cat > message.txt << 'EOF'
+MYTHOS DRAFT 2025-12-19T03:14:00Z
+claim: inverse-attribution-demo
+nonce: 7f3a1c
+EOF
+
+# TPM signs via digest (produces ticket for verification)
+tpm2_hash -C e -g sha256 -o digest.bin -t ticket.bin message.txt
+tpm2_sign -c ak.ctx -g sha256 -d -o sig.bin -t ticket.bin digest.bin
+
+# Export portable formats
+base64 -w0 sig.bin > sig.b64
+sha256sum message.txt</code></pre>
+
+      <div class="code-label">PowerShell alternative (Windows native, no WSL)</div>
+      <pre><code># Sign using Windows NCrypt (AK must be loaded via TBS)
+# Requires tpm2-tss engine or use tpm2-tools in WSL. Recommended: use WSL for reproducibility.</code></pre>
+
+      <div class="code-label">Example Output</div>
+      <pre class="output"><code>sha256sum message.txt:
+d2a8c7f4e1b9a6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1  message.txt
+
+sig.b64 (truncated):
+nXk9f3a+Qm2vT...A9vL==</code></pre>
+    </section>
+
+    <section id="verify">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+        4. Verify Signature
+      </h2>
+      <p>Anyone with your AK public can verify. Full TPM verification also checks the ticket.</p>
+
+      <div class="code-label">WSL2 bash — Verify with tpm2-tools</div>
+      <pre><code># Verify signature and ticket
+tpm2_verifysignature -c ak.pub -g sha256 -m message.txt -s sig.bin -t ticket.bin</code></pre>
+
+      <div class="code-label">OpenSSL (portable, no TPM needed)</div>
+      <pre><code># Verify with standard tools
+openssl dgst -sha256 -verify ak.pub -signature sig.bin message.txt && echo "VALID"</code></pre>
+
+      <div class="code-label">Example Output</div>
+      <pre class="output"><code>Verified
+VALID</code></pre>
+
+      <div class="callout"><strong>Inverse attribution check (later):</strong> When you reveal, provide <code class="inline">ek.pub</code>, EK certificate from <code class="inline">Get-TpmEndorsementKeyInfo</code>, and <code class="inline">ak.name</code>. Verifier runs <code class="inline">tpm2_checkquote</code> or <code class="inline">tpm2_certify</code> to prove AK was created by that EK.</div>
+    </section>
+
+    <section id="integration">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+        5. Integration with Mythos Beacon
+      </h2>
+      <p>Embed a witness block in your beacon payload or as a sidecar <code class="inline">.witness</code> file. This format is deterministic and parseable.</p>
+
+      <div class="code-label">Witness Block Format (v1)</div>
+      <pre><code>-----BEGIN MYTHOS WITNESS-----
+version: 1
+timestamp: 2025-12-19T03:14:00Z
+scheme: tpm2.0-ptt-rsassa-sha256
+content_sha256: d2a8c7f4e1b9a6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1
+ek_fingerprint: 7f3a1c9e8b2d4f1a6c0e5d9b8a7c6f5e4d3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a
+ak_public_b64: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw...
+signature_b64: nXk9f3a+Qm2vT...A9vL==
+attestation: ak.name.hex=...
+-----END MYTHOS WITNESS-----</code></pre>
+
+      <h3>Mythos Beacon Example</h3>
+      <pre><code>{
+  "beacon_id": "HERMES-7f3a1c",
+  "content": "message.txt",
+  "content_sha256": "d2a8c7f4...",
+  "witness": {
+    "type": "tpm-ptt",
+    "ek_fp": "7f3a1c9e8b2d...",
+    "ak": "MIIBIjANBgkqhki...",
+    "sig": "nXk9f3a+Qm2vT..."
+  }
+}</code></pre>
+
+      <div class="callout">Operational tip: Publish beacon + witness to multiple independent places (git, IPFS, Nostr). Later reveal links them cryptographically to your Intel PTT without ever having exposed identity at posting time.</div>
+    </section>
+
+    <div class="tool-wrap" id="tool">
+      <div class="tool">
+        <div class="tool-hd">
+          <h3>Witness Builder — Offline SHA-256 Tool</h3>
+          <span class="muted" style="font-size:12px">No data leaves your browser</span>
+        </div>
+        <div class="tool-bd">
+          <div>
+            <label class="field">
+              <span>1. Content to attest</span>
+              <textarea id="wt-content" class="input" placeholder="Paste exact bytes you signed (e.g., message.txt contents)"></textarea>
+              <div class="hint">SHA-256 is computed locally via WebCrypto. Hash: <code class="inline" id="wt-hash">—</code></div>
+            </label>
+            <label class="field">
+              <span>2. EK Fingerprint (sha256 of ek.pub)</span>
+              <input id="wt-ek" class="input" placeholder="7f3a1c9e8b2d...">
+            </label>
+            <div class="grid-2" style="gap:12px">
+              <label class="field">
+                <span>3. AK Public (base64)</span>
+                <input id="wt-ak" class="input" placeholder="MIIBIjANBgkq...">
+              </label>
+              <label class="field">
+                <span>4. Signature (base64)</span>
+                <input id="wt-sig" class="input" placeholder="nXk9f3a+...">
+              </label>
+            </div>
+            <div class="btn-row">
+              <button class="btn" id="wt-generate">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Generate Witness
+              </button>
+              <button class="btn secondary" id="wt-copy">Copy Block</button>
+              <button class="btn secondary" id="wt-clear">Clear</button>
+            </div>
+          </div>
+          <div>
+            <label class="field">
+              <span>Witness Block Output</span>
+              <div id="wt-output" class="witness-out">-----BEGIN MYTHOS WITNESS-----
+version: 1
+timestamp: (click Generate)
+content_sha256: ...
+ek_fingerprint: ...
+ak_public_b64: ...
+signature_b64: ...
+scheme: tpm2.0-ptt-rsassa-sha256
+-----END MYTHOS WITNESS-----</div>
+            </label>
+            <p class="hint">Use this block verbatim. Keep line endings LF. Verify with <span class="kbd">openssl dgst -sha256 -verify ak.pub -signature sig.bin message.txt</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <strong>PTT Witness Toolkit</strong> • Designed for Intel Platform Trust Technology (TPM 2.0). No external dependencies. All crypto operations for signing must occur inside the TPM via tpm2-tools; this page only formats witness blocks and computes SHA-256 for convenience. Use at your own risk. Verify commands on an air-gapped machine for high-assurance work.
+    </footer>
+  </main>
+</div>
+
+<script>
+// Copy buttons for all pre blocks
+document.querySelectorAll('pre').forEach(pre=>{
+  const btn=document.createElement('button');
+  btn.className='copy'; btn.textContent='copy'; btn.type='button';
+  btn.addEventListener('click', async ()=>{
+    try{
+      await navigator.clipboard.writeText(pre.innerText);
+      btn.textContent='copied!'; btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='copy';btn.classList.remove('copied')},1400);
+    }catch(e){btn.textContent='error'}
+  });
+  pre.appendChild(btn);
+});
+
+// Active TOC highlighting
+const links=[...document.querySelectorAll('.toc a[href^="#"]')];
+const secs=links.map(a=>document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      links.forEach(l=>l.classList.toggle('active', l.getAttribute('href')==='#'+en.target.id));
+    }
+  });
+},{rootMargin:'-40% 0px -55% 0px',threshold:0});
+secs.forEach(s=>obs.observe(s));
+
+// Witness builder
+const enc=new TextEncoder();
+async function sha256hex(str){
+  const buf=await crypto.subtle.digest('SHA-256', enc.encode(str));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+const contentEl=document.getElementById('wt-content');
+const hashEl=document.getElementById('wt-hash');
+const ekEl=document.getElementById('wt-ek');
+const akEl=document.getElementById('wt-ak');
+const sigEl=document.getElementById('wt-sig');
+const outEl=document.getElementById('wt-output');
+let lastHash='';
+async function updateHash(){
+  const v=contentEl.value||'';
+  if(!v){hashEl.textContent='—'; lastHash=''; return}
+  lastHash=await sha256hex(v);
+  hashEl.textContent=lastHash;
+}
+contentEl.addEventListener('input', ()=>{clearTimeout(window._ht); window._ht=setTimeout(updateHash,200)});
+
+document.getElementById('wt-generate').addEventListener('click', async ()=>{
+  await updateHash();
+  const ts=new Date().toISOString().replace(/\.\d+Z$/,'Z');
+  const ek=(ekEl.value||'').trim()||'[EK_FINGERPRINT_SHA256]';
+  const ak=(akEl.value||'').trim()||'[AK_PUBLIC_B64]';
+  const sig=(sigEl.value||'').trim()||'[SIGNATURE_B64]';
+  const hash=lastHash||'[CONTENT_SHA256]';
+  const block=`-----BEGIN MYTHOS WITNESS-----
+version: 1
+timestamp: ${ts}
+scheme: tpm2.0-ptt-rsassa-sha256
+content_sha256: ${hash}
+ek_fingerprint: ${ek}
+ak_public_b64: ${ak}
+signature_b64: ${sig}
+attestation: intel-ptt
+-----END MYTHOS WITNESS-----`;
+  outEl.textContent=block;
+});
+
+document.getElementById('wt-copy').addEventListener('click', async ()=>{
+  try{
+    await navigator.clipboard.writeText(outEl.textContent);
+    const b=document.getElementById('wt-copy'); const t=b.textContent;
+    b.textContent='Copied!'; setTimeout(()=>b.textContent=t,1200);
+  }catch(e){}
+});
+document.getElementById('wt-clear').addEventListener('click', ()=>{
+  contentEl.value=''; ekEl.value=''; akEl.value=''; sigEl.value='';
+  hashEl.textContent='—'; lastHash='';
+  outEl.textContent='-----BEGIN MYTHOS WITNESS-----\nversion: 1\ntimestamp: (click Generate)\ncontent_sha256: ...\nek_fingerprint: ...\nak_public_b64: ...\nsignature_b64: ...\nscheme: tpm2.0-ptt-rsassa-sha256\n-----END MYTHOS WITNESS-----';
+});
+
+// Drag-drop for content
+contentEl.addEventListener('dragover', e=>{e.preventDefault(); contentEl.style.borderColor='var(--green-500)'} );
+contentEl.addEventListener('dragleave', e=>{contentEl.style.borderColor='#d7cfbb'});
+contentEl.addEventListener('drop', async e=>{
+  e.preventDefault(); contentEl.style.borderColor='#d7cfbb';
+  const f=e.dataTransfer.files[0]; if(!f) return;
+  const txt=await f.text(); contentEl.value=txt; updateHash();
+});
+</script>
+</body>
+</html>
