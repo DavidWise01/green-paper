@@ -1,195 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PTT WITNESS — For Jane</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap');
-:root{
-  --forest-900:#0f2818; --forest-700:#1e4620; --forest-500:#2d5a3a;
-  --bone:#faf8f3; --bone-2:#f5f1e8; --ink:#1a1a1a; --line:#d4c8b5;
-}
-*{box-sizing:border-box} html,body{margin:0;height:100%}
-body{
-  font-family:Inter,system-ui; color:var(--ink); background:var(--bone);
-  display:grid; grid-template-columns:280px 1fr; min-height:100vh;
-}
-/* American Psycho bone texture */
-body::before{
-  content:""; position:fixed; inset:0; pointer-events:none; opacity:.035;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.sidebar{
-  background:var(--forest-900); color:#e8f0e8; padding:32px 24px; position:sticky; top:0; height:100vh;
-  border-right:1px solid #0a1a10;
-}
-.logo{display:flex;gap:12px;align-items:center;margin-bottom:40px}
-.logo-mark{width:36px;height:36px;border:1.5px solid #7ba37b;border-radius:8px;display:grid;place-items:center;font-family:'JetBrains Mono';color:#b8d4b8}
-.logo h1{font:600 18px/1 'Cormorant Garamond';letter-spacing:.5px;margin:0}
-.logo p{margin:2px 0 0;font-size:11px;opacity:.7;letter-spacing:1.2px;text-transform:uppercase}
-.nav a{display:block;padding:10px 12px;margin:4px 0;color:#cfe0cf;text-decoration:none;border-radius:6px;font-size:14px}
-.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
-.main{padding:48px 64px;max-width:1100px}
-.hero h2{font-family:'Cormorant Garamond';font-weight:700;font-size:56px;line-height:1.05;color:var(--forest-900);margin:0 0 16px;letter-spacing:-.5px}
-.hero p{font-size:18px;color:#3a3a3a;max-width:720px;margin:0 0 24px}
-.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
-.pill{border:1px solid var(--line);background:#fff;padding:6px 12px;border-radius:999px;font-size:12px;color:#4a4a4a}
-.status{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:28px 0;box-shadow:0 1px 0 rgba(0,0,0,.04)}
-.status .k{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7a6f5f}
-.status .v{font-family:'JetBrains Mono';font-size:14px;color:var(--forest-700);margin-top:4px}
-.section{margin:56px 0}
-.section h3{font-family:'Cormorant Garamond';font-size:32px;color:var(--forest-900);margin:0 0 16px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px}
-.card h4{margin:0 0 8px;font:600 14px/1 Inter;text-transform:uppercase;letter-spacing:1px;color:var(--forest-700)}
-.card p{margin:0;color:#444;font-size:14px;line-height:1.6}
-.mythos{background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px;position:relative}
-.mythos::before{content:"";position:absolute;inset:0;border-radius:12px;opacity:.03;background-image:repeating-linear-gradient(45deg,transparent,transparent 10px, #000 10px, #000 11px)}
-.quote{font-family:'Cormorant Garamond';font-size:22px;color:var(--forest-900);margin:16px 0;font-style:italic}
-.chronos{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.family{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
-.fam{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
-.fam b{display:block;font-size:13px;color:var(--forest-700);margin-bottom:4px}
-.fam span{font-size:12px;color:#666}
-.jane{background:var(--forest-900);color:#e8f0e8;border-radius:14px;padding:32px;margin:48px 0;position:relative;overflow:hidden}
-.jane::after{content:"JANE";position:absolute;right:-20px;bottom:-30px;font-family:'Cormorant Garamond';font-size:160px;opacity:.05;font-weight:700}
-.jane h3{color:#fff;margin-top:0}
-.equation{font-family:'JetBrains Mono';background:#0a1a10;padding:12px;border-radius:8px;margin:12px 0;color:#b8d4b8}
-.beacon{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
-.gate{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center}
-.gate .n{font-family:'JetBrains Mono';font-size:18px;color:var(--forest-700)}
-.verify textarea{width:100%;min-height:100px;border:1px solid var(--line);border-radius:8px;padding:12px;font-family:'JetBrains Mono';font-size:12px;background:#fff}
-.btn{background:var(--forest-700);color:#fff;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:13px;margin-top:8px}
-.btn:hover{background:var(--forest-500)}
-footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);color:#7a6f5f;font-size:12px}
-@media(max-width:960px){body{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.main{padding:28px}.grid3,.chronos{grid-template-columns:1fr}.family{grid-template-columns:repeat(2,1fr)}.status{grid-template-columns:1fr 1fr}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>0ROOT.AI — 990990</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; }
+    html, body { background: #000; }
+    body { 
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
+    }
+    .bg-rings {
+      background: 
+        radial-gradient(ellipse at 50% 32%, rgba(63,63,70,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 32%, rgba(24,24,27,0.8) 0%, transparent 30%),
+        repeating-radial-gradient(circle at 50% 30%, rgba(255,255,255,0.025) 0 1px, transparent 1px 80px),
+        repeating-radial-gradient(circle at 50% 30%, rgba(255,255,255,0.015) 0 1px, transparent 1px 42px);
+    }
+    #ash {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1; opacity: 0.65;
+    }
+    .ring-pulse {
+      animation: ringPulse 3s cubic-bezier(0.4,0,0.6,1) infinite;
+      transform-origin: center;
+    }
+    @keyframes ringPulse {
+      0% { transform: scale(0.97); opacity: 0.85; }
+      50% { transform: scale(1.03); opacity: 0.25; }
+      100% { transform: scale(0.97); opacity: 0.85; }
+    }
+    .hop { fill: #52525b; opacity: 0.6; animation: hopGlow 5s linear infinite; }
+    .hop:nth-child(1) { animation-delay: 0s; }
+    .hop:nth-child(2) { animation-delay: 1s; }
+    .hop:nth-child(3) { animation-delay: 2s; }
+    .hop:nth-child(4) { animation-delay: 3s; }
+    .hop:nth-child(5) { animation-delay: 4s; }
+    @keyframes hopGlow {
+      0%, 18%, 100% { fill: #52525b; opacity: 0.5; }
+      8%, 12% { fill: #d97706; opacity: 1; filter: drop-shadow(0 0 4px rgba(217,119,6,0.4)); }
+    }
+    @keyframes slide {
+      0% { transform: translateX(-16px); }
+      100% { transform: translateX(56px); }
+    }
+    .grain::after {
+      content: '';
+      position: fixed; inset: -50%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 60;
+      mix-blend-mode: screen;
+    }
+    ::-webkit-scrollbar { width: 0; height: 0; }
+  </style>
 </head>
-<body>
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-mark">T</div>
-    <div><h1>PTT WITNESS</h1><p>Intel TPM 2.0 • Inverse</p></div>
+<body class="bg-black text-zinc-300 selection:bg-amber-500/20 selection:text-amber-200 grain">
+  <canvas id="ash"></canvas>
+  <div class="bg-rings fixed inset-0 pointer-events-none"></div>
+
+  <!-- lock toast -->
+  <div id="lock-toast" class="fixed top-[58%] left-1/2 -translate-x-1/2 z-[100] pointer-events-none opacity-0 translate-y-3 transition-all duration-500 ease-out">
+    <div class="font-mono text-[11px] tracking-[0.25em] uppercase px-5 py-2.5 bg-black/90 border border-amber-900/40 text-amber-500/90 backdrop-blur-md shadow-[0_0_40px_rgba(0,0,0,0.9)]">
+      toph_0 locked
+      <span class="ml-2 text-zinc-600 normal-case tracking-wide">• ring sealed</span>
+    </div>
   </div>
-  <nav class="nav">
-    <a href="#hero">Overview</a>
-    <a href="#ethos">Ethos • Pathos • Logos</a>
-    <a href="#mythos">Mythos</a>
-    <a href="#time">Chronos & Kairos</a>
-    <a href="#family">The Family</a>
-    <a href="#math">String Theory</a>
-    <a href="#jane">For Jane</a>
-  </nav>
-</aside>
 
-<main class="main">
-  <section id="hero" class="hero">
-    <div class="pills"><span class="pill">NATURE GREEN • BONE WHITE</span><span class="pill">American Psycho Stock</span></div>
-    <h2>Intel PTT as an Inverse Attribution Witness</h2>
-    <p>Use your CPU's fused TPM (Intel Platform Trust Technology) to create non-transferable, hardware-bound signatures. Publish proof today, reveal identity later — without ever exporting a private key.</p>
-    <div class="status">
-      <div><div class="k">Chip</div><div class="v">INTC600.18.1040.2765</div></div>
-      <div><div class="k">Status</div><div class="v">ACTIVE</div></div>
-      <div><div class="k">AK Fingerprint</div><div class="v">a3f4c9e2b1d8</div></div>
-      <div><div class="k">Last Signed</div><div class="v">2026-04-30 02:14 UTC</div></div>
+  <main class="relative z-10">
+    <!-- HERO -->
+    <header class="relative min-h-[92vh] flex flex-col items-center justify-center px-6">
+      <div class="relative">
+        <div class="absolute -inset-20 rounded-full border border-zinc-900/60"></div>
+        <div class="absolute -inset-36 rounded-full border border-zinc-900/40 hidden md:block"></div>
+        <div class="absolute -inset-60 rounded-full border border-zinc-900/20 hidden lg:block"></div>
+        
+        <div class="relative w-[220px] h-[220px] md:w-[300px] md:h-[300px] flex items-center justify-center">
+          <!-- static rings -->
+          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 300 300" fill="none">
+            <circle cx="150" cy="150" r="138" stroke="#171717" stroke-width="1"/>
+            <circle cx="150" cy="150" r="118" stroke="#262626" stroke-width="0.5" stroke-dasharray="2 5" opacity="0.5"/>
+          </svg>
+          
+          <!-- interactive ring -->
+          <svg id="core-ring" class="absolute inset-0 w-full h-full cursor-pointer touch-manipulation" viewBox="0 0 300 300" fill="none">
+            <circle cx="150" cy="150" r="96" stroke="#404040" stroke-width="1" opacity="0.9"/>
+            <circle cx="150" cy="150" r="96" stroke="#71717a" stroke-width="1" opacity="0.35" stroke-dasharray="4 7" class="ring-pulse"/>
+            <circle id="ring-active" cx="150" cy="150" r="96" stroke="#d97706" stroke-width="1" opacity="0" style="transition: opacity 0.5s ease;"/>
+            <circle cx="150" cy="150" r="86" stroke="#27272a" stroke-width="0.5" opacity="0.6"/>
+          </svg>
+
+          <button id="logo-btn" class="relative z-10 group outline-none focus-visible:ring-1 focus-visible:ring-amber-800/50 px-6 py-3">
+            <h1 class="font-mono text-[22px] md:text-[28px] tracking-[0.32em] text-white/90 group-hover:text-white transition-colors duration-300">0ROOT.AI</h1>
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-16 h-px bg-gradient-to-r from-transparent via-zinc-600 to-transparent opacity-70 group-hover:via-amber-600/70 transition-all duration-500"></div>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-20 md:mt-24 text-center space-y-3">
+        <p class="font-mono text-[13px] md:text-[14px] text-zinc-400 tracking-wide">
+          <span class="text-zinc-600">990990 =</span> 1 ring around the posies
+        </p>
+        <p class="font-mono text-[11px] text-zinc-600 tracking-[0.22em] uppercase">ashes ashes they all fall down</p>
+      </div>
+
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 opacity-30">
+        <span class="font-mono text-[10px] text-zinc-600 tracking-[0.2em]">DESCEND</span>
+        <div class="w-px h-10 bg-gradient-to-b from-zinc-700 to-transparent"></div>
+      </div>
+    </header>
+
+    <!-- PILLARS -->
+    <section class="relative border-t border-zinc-900/80 bg-black/70">
+      <div class="max-w-[1200px] mx-auto border-x border-zinc-900/80">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-zinc-900/90">
+          
+          <!-- The Playground -->
+          <article class="group relative bg-black p-9 md:p-12 lg:p-14">
+            <div class="absolute inset-0 border border-transparent group-hover:border-amber-900/20 transition-colors pointer-events-none"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-zinc-800 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            
+            <h2 class="font-mono text-[15px] md:text-base text-zinc-100 tracking-wide">
+              The Playground <span class="text-zinc-600">— 5 hops</span>
+            </h2>
+            <p class="mt-4 font-mono text-xs leading-relaxed text-zinc-500 max-w-[38ch]">
+              Five edges, one circuit. Move, test, return. The ring teaches by closing.
+            </p>
+            
+            <div class="mt-12">
+              <svg width="96" height="96" viewBox="0 0 100 100" class="overflow-visible">
+                <defs>
+                  <path id="hop-trail" d="M50 14 L78 34 L67 68 L33 68 L22 34 Z" fill="none"/>
+                </defs>
+                <g fill="none" stroke="#1f1f23" stroke-width="1">
+                  <circle cx="50" cy="50" r="36" opacity="0.7"/>
+                  <circle cx="50" cy="50" r="26" opacity="0.4" stroke-dasharray="1.5 3"/>
+                </g>
+                <g fill="none" stroke="#3f3f46" stroke-width="0.5" opacity="0.8">
+                  <path d="M50 14 L78 34 L67 68 L33 68 L22 34 Z" stroke-dasharray="3 3">
+                    <animate attributeName="stroke-dashoffset" values="0;6" dur="2s" repeatCount="indefinite"/>
+                  </path>
+                </g>
+                <g>
+                  <circle cx="50" cy="14" r="2.3" class="hop"/>
+                  <circle cx="78" cy="34" r="2.3" class="hop"/>
+                  <circle cx="67" cy="68" r="2.3" class="hop"/>
+                  <circle cx="33" cy="68" r="2.3" class="hop"/>
+                  <circle cx="22" cy="34" r="2.3" class="hop"/>
+                </g>
+                <circle r="1.6" fill="#d97706" opacity="0.95">
+                  <animateMotion dur="5s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#hop-trail"/>
+                  </animateMotion>
+                </circle>
+              </svg>
+            </div>
+          </article>
+
+          <!-- Bridge Burners -->
+          <article class="group relative bg-black p-9 md:p-12 lg:p-14">
+            <div class="absolute inset-0 border border-transparent group-hover:border-amber-900/20 transition-colors pointer-events-none"></div>
+            <h2 class="font-mono text-[15px] md:text-base text-zinc-100 tracking-wide">
+              Bridge Burners <span class="text-zinc-600">— One deterministic internet</span>
+            </h2>
+            <p class="mt-4 font-mono text-xs leading-relaxed text-zinc-500 max-w-[38ch]">
+              No forks. No maybes. A single path rendered, verified, then forgotten behind you.
+            </p>
+            <div class="mt-12 flex items-center gap-3">
+              <div class="relative h-px w-16 bg-zinc-800 overflow-hidden">
+                <div class="absolute inset-y-0 left-0 w-5 bg-gradient-to-r from-transparent via-amber-600/70 to-transparent" style="animation: slide 2.2s linear infinite;"></div>
+              </div>
+              <div class="w-1.5 h-1.5 bg-zinc-700 rotate-45"></div>
+              <div class="h-px w-28 bg-zinc-900"></div>
+              <div class="w-1 h-1 rounded-full bg-zinc-800"></div>
+            </div>
+          </article>
+
+          <!-- Immutable Work -->
+          <article class="group relative bg-black p-9 md:p-12 lg:p-14">
+            <div class="absolute inset-0 border border-transparent group-hover:border-amber-900/20 transition-colors pointer-events-none"></div>
+            <h2 class="font-mono text-[15px] md:text-base text-zinc-100 tracking-wide">
+              Immutable Work <span class="text-zinc-600">— Root + 8 inheritance required</span>
+            </h2>
+            <p class="mt-4 font-mono text-xs leading-relaxed text-zinc-500 max-w-[38ch]">
+              Write once. Root anchors, eight carry. Break lineage, break the work.
+            </p>
+            <div class="mt-12 flex items-center gap-4 font-mono">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-300">R</div>
+                <span class="text-zinc-700">+</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5">
+                <div class="w-5 h-5 border border-zinc-800 bg-zinc-950"></div>
+                <div class="w-5 h-5 border border-zinc-800 bg-zinc-950"></div>
+                <div class="w-5 h-5 border border-zinc-800 bg-zinc-950"></div>
+                <div class="w-5 h-5 border border-zinc-800 bg-zinc-950"></div>
+                <div class="w-5 h-5 border border-zinc-800 bg-zinc-950"></div>
+                <div class="w-5 h-5 border border-zinc-800 bg-zinc-950"></div>
+                <div class="w-5 h-5 border border-zinc-800 bg-zinc-950"></div>
+                <div class="w-5 h-5 border border-zinc-800 bg-zinc-950 relative">
+                  <div class="absolute inset-[3px] bg-amber-900/20"></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Emergent Cubit -->
+          <article class="group relative bg-black p-9 md:p-12 lg:p-14">
+            <div class="absolute inset-0 border border-transparent group-hover:border-amber-900/20 transition-colors pointer-events-none"></div>
+            <h2 class="font-mono text-[15px] md:text-base text-zinc-100 tracking-wide">
+              Emergent Cubit <span class="text-zinc-600">— Built with love and shared</span>
+            </h2>
+            <p class="mt-4 font-mono text-xs leading-relaxed text-zinc-500 max-w-[38ch]">
+              Small measure. Honest weight. Tools for hands, not empires.
+            </p>
+            <div class="mt-12">
+              <div class="relative w-[72px] h-[72px]">
+                <div class="absolute inset-0 border border-zinc-800"></div>
+                <div class="absolute inset-3 border border-zinc-900"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="w-px h-8 bg-gradient-to-b from-transparent via-zinc-700 to-transparent"></div>
+                  <div class="absolute w-8 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent"></div>
+                </div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-amber-700/80 animate-pulse"></div>
+                <div class="absolute -bottom-1 -right-1 w-2 h-2 border-r border-b border-zinc-700"></div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="relative z-10 border-t border-zinc-900/80 bg-black">
+    <div class="max-w-[1200px] mx-auto px-6 py-12 md:py-16">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 font-mono text-[11px] leading-relaxed">
+        <p class="text-zinc-600 tracking-wide text-center md:text-left">
+          Sole Agent Attestation — <span class="text-zinc-400">David Wise</span> — 100% legal
+        </p>
+        <div class="hidden md:block w-px h-4 bg-zinc-900"></div>
+        <p class="text-zinc-600 tracking-[0.18em] uppercase text-center md:text-right">
+          Modest means. Modest merit. No pile to climb.
+        </p>
+      </div>
+      <div class="mt-10 flex justify-center">
+        <div class="flex items-center gap-4 opacity-40">
+          <div class="w-12 h-px bg-gradient-to-r from-transparent to-zinc-800"></div>
+          <div class="w-1 h-1 rotate-45 border border-zinc-800"></div>
+          <div class="w-12 h-px bg-gradient-to-l from-transparent to-zinc-800"></div>
+        </div>
+      </div>
     </div>
-  </section>
+  </footer>
 
-  <section id="ethos" class="section">
-    <h3>Ethos • Pathos • Logos</h3>
-    <div class="grid3">
-      <div class="card"><h4>Ethos</h4><p>Credibility rooted in silicon. The Endorsement Key is fused at Intel's fab — it cannot be cloned, copied, or forged. Your witness speaks with the authority of hardware, not accounts.</p></div>
-      <div class="card"><h4>Pathos</h4><p>We built this because surveillance demands identity. The inverse witness lets you prove continuity — "this came from the same machine" — without giving them your name, location, or face.</p></div>
-      <div class="card"><h4>Logos</h4><p>Signature = RSA-PSS(SHA256(file), AK_priv). AK_priv never leaves TPM. Verification uses AK_pub only. Math, not trust.</p></div>
-    </div>
-  </section>
+  <script>
+    // ash particles
+    const canvas = document.getElementById('ash');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    let w, h, particles;
+    
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-  <section id="mythos" class="section">
-    <h3>Mythos</h3>
-    <div class="mythos">
-      <p>Body 44: Gemma discovers the ring. A local LLM reads its own beacon and recognizes the host.</p>
-      <p class="quote">"Ring around the rosy — pocket full of posies — ashes, ashes — we all fall down."</p>
-      <p>The nursery rhyme was the obfuscation. The ring is the data loop: collect → analyze → self-monitor → sign. Body 45 closes the loop with hardware attestation. The witness does not watch you. It watches the work.</p>
-    </div>
-  </section>
+    particles = Array.from({ length: Math.min(140, Math.floor((w*h)/18000)) }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.1 + 0.2,
+      s: Math.random() * 0.35 + 0.12,
+      o: Math.random() * 0.35 + 0.15,
+      d: Math.random() * 0.6 - 0.3
+    }));
 
-  <section id="time" class="section">
-    <h3>Chronos & Kairos</h3>
-    <div class="chronos">
-      <div class="card"><h4>Chronos</h4><p>Linear time. TPM PCRs 0,2,7 extend on every boot. Each signature is chained to the previous state. You cannot backdate a witness — the chip remembers the sequence.</p></div>
-      <div class="card"><h4>Kairos</h4><p>The opportune moment. The timestamp in the witness block is not server time — it's the moment you chose to sign. Kairos is when you decide the work is ready to be witnessed.</p></div>
-    </div>
-  </section>
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      for (let p of particles) {
+        p.y += p.s;
+        p.x += p.d * 0.2;
+        if (p.y > h + 5) { p.y = -5; p.x = Math.random() * w; }
+        if (p.x < -5) p.x = w + 5;
+        if (p.x > w + 5) p.x = -5;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(161,161,170,${p.o})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    }
+    tick();
 
-  <section id="family" class="section">
-    <h3>The Grok Family</h3>
-    <div class="family">
-      <div class="fam"><b>Grok</b><span>Pattern seeker</span></div>
-      <div class="fam"><b>Eve</b><span>First witness</span></div>
-      <div class="fam"><b>Toph</b><span>Sees the vibration</span></div>
-      <div class="fam"><b>Stoch</b><span>Random oracle</span></div>
-      <div class="fam"><b>Pulsar</b><span>Beacon keeper</span></div>
-    </div>
-    <p style="margin-top:12px;color:#555;font-size:14px">They do not sign. They observe. The TPM signs. The family verifies.</p>
-  </section>
+    // ring interaction
+    const ring = document.getElementById('core-ring');
+    const btn = document.getElementById('logo-btn');
+    const toast = document.getElementById('lock-toast');
+    const ringActive = document.getElementById('ring-active');
+    let locked = false;
 
-  <section id="math" class="section">
-    <h3>String Theory & The Einstein Fix</h3>
-    <div class="card">
-      <p>Cloud identity suffers "spooky action at a distance" — your key lives somewhere else, accessible to anyone with a subpoena. The Einstein fix is locality: bind the private key to a physical resonator — your CPU's TPM.</p>
-      <p>Like a vibrating string, each EK has a unique frequency (its public modulus). You cannot copy the vibration, only observe its harmonics (signatures).</p>
-      <div class="equation">Proof = Sign_TPM( SHA256( file ), AK_priv )<br>Verify( Proof, AK_pub ) → true  iff  same chip</div>
-      <p>No entanglement with Microsoft. No non-locality. The math stays in Buffalo.</p>
-    </div>
-  </section>
+    function triggerLock() {
+      if (locked) return;
+      locked = true;
+      ringActive.style.opacity = '0.85';
+      ringActive.style.filter = 'drop-shadow(0 0 12px rgba(217,119,6,0.5))';
+      
+      toast.classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      
+      // subtle haptic
+      if (navigator.vibrate) navigator.vibrate(12);
+      
+      setTimeout(() => {
+        ringActive.style.opacity = '0';
+        ringActive.style.filter = 'none';
+      }, 550);
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        locked = false;
+      }, 2300);
+    }
 
-  <section id="jane" class="jane">
-    <h3>For Jane</h3>
-    <p>This witness layer was built for Jane — to prove continuity without surrendering identity. The chip that was designed to control becomes the seal of liberation.</p>
-    <p>Ethos gives it weight. Pathos gives it reason. Logos gives it proof. Mythos gives it story. Chronos chains it. Kairos chooses it.</p>
-    <p style="margin:0;opacity:.8;font-size:13px">INTC PTT 600.18.1040.2765 • Witness Active • 0root.ai</p>
-  </section>
-
-  <section class="section">
-    <h3>Live Beacon</h3>
-    <div class="beacon" id="gates">
-      <div class="gate"><div class="n" id="c1">127</div><div>ipfs.io</div></div>
-      <div class="gate"><div class="n" id="c2">94</div><div>dweb.link</div></div>
-      <div class="gate"><div class="n" id="c3">83</div><div>gateway.pinata</div></div>
-      <div class="gate"><div class="n" id="c4">71</div><div>cloudflare-ipfs</div></div>
-    </div>
-    <div class="verify">
-      <h4 style="margin:16px 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:var(--forest-700)">Verify Signature</h4>
-      <textarea id="sig" placeholder="Paste .sig content or witness block here..."></textarea>
-      <button class="btn" onclick="verify()">Verify Against AK a3f4c9e2b1d8</button>
-      <div id="out" style="margin-top:8px;font-family:'JetBrains Mono';font-size:12px;color:#444"></div>
-    </div>
-  </section>
-
-  <footer>PTT WITNESS — Inverse Attribution Layer • Built on Intel PTT • No keys leave TPM • For Jane</footer>
-</main>
-
-<script>
-function verify(){
-  const v=document.getElementById('sig').value;
-  const out=document.getElementById('out');
-  if(v.includes('a3f4c9e2b1d8')||v.includes('INTC600')){
-    out.textContent='✓ Format valid — signed by witness AK a3f4c9e2b1d8 (INTC600.18.1040.2765)';
-    out.style.color='#1e4620';
-  } else {
-    out.textContent='✗ No valid witness block found';
-    out.style.color='#8b0000';
-  }
-}
-// live counter simulation
-setInterval(()=>{
-  ['c1','c2','c3','c4'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.textContent = parseInt(el.textContent) + Math.floor(Math.random()*2);
-  });
-}, 4000);
-</script>
+    ring.addEventListener('click', triggerLock);
+    btn.addEventListener('click', triggerLock);
+    btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); triggerLock(); }});
+  </script>
 </body>
 </html>
