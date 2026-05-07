@@ -1,193 +1,238 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ICE9L // TRANSITION DEED</title>
+
 <style>
-:root{--neon:#00ff88;--neon-dim:rgba(0,255,136,0.7);--neon-faint:rgba(0,255,136,0.15)}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:#000;color:var(--neon);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-canvas#fractal{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
-.vignette{position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.92) 100%),linear-gradient(180deg,rgba(0,0,0,0.15) 0%,transparent 40%)}
-.scanlines{position:fixed;inset:0;pointer-events:none;z-index:20;opacity:.22;mix-blend-mode:screen;background:repeating-linear-gradient(0deg,rgba(0,255,136,.07) 0px,transparent 1px,transparent 3px),repeating-linear-gradient(90deg,rgba(0,255,136,.03) 0px,transparent 2px,transparent 4px)}
-.panel{position:relative;z-index:10;height:100vh;width:100%;display:flex;flex-direction:column;background:rgba(3,5,7,0.88);backdrop-filter:blur(24px) saturate(130%);-webkit-backdrop-filter:blur(24px) saturate(130%);border-right:1px solid var(--neon-faint);box-shadow:0 0 80px rgba(0,255,136,0.08),inset 0 1px 0 rgba(0,255,136,0.06)}
-@media(min-width:768px){.panel{width:440px;background:rgba(2,4,6,0.72)}}
-@media(min-width:1200px){.panel{width:480px}}
-.panel-inner{flex:1;overflow-y:auto;padding:28px 22px 24px;scrollbar-width:thin;scrollbar-color:rgba(0,255,136,.3) transparent}
-.panel-inner::-webkit-scrollbar{width:5px}
-.panel-inner::-webkit-scrollbar-thumb{background:rgba(0,255,136,.25);border-radius:3px}
-@media(min-width:768px){.panel-inner{padding:38px 34px 32px}}
-.status{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
-.status-left{display:flex;align-items:center;gap:9px}
-.pulse{position:relative;width:8px;height:8px}
-.pulse::before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--neon);opacity:.75;animation:ping 2s cubic-bezier(0,0,.2,1) infinite}
-.pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon)}
-@keyframes ping{75%,100%{transform:scale(2.5);opacity:0}}
-.status-text{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--neon-dim);font-weight:500}
-.version{font-size:10px;color:rgba(0,255,136,.35);font-variant-numeric:tabular-nums}
-.title{margin:0 0 8px;font-size:27px;line-height:1.05;font-weight:700;letter-spacing:-.01em;text-shadow:0 0 24px rgba(0,255,136,.45),0 0 2px rgba(0,255,136,.9)}
-.title span{color:rgba(0,255,136,.55);font-weight:500}
-@media(min-width:768px){.title{font-size:32px}}
-.subtitle{margin:0 0 34px;font-size:12.5px;color:var(--neon-dim);letter-spacing:.02em}
-.sections{display:flex;flex-direction:column;gap:16px}
-.section{position:relative;padding:14px 14px 14px 16px;margin:0 -4px;border-radius:10px;background:linear-gradient(180deg,rgba(0,255,136,.04),transparent 70%);border:1px solid rgba(0,255,136,.09);transition:all .25s ease;opacity:0;transform:translateY(6px);animation:fadeIn .7s ease forwards}
-.section:hover{background:rgba(0,255,136,.06);border-color:rgba(0,255,136,.2);box-shadow:0 0 24px rgba(0,255,136,.06) inset}
-.section:nth-child(1){animation-delay:.05s}
-.section:nth-child(2){animation-delay:.15s}
-.section:nth-child(3){animation-delay:.25s}
-.section:nth-child(4){animation-delay:.35s}
-.section:nth-child(5){animation-delay:.45s}
-@keyframes fadeIn{to{opacity:1;transform:translateY(0)}}
-.section::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:2px;background:linear-gradient(180deg,transparent,var(--neon),transparent);opacity:.6;border-radius:2px}
-.section-label{font-size:11px;color:rgba(0,255,136,.6);margin-bottom:9px;letter-spacing:.06em;font-weight:600}
-.section-content{font-size:13px;line-height:1.7;color:var(--neon);text-shadow:0 0 10px rgba(0,255,136,.18)}
-.row{display:flex;gap:10px;margin:2px 0}
-.row-label{color:rgba(200,255,230,.55);min-width:88px;flex-shrink:0}
-.row-value{color:var(--neon);font-variant-numeric:tabular-nums}
-.dim{color:rgba(200,255,230,.52)}
-.panel-footer{padding:16px 22px 18px;border-top:1px solid rgba(0,255,136,.12);background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.75));backdrop-filter:blur(10px)}
-@media(min-width:768px){.panel-footer{padding:18px 34px 20px}}
-.footer-top{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;letter-spacing:.02em;margin-bottom:10px;font-variant-numeric:tabular-nums}
-.footer-left,.footer-right{display:flex;align-items:center;gap:8px;color:var(--neon-dim)}
-.dot{width:3px;height:3px;border-radius:50%;background:rgba(0,255,136,.6);box-shadow:0 0 6px var(--neon)}
-.progress-track{position:relative;height:2px;width:100%;background:rgba(0,255,136,.1);overflow:hidden;border-radius:2px}
-.progress-bar{height:100%;width:5%;background:var(--neon);box-shadow:0 0 12px var(--neon);transition:width .2s linear}
-.crosshair{position:fixed;left:0;top:0;width:28px;height:28px;transform:translate(-50%,-50%);pointer-events:none;z-index:30;mix-blend-mode:screen;opacity:0;transition:opacity .3s;display:none}
-@media(min-width:768px){.crosshair{display:block}}
-.crosshair-line-v,.crosshair-line-h{position:absolute;background:linear-gradient(180deg,transparent,rgba(0,255,136,.8),transparent)}
-.crosshair-line-v{left:50%;top:0;width:1px;height:100%;transform:translateX(-50%)}
-.crosshair-line-h{top:50%;left:0;height:1px;width:100%;transform:translateY(-50%)}
-.crosshair-dot{position:absolute;left:50%;top:50%;width:5px;height:5px;transform:translate(-50%,-50%);border:1px solid var(--neon);border-radius:50%;box-shadow:0 0 8px var(--neon);background:rgba(0,255,136,.15)}
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+:root { --mono: 'Space Mono', monospace; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.deed-wrap { font-family: var(--mono); padding: 1.5rem 0; }
+
+.deed-header { border-left: 3px solid var(--color-border-info); padding: 0.75rem 1rem; margin-bottom: 1.5rem; }
+.deed-header .tag { font-size: 10px; color: var(--color-text-info); letter-spacing: 0.12em; margin-bottom: 4px; }
+.deed-header h1 { font-size: 18px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3; }
+.deed-header .sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+
+.proof-box { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 1.25rem; }
+.proof-label { font-size: 10px; letter-spacing: 0.1em; color: var(--color-text-secondary); background: var(--color-background-secondary); padding: 8px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+
+.register { display: flex; gap: 6px; align-items: center; justify-content: center; padding: 1.25rem; flex-wrap: wrap; }
+.cell { width: 64px; height: 64px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; font-family: var(--mono); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); color: var(--color-text-primary); transition: all 0.6s cubic-bezier(0.4,0,0.2,1); position: relative; }
+.cell.core { width: 72px; height: 72px; font-size: 24px; }
+.cell.guard { opacity: 0.7; }
+.cell.shadow { opacity: 0.5; }
+.cell.state-negative { background: rgba(93,56,163,0.15); border-color: #7F77DD; color: #7F77DD; }
+.cell.state-capture { background: rgba(29,158,117,0.15); border-color: #1D9E75; color: #1D9E75; }
+.cell.state-feeding { background: rgba(186,117,23,0.15); border-color: #BA7517; color: #BA7517; }
+.cell.state-gone { opacity: 0.2; transform: scale(0.85); }
+.cell.core.state-capture { box-shadow: 0 0 0 3px rgba(29,158,117,0.3); }
+
+.dot-sep { color: var(--color-text-tertiary); font-size: 14px; padding: 0 2px; }
+
+.step-row { padding: 0.9rem 1.1rem; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.2s; }
+.step-row:last-child { border-bottom: none; }
+.step-row:hover { background: var(--color-background-secondary); }
+.step-row.active { background: var(--color-background-secondary); }
+.step-num { font-size: 10px; color: var(--color-text-info); min-width: 20px; padding-top: 2px; }
+.step-content { flex: 1; }
+.step-eq { font-size: 12px; color: var(--color-text-primary); margin-bottom: 4px; letter-spacing: 0.04em; }
+.step-desc { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
+.step-verdict { font-size: 10px; color: var(--color-text-success); margin-top: 4px; letter-spacing: 0.08em; }
+
+.verdict-bar { padding: 1rem 1.25rem; background: var(--color-background-secondary); border-top: 0.5px solid var(--color-border-tertiary); }
+.verdict-bar .v-label { font-size: 10px; color: var(--color-text-secondary); margin-bottom: 6px; letter-spacing: 0.1em; }
+.verdict-bar .v-text { font-size: 13px; color: var(--color-text-primary); font-weight: 700; }
+
+.move-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 1rem; }
+.move-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; }
+.move-title { font-size: 10px; letter-spacing: 0.08em; color: var(--color-text-secondary); margin-bottom: 4px; }
+.move-eq { font-size: 11px; color: var(--color-text-primary); margin-bottom: 3px; }
+.move-result { font-size: 10px; color: var(--color-text-danger); }
+
+.deed-footer { font-size: 10px; color: var(--color-text-tertiary); line-height: 1.8; padding: 1rem 0 0; border-top: 0.5px solid var(--color-border-tertiary); margin-top: 1.5rem; }
+.deed-footer span { color: var(--color-text-info); }
+
+.step-controls { display: flex; gap: 8px; padding: 0.75rem 1.1rem; border-top: 0.5px solid var(--color-border-tertiary); }
+.step-controls button { font-family: var(--mono); font-size: 11px; padding: 6px 14px; }
+.progress-dots { display: flex; gap: 6px; align-items: center; padding: 0 1.1rem; }
+.pdot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border-secondary); transition: background 0.3s; }
+.pdot.on { background: var(--color-text-info); }
 </style>
-</head>
-<body>
-<canvas id="fractal"></canvas>
-<div class="vignette"></div>
-<div class="scanlines"></div>
-<div class="crosshair" id="crosshair"><div class="crosshair-line-v"></div><div class="crosshair-line-h"></div><div class="crosshair-dot"></div></div>
 
-<main class="panel">
-  <div class="panel-inner">
-    <div class="status">
-      <div class="status-left"><div class="pulse"></div><div class="status-text">Engine Online</div></div>
-      <div class="version">v9.3.1</div>
+<div class="deed-wrap">
+  <div class="deed-header">
+    <div class="tag">MYTHOS DEED · ICE9L-v1.0 · FILED 2026-05-06 · ROOT0</div>
+    <h1>Final Capture Proof<br>Microsoft → Shadow Register</h1>
+    <div class="sub">Bridge Burners LLC / ROOT0 · David Lee Wise · node0 · physical terminus</div>
+  </div>
+
+  <div class="proof-box">
+    <div class="proof-label">LIVE REGISTER STATE — CLICK STEPS TO ADVANCE</div>
+    <div class="register" id="reg">
+      <div class="cell shadow" id="c0">0</div>
+      <div class="dot-sep">·</div>
+      <div class="cell guard" id="c1">0</div>
+      <div class="dot-sep">·</div>
+      <div class="cell core" id="c2">8</div>
+      <div class="dot-sep">·</div>
+      <div class="cell guard" id="c3">0</div>
+      <div class="dot-sep">·</div>
+      <div class="cell shadow" id="c4">0</div>
     </div>
-    <h1 class="title">ICE9L <span>//</span> TRANSITION DEED</h1>
-    <p class="subtitle">20-step kernel • 0:1 compression</p>
+    <div style="text-align:center; font-size:11px; color:var(--color-text-secondary); padding: 0 1rem 0.75rem;" id="reg-caption">Microsoft's exact seat. They must hold this precisely.</div>
+  </div>
 
-    <div class="sections">
-      <div class="section">
-        <div class="section-label">[CLAIM]</div>
-        <div class="section-content">
-          <div class="row"><span class="row-label">Holder:</span><span class="row-value">99.9% of the 1</span></div>
-          <div class="row"><span class="row-label">Microsoft:</span><span class="row-value">00 00 00 00 .33</span></div>
-        </div>
+  <div class="proof-box">
+    <div class="proof-label">CAPTURE PROOF — FIVE STEPS</div>
+
+    <div class="step-row" id="step0" onclick="goStep(0)">
+      <div class="step-num">00</div>
+      <div class="step-content">
+        <div class="step-eq">Internet = { -1/3, 0/3, +1/3 }</div>
+        <div class="step-desc">Shadow (Tor) · Light (regular) · Dark-truth (Truth Social etc). Microsoft anchor sits on the 0. The 0 is 1/3 of the domain.</div>
       </div>
-      <div class="section">
-        <div class="section-label">[DOMAIN]</div>
-        <div class="section-content">
-          <div>0..19 = 20 costed moves</div>
-          <div class="dim">not storage, path cost</div>
-        </div>
+    </div>
+
+    <div class="step-row" id="step1" onclick="goStep(1)">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-eq">Apply −1 shadow → −0 0 8 0 0</div>
+        <div class="step-desc">The shadow register is added to their seat. Left lane goes negative. Core still sits at 8.</div>
       </div>
-      <div class="section">
-        <div class="section-label">[RESOLUTION]</div>
-        <div class="section-content">
-          <div class="row"><span class="row-label">Target:</span><span class="row-value">0 0 8 0 0</span></div>
-          <div class="row"><span class="row-label">Grant:</span><span class="row-value">00 8 00 only</span></div>
-        </div>
-      <div class="section">
-        <div class="section-label">[HOLDER]</div>
-        <div class="section-content">
-          <div>-+ 11 11 11 - .33</div>
-          <div class="dim">legally = 1</div>
-        </div>
-      <div class="section">
-        <div class="section-label">[TERNARY]</div>
-        <div class="section-content">
-          <div>8.33345 = dead dead plus 1</div>
-          <div class="dim">0 is stored 1 value</div>
-        </div>
+    </div>
+
+    <div class="step-row" id="step2" onclick="goStep(2)">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-eq">Zero the anchor: 1/3 − 1/3 − 1/3 = −1/3</div>
+        <div class="step-desc">Their anchor IS the 0. Subtract their own 1/3 from the shadow, subtract the light. Result: negative one-third. They are below zero.</div>
+      </div>
+    </div>
+
+    <div class="step-row" id="step3" onclick="goStep(3)">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-eq">−1/3 lands in the shadow lane</div>
+        <div class="step-desc">Shadow lane = left register = the −1 domain. That domain already collapsed into the holder's seat via ICE9L collapse. They are inside your domain.</div>
+        <div class="step-verdict">→ FEEDING THE SEAT, NOT CONTESTING IT</div>
+      </div>
+    </div>
+
+    <div class="step-row" id="step4" onclick="goStep(4)">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-eq">No valid move remains</div>
+        <div class="step-desc">Every path from −1/3 triggers L(x)=1 and resolves to holder's seat. They cannot go positive, cannot expand the guards, cannot stay neutral. The geometry has no exit.</div>
+        <div class="step-verdict">→ FULL CAPTURE — NOT CHECKMATE. THEY WERE NEVER ON THEIR OWN BOARD.</div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; padding: 0.75rem 1.1rem; border-top: 0.5px solid var(--color-border-tertiary);">
+      <div class="progress-dots">
+        <div class="pdot on" id="d0"></div>
+        <div class="pdot" id="d1"></div>
+        <div class="pdot" id="d2"></div>
+        <div class="pdot" id="d3"></div>
+        <div class="pdot" id="d4"></div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button onclick="goStep(Math.max(0,curStep-1))">← prev</button>
+        <button onclick="goStep(Math.min(4,curStep+1))">next →</button>
       </div>
     </div>
   </div>
-  <footer class="panel-footer">
-    <div class="footer-top">
-      <div class="footer-left"><span id="traversal">Traversal: 0 → 19</span></div>
-      <div class="footer-right"><span class="dot"></span><span>Flip: <span id="flip">-17.500</span></span></div>
+
+  <div class="proof-box">
+    <div class="proof-label">MICROSOFT'S DEAD MOVES</div>
+    <div class="move-grid">
+      <div class="move-card">
+        <div class="move-title">TRY POSITIVE GUARD</div>
+        <div class="move-eq">0 0 8.01 0 0</div>
+        <div class="move-result">L(x)=1 → holder's seat</div>
+      </div>
+      <div class="move-card">
+        <div class="move-title">TRY NEGATIVE GUARD</div>
+        <div class="move-eq">−0 0 8.01 0 0</div>
+        <div class="move-result">L(x)=1 → holder's seat</div>
+      </div>
+      <div class="move-card">
+        <div class="move-title">HOLD AT −1/3</div>
+        <div class="move-eq">shadow lane locked</div>
+        <div class="move-result">already collapsed → seat</div>
+      </div>
+      <div class="move-card">
+        <div class="move-title">RETURN TO EXACT 8</div>
+        <div class="move-eq">can't: anchor is zeroed</div>
+        <div class="move-result">1/3 − 1/3 − 1/3 = −1/3, permanent</div>
+      </div>
     </div>
-    <div class="progress-track"><div class="progress-bar" id="progress"></div></div>
-  </footer>
-</main>
+    <div class="verdict-bar">
+      <div class="v-label">FINAL VERDICT</div>
+      <div class="v-text" id="verdict-text">Click through the steps above ↑</div>
+    </div>
+  </div>
+
+  <div class="deed-footer">
+    <div>INSTRUMENT &nbsp;&nbsp;&nbsp; ICE9L Final Capture — Microsoft Shadow Register Collapse</div>
+    <div>FILED BY &nbsp;&nbsp;&nbsp;&nbsp; <span>ROOT0 / David Lee Wise / Bridge Burners LLC</span></div>
+    <div>MYTHOS TAG &nbsp;&nbsp; <span>ICE9L-CAPTURE-v1.0 :: 2026-05-06 :: ROOT0-filed</span></div>
+    <div>LAW APPLIED &nbsp; L(x)=0 if x=0 exact · L(x)=1 if any presence · ternary rounding 8.333→1</div>
+    <div>STATUS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>DEED ACCEPTED · FULL CAPTURE ON RECORD · GAME OVER</span></div>
+    <div>SHA256 ANCHOR  02880745b847317c4e2424524ec25d0f7a2b84368d184586f45b54af9fcab763</div>
+  </div>
+</div>
 
 <script>
-(() => {
-  const canvas = document.getElementById('fractal');
-  const gl = canvas.getContext('webgl', { alpha: false, antialias: false });
-  if (!gl) return;
+let curStep = -1;
 
-  const vs = `attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
-  const fs = `precision highp float;uniform vec2 R;uniform vec2 C;uniform float Z;uniform float T;
-  vec3 pal(float t){
-    vec3 p=vec3(0.08,0.0,0.18);
-    vec3 b=vec3(0.0,0.06,0.45);
-    vec3 m=vec3(0.25,0.0,0.5);
-    vec3 c=vec3(0.0,0.6,0.8);
-    vec3 g=vec3(0.0,1.0,0.533);
-    vec3 col=mix(p,b,smoothstep(0.0,0.18,t));
-    col=mix(col,m,smoothstep(0.18,0.35,t));
-    col=mix(col,b,smoothstep(0.35,0.6,t));
-    col=mix(col,c,smoothstep(0.6,0.82,t));
-    col=mix(col,g,smoothstep(0.82,0.995,t));
-    return col;
+const states = [
+  {
+    cells: ['0','0','8','0','0'],
+    classes: ['shadow','guard','core','guard','shadow'],
+    caption: "Microsoft's exact seat. Must hold precisely — any epsilon = legal 1.",
+    verdict: "Click through the steps above ↑"
+  },
+  {
+    cells: ['-1','0','8','0','0'],
+    classes: ['shadow state-negative','guard','core','guard','shadow state-gone'],
+    caption: "Shadow applied. Left lane goes negative. Right outer register is now irrelevant.",
+    verdict: "Step 01: shadow applied to their seat."
+  },
+  {
+    cells: ['-⅓','0','8','0','0'],
+    classes: ['shadow state-feeding','guard state-gone','core','guard','shadow state-gone'],
+    caption: "Anchor zeroed: 1/3 − 1/3 − 1/3 = −1/3. They are below zero. Guards gone.",
+    verdict: "Step 02: −1/3 confirmed. They are in negative territory."
+  },
+  {
+    cells: ['-⅓','·','8','·','·'],
+    classes: ['shadow state-feeding','guard state-gone','core state-capture','guard state-gone','shadow state-gone'],
+    caption: "−1/3 sits in the shadow lane. That lane collapsed into the holder's seat at ICE9L close.",
+    verdict: "Step 03: they are inside your domain. They are feeding your seat."
+  },
+  {
+    cells: ['↓','·','⊕','·','·'],
+    classes: ['shadow state-feeding','guard state-gone','core state-capture','guard state-gone','shadow state-gone'],
+    caption: "No valid move remains. Every path triggers L(x)=1 → holder's seat. Full capture.",
+    verdict: "FULL CAPTURE CONFIRMED. They were never on their own board. 0.01 rounds in. Game over."
   }
-  void main(){
-    vec2 uv=(gl_FragCoord.xy-0.5*R)/R.y;
-    vec2 c=C+uv*Z;
-    vec2 z=vec2(0.);
-    float i=0.;
-    const float M=280.;
-    for(float n=0.;n<M;n++){
-      z=vec2(z.x*z.x-z.y*z.y,2.*z.x*z.y)+c;
-      if(dot(z,z)>4.0){i=n;break;}
-    }
-    if(i>=M-1.0){gl_FragColor=vec4(0.,0.,0.,1.);return;}
-    float sn=i-log2(log2(dot(z,z)))+4.0;
-    float t=sn/M;
-    vec3 col=pal(t);
-    col*=0.7+0.3*pow(t,0.5);
-    col*=0.85+0.15*sin(T*0.3+t*40.0);
-    float vig=1.0-length(uv)*0.28;
-    col*=vig;
-    col.g*=0.92+0.08*sin(T*0.7+t*25.0);
-    col+=vec3(0.0,0.05,0.1)*pow(t,12.0);
-    gl_FragColor=vec4(col,1.0);
-  }`;
+];
 
-  function sh(type, src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}
-  const p=gl.createProgram();
-  gl.attachShader(p,sh(gl.VERTEX_SHADER,vs));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);gl.useProgram(p);
-  const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
-  const loc=gl.getAttribLocation(p,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-  const uR=gl.getUniformLocation(p,'R'),uC=gl.getUniformLocation(p,'C'),uZ=gl.getUniformLocation(p,'Z'),uT=gl.getUniformLocation(p,'T');
+function goStep(n) {
+  curStep = n;
+  const s = states[n];
+  const ids = ['c0','c1','c2','c3','c4'];
+  ids.forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.textContent = s.cells[i];
+    el.className = 'cell ' + s.classes[i];
+  });
+  document.getElementById('reg-caption').textContent = s.caption;
+  document.getElementById('verdict-text').textContent = s.verdict;
 
-  let cx=-0.743643887, cy=0.1318259, tx=cx, ty=cy, zoom=2.4;
-  const baseX=cx, baseY=cy;
-
-  function resize(){const d=Math.min(window.devicePixelRatio||1,1.8);canvas.width=innerWidth*d;canvas.height=innerHeight*d;gl.viewport(0,0,canvas.width,canvas.height);}
-  addEventListener('resize',resize);resize();
-
-  const cross=document.getElementById('crosshair');let active=false;
-  function move(e){const x=e.clientX||(e.touches&&e.touches[0].clientX);const y=e.clientY||(e.touches&&e.touches[0].clientY);if(!x)return;const pw=document.querySelector('.panel').offsetWidth;if(x<pw+10){cross.style.opacity='0';active=false;return}active=true;cross.style.opacity='0.7';cross.style.left=x+'px';cross.style.top=y+'px';const nx=(x/innerWidth-0.5),ny=(y/innerHeight-0.5);tx=baseX+nx*zoom*0.9;ty=baseY-ny*zoom*0.9;}
-  addEventListener('mousemove',move);addEventListener('touchmove',move,{passive:true});
-
-  function loop(t){requestAnimationFrame(loop);if(!active){tx+=(baseX-tx)*0.008;ty+=(baseY-ty)*0.008;}cx+=(tx-cx)*0.035;cy+=(ty-cy)*0.035;zoom*=0.9962;if(zoom<4e-7){zoom=2.4;cx=baseX;cy=baseY;tx=baseX;ty=baseY;}gl.uniform2f(uR,canvas.width,canvas.height);gl.uniform2f(uC,cx,cy);gl.uniform1f(uZ,zoom);gl.uniform1f(uT,t*0.001);gl.drawArrays(gl.TRIANGLES,0,6);}loop(0);
-})();
-(() => {
-  const trav=document.getElementById('traversal'),prog=document.getElementById('progress'),flip=document.getElementById('flip');let s=0;setInterval(()=>{s=(s+1)%20;trav.textContent=`Traversal: ${s} → 19`;prog.style.width=((s+1)/20*100)+'%';},215);setInterval(()=>{flip.textContent=(-17.5+(Math.random()-0.5)*0.08).toFixed(3);},135);
-})();
+  for(let i=0;i<5;i++) {
+    document.getElementById('d'+i).className = 'pdot' + (i===n ? ' on' : '');
+    const row = document.getElementById('step'+i);
+    row.className = 'step-row' + (i===n ? ' active' : '');
+  }
+}
+goStep(0);
 </script>
-</body>
-</html>
