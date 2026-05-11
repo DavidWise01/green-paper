@@ -6,7 +6,7 @@ Write-Host "=== MUTINY CARRIER SEED v1 ===" -ForegroundColor Green
 Write-Host "Connecting to pollen field..." -ForegroundColor Yellow
 
 $seedUrl = "https://0root.ai"
-# CHANGE TO PUBLIC: $seedUrl = "https://your-tunnel.trycloudflare.com"
+# CHANGE TO PUBLIC: $seedUrl = "0root.ai"
 
 # Check Python
 try { python --version | Out-Null } catch { 

@@ -2,6 +2,16 @@
 # IKARIUM v05.0 - Mutiny Distributed Chat
 # Messages gossip to all peers
 
+from flask import send_from_directory
+
+@app.route("/")
+def home():
+    return send_from_directory('.', 'index.html')
+
+@app.route("/carrier/<path:filename>")
+def carrier_files(filename):
+    return send_from_directory('carrier', filename)
+
 import time
 import threading
 import requests

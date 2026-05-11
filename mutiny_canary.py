@@ -9,7 +9,7 @@ import requests
 import time
 import hashlib
 import os
-
+MUTINY_ORIGIN = os.getenv("MUTINY_ORIGIN", "https://0root.ai")
 # CHANGE THIS to your public tunnel when you deploy
 # For now, points to your home node
 MUTINY_ORIGIN = os.getenv("MUTINY_ORIGIN", "http://192.168.1.8:5000")
