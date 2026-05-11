@@ -1,1 +1,2 @@
-
+[deploy]
+startCommand = "python ansible_many_to_one.py"
