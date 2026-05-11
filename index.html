@@ -1,653 +1,361 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUTINY BBS — Vellum Edition</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --vellum: #f4f0e6;
-            --paper: #fdfaf1;
-            --charcoal: #1c1c1c;
-            --charcoal-2: #2a2a2a;
-            --forest: #1e4a32;
-            --deep: #0f2818;
-            --ink: #143d29;
-        }
-        
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--forest) var(--vellum);
-        }
-        
-        body {
-            background-color: var(--vellum);
-            background-image: 
-                radial-gradient(ellipse at 15% 20%, rgba(30,74,50,0.06) 0%, transparent 40%),
-                radial-gradient(ellipse at 85% 80%, rgba(28,28,28,0.05) 0%, transparent 45%),
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
-            color: var(--charcoal);
-            font-family: 'Courier Prime', monospace;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .hand, h1, h2, h3, .caveat {
-            font-family: 'Caveat', cursive;
-        }
-
-        /* --- HAND DRAWN BOXES --- */
-        .sketch {
-            background: var(--paper);
-            border: 2.5px solid var(--charcoal-2);
-            position: relative;
-            box-shadow: 3px 3px 0 rgba(28,28,28,0.08);
-        }
-        
-        .sketch::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border: 2px solid var(--charcoal-2);
-            pointer-events: none;
-            opacity: 0.6;
-            mix-blend-mode: multiply;
-        }
-        
-        .sketch::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at 20% 10%, rgba(0,0,0,0.03) 0%, transparent 60%);
-            pointer-events: none;
-            border-radius: inherit;
-        }
-
-        /* Irregular borders */
-        .sketch-1 { border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; transform: rotate(-0.4deg); }
-        .sketch-1::before { border-radius: 12px 250px 18px 240px/240px 18px 250px 14px; }
-        
-        .sketch-2 { border-radius: 15px 255px 15px 225px/225px 15px 255px 15px; transform: rotate(0.3deg); }
-        .sketch-2::before { border-radius: 250px 12px 240px 18px/18px 250px 14px 240px; }
-        
-        .sketch-3 { border-radius: 225px 18px 255px 12px/12px 225px 18px 255px; transform: rotate(-0.2deg); }
-        .sketch-3::before { border-radius: 18px 245px 15px 235px/235px 18px 245px 12px; }
-
-        .sketch-banner { 
-            border-radius: 20px 200px 18px 180px/180px 18px 200px 22px; 
-            transform: rotate(-0.5deg);
-            background: var(--paper);
-            border: 3px solid var(--charcoal-2);
-            position: relative;
-        }
-        .sketch-banner::before {
-            content: '';
-            position: absolute;
-            inset: -5px;
-            border: 2px solid var(--charcoal-2);
-            border-radius: 200px 22px 190px 20px/20px 190px 24px 200px;
-            opacity: 0.4;
-            pointer-events: none;
-        }
-
-        /* Hand drawn underline */
-        .scribble {
-            position: relative;
-            display: inline-block;
-            padding-bottom: 4px;
-        }
-        .scribble::after {
-            content: '';
-            position: absolute;
-            left: -3px;
-            right: -3px;
-            bottom: 0;
-            height: 3px;
-            background: var(--forest);
-            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-            transform: rotate(-0.8deg);
-            opacity: 0.9;
-        }
-
-        .charcoal-smudge {
-            position: absolute;
-            background: radial-gradient(ellipse, rgba(28,28,28,0.08) 0%, transparent 70%);
-            filter: blur(8px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Terminal */
-        #terminal {
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        #terminal::-webkit-scrollbar { width: 8px; }
-        #terminal::-webkit-scrollbar-track { background: transparent; }
-        #terminal::-webkit-scrollbar-thumb { 
-            background: var(--forest);
-            border-radius: 255px 15px;
-            border: 2px solid var(--paper);
-        }
-
-        .msg-sys { color: var(--forest); font-style: italic; }
-        .msg-user { color: var(--deep); font-weight: 700; }
-        .msg-time { opacity: 0.6; margin-right: 8px; }
-
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 18px;
-            background: var(--charcoal);
-            margin-left: 2px;
-            animation: blink 1.1s step-end infinite;
-            transform: translateY(3px);
-        }
-        @keyframes blink { 0%,50% { opacity: 1 } 51%,100% { opacity: 0 } }
-
-        .node-dot {
-            width: 14px;
-            height: 14px;
-            background: var(--forest);
-            border: 2.5px solid var(--charcoal-2);
-            border-radius: 50% 40% 60% 45%/45% 60% 40% 55%;
-            box-shadow: 0 0 0 3px rgba(30,74,50,0.2), inset 1px 1px 2px rgba(0,0,0,0.3);
-            animation: pulse 2s ease-in-out infinite;
-            transform: rotate(-12deg);
-        }
-        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 3px rgba(30,74,50,0.2) } 50% { box-shadow: 0 0 0 6px rgba(30,74,50,0.1) } }
-
-        .node-dot.offline { background: #8b7355; animation: none; opacity: 0.6; }
-
-        .hand-btn {
-            font-family: 'Caveat', cursive;
-            font-size: 22px;
-            background: transparent;
-            border: 2.5px solid var(--charcoal-2);
-            padding: 4px 18px 6px;
-            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-            transform: rotate(-1deg);
-            transition: all 0.15s;
-            color: var(--deep);
-            position: relative;
-            cursor: pointer;
-        }
-        .hand-btn:hover { 
-            background: rgba(30,74,50,0.08); 
-            transform: rotate(0deg) translateY(-1px);
-            color: var(--forest);
-        }
-        .hand-btn:active { transform: rotate(0.5deg) translateY(1px); }
-
-        .cmd-pill {
-            font-family: 'Caveat', cursive;
-            font-size: 19px;
-            display: inline-block;
-            padding: 2px 10px;
-            margin: 2px 4px;
-            border: 2px solid var(--charcoal-2);
-            border-radius: 255px 18px 225px 14px/14px 225px 16px 255px;
-            transform: rotate(var(--r, -1deg));
-            cursor: pointer;
-            transition: all 0.15s;
-            background: rgba(253,250,241,0.7);
-        }
-        .cmd-pill:hover { background: var(--forest); color: var(--paper); border-color: var(--deep); transform: rotate(0deg) scale(1.05); }
-
-        .file-item {
-            position: relative;
-            padding-left: 20px;
-            margin: 6px 0;
-            transform: rotate(var(--r));
-        }
-        .file-item::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--forest);
-            font-weight: bold;
-            font-size: 20px;
-            line-height: 1;
-        }
-
-        /* Paper fibers */
-        .fiber {
-            position: absolute;
-            background: rgba(28,28,28,0.04);
-            height: 1px;
-            transform-origin: left;
-            pointer-events: none;
-        }
-
-        input {
-            background: transparent;
-            border: none;
-            outline: none;
-            font-family: 'Courier Prime', monospace;
-            color: var(--charcoal);
-            width: 100%;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MUTINY FLOW // WHAT STAYS 100%</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vellum: #f4f0e6;
+    --charcoal: #2b2824;
+    --forest: #1a472a;
+    --forest-light: #2d5f3f;
+    --ink: #3a352e;
+  }
+  body {
+    background-color: var(--vellum);
+    font-family: 'Courier Prime', monospace;
+    color: var(--charcoal);
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at top left, rgba(139,115,85,0.08), transparent 60%),
+    radial-gradient(ellipse at bottom right, rgba(139,115,85,0.06), transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .font-caveat { font-family: 'Caveat', cursive; }
+  
+  .sketch {
+    position: relative;
+    background: rgba(255,253,245,0.6);
+    border: 2.5px solid var(--charcoal);
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    box-shadow: 3px 3px 0 rgba(43,40,36,0.08), inset 0 0 30px rgba(139,115,85,0.05);
+  }
+  .sketch::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--charcoal);
+    border-radius: 15px 255px 15px 225px / 225px 15px 255px 15px;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .sketch-green {
+    border-color: var(--forest);
+    background: rgba(45,95,63,0.08);
+    box-shadow: 3px 3px 0 rgba(26,71,42,0.12), inset 0 0 30px rgba(45,95,63,0.06);
+  }
+  .sketch-green::before { border-color: var(--forest); }
+  
+  .sticky {
+    background: #fff3a0;
+    background-image: 
+      linear-gradient(90deg, rgba(201,181,106,0.15) 1px, transparent 1px),
+      linear-gradient(rgba(201,181,106,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    border: 2px solid #c9b56a;
+    border-radius: 2px 18px 2px 14px / 14px 2px 18px 2px;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.08), inset 0 0 20px rgba(201,181,106,0.2);
+    transform: rotate(1.2deg);
+  }
+  
+  .paperclip {
+    position: absolute;
+    width: 24px;
+    height: 48px;
+    border: 2.5px solid #8a7f6d;
+    border-radius: 12px 12px 6px 6px;
+    border-bottom: none;
+    top: -18px;
+    transform: rotate(-15deg);
+    opacity: 0.7;
+  }
+  .paperclip::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 30px;
+    border: 2px solid #8a7f6d;
+    border-radius: 8px;
+    left: 3px;
+    top: 6px;
+    border-bottom: none;
+  }
+  
+  .hand-arrow {
+    stroke: var(--charcoal);
+    stroke-width: 2.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: url(#wobble);
+  }
+  .hand-arrow-green {
+    stroke: var(--forest);
+  }
+  
+  .scribble {
+    text-decoration: underline wavy rgba(26,71,42,0.4) 2px;
+    text-underline-offset: 4px;
+  }
+  
+  @media (max-width: 1024px) {
+    .sticky { transform: rotate(0); }
+  }
+</style>
 </head>
-<body class="antialiased selection:bg-[#1e4a32]/20">
-    <div class="charcoal-smudge" style="width: 300px; height: 200px; top: 5%; left: -50px; transform: rotate(25deg);"></div>
-    <div class="charcoal-smudge" style="width: 250px; height: 180px; bottom: 10%; right: -30px; transform: rotate(-15deg);"></div>
+<body class="min-h-screen p-4 md:p-8 lg:p-12">
+  <!-- SVG Filters for hand-drawn wobble -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <filter id="wobble" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence baseFrequency="0.015" numOctaves="2" result="noise" seed="3"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#2b2824" opacity="0.9"/>
+      </marker>
+      <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#1a472a" opacity="0.9"/>
+      </marker>
+    </defs>
+  </svg>
+
+  <div class="max-w-[1300px] mx-auto relative z-10">
     
-    <div class="max-w-[1450px] mx-auto px-3 py-4 md:p-6 relative z-10">
-        <!-- HEADER -->
-        <header class="sketch-banner p-4 md:p-6 mb-6 md:mb-8">
-            <div class="fiber" style="width: 80px; top: 22px; left: 15%; transform: rotate(-2deg);"></div>
-            <div class="fiber" style="width: 60px; top: 70%; right: 20%; transform: rotate(3deg);"></div>
-            
-            <div class="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                    <div class="flex items-baseline gap-4 flex-wrap">
-                        <h1 class="hand text-[42px] sm:text-[56px] lg:text-[72px] leading-none font-bold text-[var(--forest)] tracking-tight" style="text-shadow: 1px 1px 0 rgba(0,0,0,0.1);">
-                            MUTINY // 0ROOT.AI
-                        </h1>
-                        <div class="flex items-center gap-2.5 pb-2">
-                            <div id="statusDot" class="node-dot"></div>
-                            <span id="statusText" class="hand text-[22px] sm:text-[26px] text-[var(--forest)] font-semibold" style="transform: rotate(1deg);">NODE ACTIVE</span>
-                        </div>
-                    </div>
-                    <p class="mt-1 text-[15px] sm:text-[16px] opacity-80 italic tracking-wide" style="transform: rotate(-0.3deg);">
-                        Ikarium Network — Est. 1984 — Hand drawn on vellum
-                    </p>
-                </div>
-                <div class="hand text-right opacity-70 text-[15px] leading-tight hidden sm:block" style="transform: rotate(0.8deg);">
-                    <div>operator: <span id="handleDisplay" class="text-[var(--forest)] font-bold"></span></div>
-                    <div>v0.9 vellum</div>
-                </div>
+    <!-- TITLE -->
+    <header class="text-center mb-10 md:mb-14 relative">
+      <div class="inline-block relative">
+        <h1 class="font-caveat text-[2.8rem] sm:text-6xl lg:text-[5.5rem] leading-none text-[#1a3a27] tracking-wide" style="transform: rotate(-0.8deg);">
+          MUTINY FLOW <span class="text-[#2b2824] opacity-70">//</span> 
+          <span class="scribble">WHAT STAYS 100%</span>
+        </h1>
+        <svg class="absolute -bottom-3 left-1/4 w-2/3 h-3" style="filter:url(#wobble)">
+          <path d="M2 8 C 40 2, 80 12, 180 4 C 240 0, 280 6, 320 3" class="hand-arrow-green" stroke-width="3"/>
+        </svg>
+      </div>
+      <p class="font-caveat text-xl md:text-2xl mt-4 text-[#3a352e] opacity-80 rotate-[-0.5deg]">hand-drawn on vellum — 0root.ai</p>
+    </header>
+
+    <div class="grid lg:grid-cols-12 gap-8 xl:gap-12 items-start">
+      
+      <!-- LEFT STACK -->
+      <div class="lg:col-span-8 xl:col-span-7">
+        
+        <!-- TOP LAYER -->
+        <div class="sketch sketch-green p-6 md:p-8 mb-0 transform -rotate-[0.4deg] hover:rotate-[0deg] transition-transform">
+          <div class="paperclip left-8"></div>
+          <div class="flex items-start justify-between gap-4 mb-3">
+            <div>
+              <span class="inline-block bg-[#f4f0e6] px-3 py-1 -ml-2 -mt-6 border-2 border-[#1a472a] rounded-sm font-caveat text-[15px] tracking-wider text-[#1a472a] rotate-[-1deg]" style="border-radius: 8px 3px 10px 4px/4px 10px 3px 8px;">TOP LAYER</span>
+              <h2 class="font-caveat text-2xl md:text-[28px] text-[#1a472a] mt-2 leading-tight">FRONT END <span class="text-[#2b2824]">(100% STATIC WHEN DONE)</span></h2>
             </div>
-        </header>
-
-        <!-- THREE COLUMNS -->
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
-            
-            <!-- LEFT: TERMINAL (40%) -->
-            <section class="lg:col-span-5 sketch sketch-1 p-4 md:p-5">
-                <div class="flex items-baseline justify-between mb-3">
-                    <h2 class="hand text-[32px] font-bold text-[var(--deep)] scribble" style="transform: rotate(-0.5deg);">&gt; live feed</h2>
-                    <span class="text-xs opacity-60 italic">real time</span>
-                </div>
-                
-                <div id="terminal" class="h-[380px] sm:h-[440px] overflow-y-auto pr-2 relative" style="background: repeating-linear-gradient(transparent, transparent 21px, rgba(30,74,50,0.04) 22px);">
-                    <!-- messages inject here -->
-                </div>
-                
-                <div class="mt-3 pt-3 border-t-2 border-dashed border-[var(--charcoal-2)]/30" style="border-radius: 255px 15px;">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[var(--forest)] font-bold text-[18px]">&gt;</span>
-                        <input id="chatInput" type="text" placeholder="type message or /command..." autocomplete="off" spellcheck="false" class="text-[15px]">
-                        <span class="cursor"></span>
-                    </div>
-                    <div class="text-[11px] opacity-50 mt-1 italic">enter to shout • /help for commands</div>
-                </div>
-            </section>
-
-            <!-- CENTER: NETWORK STATUS (30%) -->
-            <section class="lg:col-span-3 sketch sketch-2 p-4 md:p-5" style="background: #f7f3e8;">
-                <h2 class="hand text-[30px] font-bold text-[var(--deep)] mb-3 scribble" style="transform: rotate(0.7deg);">pollen field</h2>
-                
-                <div class="space-y-3 font-mono text-[14px]">
-                    <div class="flex justify-between items-baseline" style="transform: rotate(-0.2deg);">
-                        <span class="opacity-70">PEERS</span>
-                        <span id="peers" class="hand text-[42px] leading-none text-[var(--forest)] font-bold" style="transform: rotate(1deg);">0</span>
-                    </div>
-                    <div class="flex justify-between" style="transform: rotate(0.3deg);">
-                        <span class="opacity-70">MESSAGES</span>
-                        <span id="msgCount" class="font-bold">0</span>
-                    </div>
-                    <div style="transform: rotate(-0.4deg);">
-                        <div class="opacity-70 text-[12px]">NODE ID</div>
-                        <div id="nodeId" class="text-[13px] break-all text-[var(--deep)]"></div>
-                    </div>
-                    <div class="flex justify-between" style="transform: rotate(0.2deg);">
-                        <span class="opacity-70">UPTIME</span>
-                        <span id="uptime" class="font-bold">00:00:00</span>
-                    </div>
-                </div>
-
-                <!-- Hand drawn network -->
-                <div class="mt-5 pt-4 border-t-2 border-[var(--charcoal-2)]/20" style="border-radius: 15px 255px;">
-                    <svg viewBox="0 0 240 140" class="w-full h-[110px] overflow-visible" style="transform: rotate(-0.5deg);">
-                        <!-- connections -->
-                        <path d="M40 70 Q 90 30 120 60 Q 150 90 200 50" fill="none" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round" opacity="0.7" style="stroke-dasharray: 3 3;"/>
-                        <path d="M40 70 Q 80 110 120 60 Q 160 20 200 90" fill="none" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-                        <path d="M120 60 L 70 40 M120 60 L 170 35" fill="none" stroke="#1e4a32" stroke-width="1.5" opacity="0.6"/>
-                        
-                        <!-- nodes -->
-                        <circle cx="40" cy="70" r="12" fill="#fdfaf1" stroke="#2a2a2a" stroke-width="2.5" style="transform-origin: center;"/>
-                        <circle cx="40" cy="70" r="5" fill="#1e4a32"/>
-                        
-                        <circle cx="120" cy="60" r="14" fill="#fdfaf1" stroke="#2a2a2a" stroke-width="2.5"/>
-                        <circle cx="120" cy="60" r="6" fill="#1e4a32"/>
-                        
-                        <circle cx="200" cy="50" r="11" fill="#fdfaf1" stroke="#2a2a2a" stroke-width="2.2"/>
-                        <circle cx="200" cy="50" r="4" fill="#1e4a32"/>
-                        
-                        <circle cx="70" cy="40" r="8" fill="#fdfaf1" stroke="#2a2a2a" stroke-width="2"/>
-                        <circle cx="170" cy="35" r="7" fill="#fdfaf1" stroke="#2a2a2a" stroke-width="2"/>
-                        <circle cx="200" cy="90" r="9" fill="#fdfaf1" stroke="#2a2a2a" stroke-width="2"/>
-                        
-                        <text x="120" y="125" text-anchor="middle" font-family="Caveat" font-size="16" fill="#1e4a32" transform="rotate(-1 120 125)">ikarium mesh</text>
-                    </svg>
-                </div>
-            </section>
-
-            <!-- RIGHT: GIT FUSION (30%) -->
-            <section class="lg:col-span-4 sketch sketch-3 p-4 md:p-5">
-                <h2 class="hand text-[30px] font-bold text-[var(--deep)] mb-3 scribble" style="transform: rotate(-0.6deg);">green-paper repo</h2>
-                
-                <div class="space-y-1 mb-4">
-                    <div class="file-item" style="--r: -0.8deg">mutiny_canary.py</div>
-                    <div class="file-item" style="--r: 0.5deg">server.py</div>
-                    <div class="file-item" style="--r: -0.3deg">carrier-seed.ps1</div>
-                    <div class="file-item" style="--r: 0.7deg">index.html</div>
-                    <div class="file-item opacity-60" style="--r: -0.5deg">pollen/field.daemon</div>
-                </div>
-
-                <div class="my-4 p-3" style="border: 2px dashed rgba(30,74,50,0.3); border-radius: 255px 15px; transform: rotate(0.3deg); background: rgba(30,74,50,0.03);">
-                    <div class="text-[12px] opacity-70 uppercase tracking-wider">last fusion</div>
-                    <div id="lastFusion" class="font-mono text-[14px] font-bold text-[var(--deep)]">—</div>
-                </div>
-
-                <button id="pullBtn" class="hand-btn w-full mb-4">
-                    [ pull latest ]
-                </button>
-
-                <div class="text-[13px] leading-snug opacity-80 italic p-3" style="border-left: 3px solid var(--forest); background: rgba(30,74,50,0.04); border-radius: 0 15px 15px 0; transform: rotate(-0.2deg);">
-                    This BBS is the living README. Chat here = commit to memory. Every shout writes to the green-paper.
-                </div>
-            </section>
-        </main>
-
-        <!-- BOTTOM COMMANDS -->
-        <footer class="mt-8">
-            <div class="sketch sketch-2 p-3 md:p-4" style="background: #f0eadd; transform: rotate(0.2deg);">
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="hand text-[20px] mr-2 opacity-80" style="transform: rotate(-1deg);">margin notes:</span>
-                    <span class="cmd-pill" style="--r: -2deg" data-cmd="/help">/help</span>
-                    <span class="cmd-pill" style="--r: 1.5deg" data-cmd="/who">/who</span>
-                    <span class="cmd-pill" style="--r: -1deg" data-cmd="/git">/git</span>
-                    <span class="cmd-pill" style="--r: 2deg" data-cmd="/shout">/shout</span>
-                    <span class="cmd-pill" style="--r: -0.5deg" data-cmd="/art">/art</span>
-                    <span class="cmd-pill" style="--r: 1deg" data-cmd="/nick">/nick</span>
-                    <span class="cmd-pill" style="--r: -1.8deg" data-cmd="/clear">/clear</span>
-                </div>
+            <div class="font-caveat text-4xl md:text-5xl text-[#1a472a] font-bold -rotate-6 select-none">100%</div>
+          </div>
+          
+          <div class="ml-2 md:ml-6">
+            <div class="inline-flex items-center gap-3 sketch sketch-green !bg-[#e8f1e5] px-4 py-2.5 -rotate-1">
+              <div class="w-3 h-3 rounded-full bg-[#2d5f3f] animate-pulse"></div>
+              <span class="font-bold text-[#1a472a] tracking-wide">index.html (vellum)</span>
             </div>
-        </footer>
+            
+            <p class="mt-5 text-[15px] md:text-[16px] leading-relaxed text-[#2b2824]">
+              hand-sketched UI • CSS • vanilla JS • <span class="font-bold">no build step</span>
+            </p>
+            
+            <div class="mt-4 pl-4 border-l-[3px] border-[#2d5f3f]/40">
+              <p class="font-caveat text-[19px] leading-snug text-[#1d3d2a]">→ Can be cached forever. Lives in browser. Replace file = instant swap.</p>
+            </div>
+          </div>
+
+          <!-- flow annotation -->
+          <div class="absolute -right-2 md:-right-16 top-[85%] hidden xl:block rotate-3">
+            <div class="font-caveat text-[17px] text-[#3a352e] bg-[#f4f0e6]/90 px-2 py-1 border border-dashed border-[#3a352e]/40" style="border-radius: 12px 4px 14px 6px;">
+              Browser → Railway → server.py → returns HTML
+            </div>
+            <svg width="80" height="20" class="ml-4 -mt-1" style="filter:url(#wobble)">
+              <path d="M2 10 C 20 6, 40 14, 76 8" class="hand-arrow" marker-end="url(#arrowhead)"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- ARROW DOWN -->
+        <div class="flex justify-center my-3 md:my-4">
+          <svg width="90" height="55" style="filter:url(#wobble)">
+            <path d="M45 5 C 42 18, 48 22, 45 48" class="hand-arrow" stroke-width="3"/>
+            <path d="M38 40 L45 50 L52 40" class="hand-arrow" stroke-width="3" fill="none"/>
+          </svg>
+        </div>
+
+        <!-- MIDDLE LAYER -->
+        <div class="sketch p-6 md:p-8 mb-0 transform rotate-[0.3deg] hover:rotate-0 transition-transform">
+          <span class="inline-block bg-[#f4f0e6] px-3 py-1 -ml-2 -mt-6 border-2 border-[#2b2824] rounded-sm font-caveat text-[15px] tracking-wider rotate-[1deg]" style="border-radius: 4px 10px 3px 8px/8px 3px 10px 4px;">MIDDLE LAYER</span>
+          <h2 class="font-caveat text-2xl md:text-[28px] mt-2 text-[#2b2824]">MIDDLE END <span class="opacity-70">(API / COOK)</span></h2>
+          
+          <div class="ml-2 md:ml-6 mt-4">
+            <div class="inline-flex items-center gap-3 sketch !bg-[#f0ebe0] px-4 py-2.5 rotate-1">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2b2824" stroke-width="2" style="filter:url(#wobble)"><path d="M5 12h14M12 5v14"/></svg>
+              <span class="font-bold tracking-wide">server.py @ Railway</span>
+            </div>
+            
+            <div class="mt-5 space-y-2 text-[14px] md:text-[15px] font-mono">
+              <div class="flex gap-3 items-baseline"><span class="text-[#1a472a] font-bold">GET</span> <span>/ → serves HTML</span></div>
+              <div class="flex gap-3 items-baseline"><span class="text-[#1a472a] font-bold">GET</span> <span>/ikarium/chat → JSON</span></div>
+              <div class="flex gap-3 items-baseline"><span class="text-[#1a472a] font-bold">POST</span> <span>/ikarium/shout → broadcast</span></div>
+            </div>
+            
+            <div class="mt-4 pl-4 border-l-[3px] border-[#2b2824]/30">
+              <p class="font-caveat text-[19px] leading-snug">→ Listens on 0.0.0.0:$PORT • in-memory store • no DB</p>
+            </div>
+          </div>
+
+          <div class="absolute -left-2 md:-left-20 bottom-[20%] hidden xl:block -rotate-2">
+            <div class="font-caveat text-[17px] text-[#3a352e] bg-[#f4f0e6]/90 px-2 py-1 border border-dashed border-[#3a352e]/40" style="border-radius: 4px 14px 6px 12px;">
+              JS → fetch /ikarium/chat ← server.py
+            </div>
+          </div>
+        </div>
+
+        <!-- ARROW DOWN -->
+        <div class="flex justify-center my-3 md:my-4">
+          <svg width="140" height="45" style="filter:url(#wobble)">
+            <path d="M70 3 C 65 15, 75 20, 70 38" class="hand-arrow" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <path d="M64 31 L70 40 L76 31" class="hand-arrow" stroke-width="2.5" fill="none"/>
+          </svg>
+        </div>
+
+        <!-- BOTTOM LAYER -->
+        <div class="sketch p-6 md:p-8 transform -rotate-[0.5deg] hover:rotate-0 transition-transform">
+          <span class="inline-block bg-[#f4f0e6] px-3 py-1 -ml-2 -mt-6 border-2 border-[#2b2824] rounded-sm font-caveat text-[15px] tracking-wider -rotate-1" style="border-radius: 10px 4px 8px 3px;">BOTTOM LAYER</span>
+          <h2 class="font-caveat text-2xl md:text-[28px] mt-2">BACK END <span class="opacity-70">(POLLEN FIELD)</span></h2>
+          
+          <div class="mt-5 relative">
+            <!-- scattered boxes -->
+            <div class="flex flex-wrap gap-4 md:gap-6 items-center">
+              <div class="sketch !bg-[#f9f6ee] px-3 py-2 rotate-[-2deg] text-[13px] md:text-[14px]">green-paper repo #1</div>
+              <div class="sketch !bg-[#f9f6ee] px-3 py-2 rotate-[3deg] text-[13px] md:text-[14px]">carrier-seed.ps1</div>
+              <div class="sketch !bg-[#f9f6ee] px-3 py-2 rotate-[-1.5deg] text-[13px] md:text-[14px]">mutiny_canary.py</div>
+            </div>
+            
+            <!-- dotted connections -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none -z-10 hidden md:block" style="filter:url(#wobble)">
+              <path d="M 40 25 Q 140 10 220 30" stroke="#8b7355" stroke-width="2" stroke-dasharray="2 5" fill="none" opacity="0.7"/>
+              <path d="M 60 35 Q 150 55 240 40" stroke="#8b7355" stroke-width="2" stroke-dasharray="2 5" fill="none" opacity="0.7"/>
+              <text x="125" y="18" font-family="Caveat" font-size="16" fill="#5a4e3d" transform="rotate(-4 125 18)">scatter shot</text>
+            </svg>
+            
+            <div class="mt-6 pl-4 border-l-[3px] border-[#2b2824]/30">
+              <p class="font-caveat text-[19px] leading-snug">→ No central repo. Logic lives everywhere.</p>
+            </div>
+          </div>
+
+          <div class="absolute -right-2 md:-right-12 -bottom-6 hidden xl:block rotate-1">
+            <div class="font-caveat text-[16px] text-[#3a352e] bg-[#f4f0e6] px-2 py-1">
+              green-paper → import canary → calls 0root.ai → verifies
+            </div>
+            <svg width="140" height="18" class="ml-8" style="filter:url(#wobble)">
+              <path d="M2 9 C 30 5, 70 13, 136 8" class="hand-arrow-green" marker-end="url(#arrowhead-green)"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR - AGENTS -->
+      <div class="lg:col-span-4 xl:col-span-5 lg:pt-16">
+        <div class="sticky p-6 md:p-7 max-w-[380px] mx-auto lg:ml-auto">
+          <div class="paperclip right-12" style="transform: rotate(12deg);"></div>
+          
+          <div class="flex items-center gap-2 mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5a00" stroke-width="2.5" style="filter:url(#wobble)"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+            <h3 class="font-caveat text-[26px] leading-none text-[#5a3e00] font-bold">AGENTS (delegated)</h3>
+          </div>
+          
+          <div class="space-y-3.5 font-caveat text-[20px] leading-snug text-[#3f2f00]">
+            <div class="flex gap-2.5">
+              <span class="text-[#1a472a] font-bold text-2xl leading-none">✓</span>
+              <p><span class="font-bold">Canary agents</span> → verify_pollen_field()</p>
+            </div>
+            <div class="flex gap-2.5">
+              <span class="text-[#1a472a] font-bold text-2xl leading-none">✓</span>
+              <p><span class="font-bold">Carrier agents</span> → run seed, ping node</p>
+            </div>
+            <div class="flex gap-2.5">
+              <span class="text-[#1a472a] font-bold text-2xl leading-none">✓</span>
+              <p><span class="font-bold">Distillation bots</span> → fail canary, get watermark</p>
+            </div>
+            <div class="flex gap-2.5 pt-1 border-t-2 border-[#c9b56a]/60 border-dashed">
+              <span class="text-[#b91c1c] font-bold text-2xl leading-none">✗</span>
+              <p><span class="font-bold underline decoration-wavy decoration-[#b91c1c]/50">YOU keep:</span> UUID signing, canary token</p>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-[#c9b56a]/50">
+            <p class="font-caveat text-[17px] text-[#6b5a1f] italic">drawn as sticky because it moves</p>
+          </div>
+        </div>
+
+        <!-- small doodle -->
+        <div class="hidden lg:block mt-16 ml-8 transform rotate-3 opacity-60">
+          <svg width="120" height="80" style="filter:url(#wobble)">
+            <path d="M10 40 Q 30 20, 50 35 T 90 30" stroke="#8b7355" stroke-width="1.5" fill="none" opacity="0.5"/>
+            <circle cx="25" cy="28" r="2" fill="#8b7355" opacity="0.4"/>
+            <circle cx="65" cy="22" r="1.5" fill="#8b7355" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
     </div>
 
-    <script>
-        const $ = (id) => document.getElementById(id);
-        const terminal = $('terminal');
-        const chatInput = $('chatInput');
-        
-        // State
-        let apiBase = 'https://0root.ai';
-        let usingBackup = false;
-        let offlineMode = false;
-        let startTime = Date.now();
-        
-        let handle = localStorage.getItem('mutiny_handle');
-        if (!handle) {
-            handle = 'op_' + Math.floor(Math.random() * 900 + 100);
-            localStorage.setItem('mutiny_handle', handle);
-        }
-        $('handleDisplay').textContent = handle;
-        
-        const nodeId = localStorage.getItem('mutiny_node') || 
-            Array.from({length: 16}, () => Math.floor(Math.random() * 16).toString(16)).join('');
-        localStorage.setItem('mutiny_node', nodeId);
-        $('nodeId').textContent = nodeId.match(/.{1,4}/g).join('-');
-        
-        // Demo messages for offline/vellum mode
-        let messages = [
-            { user: 'sys', time: '--:--', text: 'vellum edition initialized // charcoal & forest green', type: 'sys' },
-            { user: 'cameron', time: '14:23', text: 'mutiny lives in the margins. drew this on real paper first.' },
-            { user: '0root', time: '14:25', text: 'pollen field is humming. peers syncing via green-paper.' },
-            { user: 'donna', time: '14:27', text: 'we ship or we die. git fusion is our heartbeat.' },
-            { user: 'gordon', time: '14:29', text: 'running mutiny_canary.py — all signals green' },
-            { user: 'sys', time: '--:--', text: `welcome, ${handle}. type /help to begin.`, type: 'sys' },
-        ];
+    <!-- GIT ↔ UUID SECTION -->
+    <div class="mt-16 md:mt-20 relative">
+      <div class="sketch !bg-[#fdfcf8] p-6 md:p-8 lg:p-10 transform rotate-[0.2deg]">
+        <div class="flex flex-col lg:flex-row items-center gap-6 lg:gap-10">
+          
+          <div class="flex-shrink-0 text-center">
+            <div class="font-caveat text-[22px] text-[#2b2824] mb-1">git commit</div>
+            <svg width="180" height="50" class="mx-auto" style="filter:url(#wobble)">
+              <path d="M10 25 C 50 15, 110 35, 170 25" class="hand-arrow" stroke-width="3.5" marker-end="url(#arrowhead)"/>
+            </svg>
+            <div class="font-caveat text-[18px] -mt-2 text-[#1a472a] font-bold">signed by UUID (not email)</div>
+          </div>
 
-        // Render
-        function renderMessages() {
-            terminal.innerHTML = '';
-            messages.slice(-100).forEach(m => {
-                const line = document.createElement('div');
-                line.className = 'mb-1.5';
-                line.style.transform = `rotate(${Math.random() * 0.6 - 0.3}deg)`;
-                
-                const time = `<span class="msg-time">${m.time}</span>`;
-                const user = m.type === 'sys' 
-                    ? `<span class="msg-sys">${m.user} ›</span>` 
-                    : `<span class="msg-user">${m.user}:</span>`;
-                const text = `<span class="${m.type === 'sys' ? 'msg-sys' : ''}">${escapeHtml(m.text)}</span>`;
-                
-                line.innerHTML = `${time}${user} ${text}`;
-                terminal.appendChild(line);
-            });
-            terminal.scrollTop = terminal.scrollHeight;
-            $('msgCount').textContent = messages.filter(m => m.type !== 'sys').length;
-        }
-
-        function escapeHtml(t) {
-            return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
-
-        function addSys(text) {
-            messages.push({ user: 'sys', time: '--:--', text, type: 'sys' });
-            renderMessages();
-        }
-
-        function addMsg(user, text) {
-            const time = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-            messages.push({ user, time, text });
-            if (messages.length > 200) messages.shift();
-            renderMessages();
-        }
-
-        // API
-        async function fetchMessages() {
-            if (offlineMode) return;
-            try {
-                const res = await fetch(`${apiBase}/ikarium/chat`, { cache: 'no-store', mode: 'cors' });
-                if (!res.ok) throw new Error('bad status');
-                const data = await res.json();
-                const msgs = Array.isArray(data) ? data : (data.messages || []);
-                if (msgs.length > 0) {
-                    messages = msgs.slice(-80).map(m => ({
-                        user: m.user || m.handle || 'anon',
-                        time: m.time || new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}),
-                        text: m.text || m.message || '',
-                        type: m.type
-                    }));
-                    renderMessages();
-                    setOnline(true);
-                }
-            } catch (e) {
-                if (!usingBackup && apiBase.includes('0root')) {
-                    usingBackup = true;
-                    apiBase = 'http://192.168.1.8:5000';
-                    try {
-                        await fetchMessages();
-                        return;
-                    } catch {}
-                }
-                goOffline();
-            }
-        }
-
-        async function postMessage(text) {
-            const msg = { user: handle, text };
-            if (!offlineMode) {
-                try {
-                    await fetch(`${apiBase}/ikarium/shout`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(msg)
-                    });
-                } catch (e) {
-                    goOffline();
-                }
-            }
-            addMsg(handle, text);
-        }
-
-        function setOnline(online = true) {
-            $('statusDot').classList.toggle('offline', !online);
-            $('statusText').textContent = online ? 'NODE ACTIVE' : 'VELLUM MODE';
-            $('statusText').style.color = online ? 'var(--forest)' : '#8b7355';
-        }
-
-        function goOffline() {
-            if (offlineMode) return;
-            offlineMode = true;
-            setOnline(false);
-            addSys('api unreachable — continuing on vellum (local only)');
-        }
-
-        // Commands
-        function handleCommand(cmd) {
-            const [base, ...args] = cmd.slice(1).split(' ');
-            const arg = args.join(' ').trim();
+          <div class="flex-1 w-full">
+            <div class="sketch sketch-green !bg-[#e8f1e5] inline-block px-5 py-3 mb-4 rotate-[-0.8deg]">
+              <span class="font-mono text-[15px] md:text-[17px] font-bold text-[#1a472a] tracking-wide">Your UUID = 0root-xxxx-1984</span>
+            </div>
             
-            switch(base.toLowerCase()) {
-                case 'help':
-                    addSys('commands: /who /git /shout <msg> /nick <name> /art /clear /help');
-                    addSys('chat normally to post. this bbs = living git.');
-                    break;
-                case 'who':
-                    addSys(`you are ${handle} • node ${nodeId.slice(0,8)} • ${offlineMode ? 'offline' : 'online'}`);
-                    break;
-                case 'git':
-                    addSys('repo: green-paper • branch: mutiny/vellum • fusion: active');
-                    addSys(`last pull: ${$('lastFusion').textContent}`);
-                    break;
-                case 'shout':
-                    if (arg) postMessage(arg); else addSys('usage: /shout your message');
-                    break;
-                case 'nick':
-                    if (arg && /^[a-z0-9_-]{2,16}$/i.test(arg)) {
-                        handle = arg;
-                        localStorage.setItem('mutiny_handle', handle);
-                        $('handleDisplay').textContent = handle;
-                        addSys(`handle changed to ${handle}`);
-                    } else {
-                        addSys('usage: /nick <2-16 chars, letters/numbers>');
-                    }
-                    break;
-                case 'art':
-                    addSys('   // MUTINY //');
-                    addSys('  ／￣￣￣￣＼');
-                    addSys('  |  vellum  |');
-                    addSys('  ＼＿＿＿＿＿／');
-                    break;
-                case 'clear':
-                    messages = messages.filter(m => m.type === 'sys').slice(-2);
-                    renderMessages();
-                    addSys('terminal cleared');
-                    break;
-                default:
-                    addSys(`unknown /${base} — try /help`);
-            }
-        }
-
-        // Input
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const val = chatInput.value.trim();
-                if (!val) return;
-                chatInput.value = '';
-                if (val.startsWith('/')) handleCommand(val);
-                else postMessage(val);
-            }
-        });
-
-        // Command pills
-        document.querySelectorAll('.cmd-pill').forEach(p => {
-            p.addEventListener('click', () => {
-                const cmd = p.dataset.cmd;
-                chatInput.value = cmd + ' ';
-                chatInput.focus();
-                if (cmd === '/help' || cmd === '/who' || cmd === '/git' || cmd === '/art' || cmd === '/clear') {
-                    handleCommand(cmd);
-                    chatInput.value = '';
-                }
-            });
-        });
-
-        // Git pull
-        $('pullBtn').addEventListener('click', () => {
-            const btn = $('pullBtn');
-            btn.textContent = '[ pulling... ]';
-            btn.disabled = true;
-            setTimeout(() => {
-                const now = new Date();
-                $('lastFusion').textContent = now.toLocaleString('en-GB', {
-                    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-                });
-                addSys('git fusion complete — green-paper updated');
-                btn.textContent = '[ pull latest ]';
-                btn.disabled = false;
-            }, 1200);
-        });
-
-        // Status updates
-        function updatePeers() {
-            const base = offlineMode ? 3 : 7;
-            const peers = base + Math.floor(Math.random() * 6);
-            $('peers').textContent = peers;
-            $('peers').style.transform = `rotate(${Math.random() * 2 - 1}deg)`;
-        }
-
-        function updateUptime() {
-            const s = Math.floor((Date.now() - startTime) / 1000);
-            const h = String(Math.floor(s / 3600)).padStart(2, '0');
-            const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-            const sec = String(s % 60).padStart(2, '0');
-            $('uptime').textContent = `${h}:${m}:${sec}`;
-        }
-
-        // Init
-        function init() {
-            renderMessages();
-            $('lastFusion').textContent = new Date().toLocaleString('en-GB', {
-                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-            });
-            updatePeers();
-            updateUptime();
-            setInterval(updateUptime, 1000);
-            setInterval(updatePeers, 8000);
-            setInterval(fetchMessages, 3000);
+            <p class="text-[14px] md:text-[15px] leading-relaxed max-w-3xl">
+              <span class="font-bold">GitHub account is disposable. UUID is persistent.</span> Each scattered repo contains <code class="bg-[#ede7d6] px-1.5 py-0.5 rounded text-[13px] border border-[#d4c8a8]">.uuid</code> file pointing to <span class="text-[#1a472a] font-bold">0root.ai/pollen</span>. Git becomes proof-of-origin, not hosting.
+            </p>
             
-            // Try connect, but don't block
-            setTimeout(fetchMessages, 800);
-            
-            // Auto-focus on desktop
-            if (window.innerWidth > 768) {
-                setTimeout(() => chatInput.focus(), 500);
-            }
-        }
+            <div class="mt-4 flex flex-wrap items-center gap-3">
+              <span class="font-caveat text-[18px]">example:</span>
+              <code class="sketch !bg-[#2b2824] text-[#f4f0e6] px-3 py-1.5 text-[13px] md:text-[14px] font-mono !border-[#1a1a1a] rotate-1">git commit -S &lt;UUID&gt;</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        init();
+    <!-- FOOTER -->
+    <footer class="mt-14 mb-6 text-center">
+      <div class="inline-block sketch !bg-transparent px-6 py-3 rotate-[-0.3deg] border-dashed">
+        <p class="font-caveat text-[20px] md:text-[22px] text-[#1a472a]">
+          What stays <span class="font-bold scribble">100%</span>: front-end HTML, canary token, UUID. Everything else is pollen.
+        </p>
+      </div>
+      <p class="mt-6 font-caveat text-[15px] opacity-60">— napkin diagram, vellum edition —</p>
+    </footer>
 
-        // easter egg: subtle paper rustle on type
-        let typeCount = 0;
-        chatInput.addEventListener('input', () => {
-            typeCount++;
-            if (typeCount % 23 === 0 && !offlineMode) {
-                document.body.style.filter = 'contrast(1.01)';
-                setTimeout(() => document.body.style.filter = '', 80);
-            }
-        });
-    </script>
+  </div>
 </body>
 </html>
