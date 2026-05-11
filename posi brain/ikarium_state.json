@@ -1,0 +1,30 @@
+{
+  "id": "Ikarium-David-1778524602",
+  "peers": {
+    "test-garden": {
+      "url": "192.168.1.8",
+      "last_seen": "2026-05-11T13:39:57.239668",
+      "git": [
+        {
+          "name": "green-paper"
+        }
+      ],
+      "greeting": "hello from 0root"
+    },
+    "test-seed2": {
+      "url": "192.168.1.8",
+      "last_seen": "2026-05-11T13:41:09.230128",
+      "git": [
+        {
+          "name": "green-paper"
+        }
+      ],
+      "greeting": "hello from Dave"
+    }
+  },
+  "memories": [
+    "Greet test-garden",
+    "Greet test-seed2"
+  ],
+  "timestamp": "2026-05-11T13:46:43.661451"
+}
