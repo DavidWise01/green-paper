@@ -3,665 +3,570 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MUTINY // IKARIUM NODE NETWORK</title>
+<title>MUTINY COLLAB BBS // IKARIUM NODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <style>
 :root {
   --green: #00ff41;
   --pink: #ff0066;
-  --amber: #ffb000;
-  --cyan: #00ffff;
-  --dim: #007a1f;
+  --amber: #ffaa00;
+  --cyan: #00e5ff;
+  --bg: #000602;
 }
-* { box-sizing: border-box; }
-html, body { height: 100%; }
+* { box-sizing: border-box; margin:0; padding:0; }
+html, body { height:100%; overflow:hidden; }
 body {
-  margin: 0;
-  background: #000000;
-  color: var(--green);
-  font-family: 'VT323', 'Courier New', monospace;
-  font-size: 20px;
-  line-height: 1.25;
-  text-shadow: 0 0 2px var(--green), 0 0 12px rgba(0,255,65,0.35);
-  overflow-x: hidden;
-  cursor: crosshair;
+  background:#0a0a0a;
+  font-family:'VT323', monospace;
+  color:var(--green);
+  text-shadow:0 0 3px var(--green), 0 0 10px rgba(0,255,65,0.3);
+  font-size:20px;
+  line-height:1.2;
 }
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse at center, #0f1f0f 0%, #000 70%);
-  z-index: -2;
-}
-.crt-frame {
-  padding: min(4vw, 40px);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.crt {
-  position: relative;
-  width: 100%;
-  max-width: 1400px;
-  background: #000;
-  border: 12px solid #0a0a0a;
-  border-top-color: #1a1a1a;
-  border-left-color: #111;
-  border-radius: 60px / 280px;
-  box-shadow: 
-    0 0 0 3px #000,
-    0 0 0 6px #222,
-    0 0 0 9px #000,
-    inset 0 0 80px rgba(0,0,0,1),
-    inset 0 0 200px rgba(0,255,65,0.05),
-    0 0 120px rgba(0,255,65,0.12),
-    0 25px 50px rgba(0,0,0,0.8);
-  padding: clamp(20px, 3vw, 48px) clamp(18px, 2.5vw, 40px);
-  transform: perspective(1200px) rotateX(1.5deg);
-}
-.crt::after {
-  content: '';
-  position: absolute;
-  inset: -12px;
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent 15%);
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-.scanlines {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,0,0,0) 0px,
-    rgba(0,0,0,0) 2px,
-    rgba(0,255,65,0.07) 3px,
-    rgba(0,0,0,0) 4px
-  );
-  z-index: 100;
-  border-radius: inherit;
-  mix-blend-mode: screen;
-  animation: scan-drift 8s linear infinite;
-}
-@keyframes scan-drift { to { background-position: 0 8px; } }
-.flicker {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  background: rgba(0,255,65,0.018);
-  z-index: 99;
-  animation: flicker 0.12s infinite steps(2);
-  border-radius: inherit;
-  mix-blend-mode: screen;
-}
-@keyframes flicker {
-  0% { opacity: 0.85; }
-  5% { opacity: 0.92; }
-  10% { opacity: 0.78; }
-  15% { opacity: 1; }
-  50% { opacity: 0.9; }
-  80% { opacity: 0.95; }
-  100% { opacity: 0.88; }
-}
-.vignette {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: 
-    inset 0 0 180px #000,
-    inset 0 0 60px #000,
-    inset 0 20px 40px rgba(0,0,0,0.9);
-  z-index: 98;
+.crt-container {
+  position:relative;
+  width:100vw;
+  height:100vh;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px;
 }
 .screen {
-  position: relative;
-  z-index: 10;
-  transform: translateZ(0);
-  filter: contrast(1.1) brightness(1.05);
+  position:relative;
+  width:100%;
+  height:100%;
+  max-width:1400px;
+  background: radial-gradient(ellipse at center, #001a05 0%, #000400 60%, #000000 100%);
+  border-radius: 28px / 22px;
+  box-shadow: inset 0 0 120px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,65,0.15), 0 0 30px rgba(0,0,0,0.8);
+  padding:18px 22px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  animation: flicker 0.15s infinite linear alternate;
+  overflow:hidden;
 }
-.glitch-now .screen {
-  animation: screen-jump 0.2s;
+@keyframes flicker {
+  0%,100% { opacity:1; filter:brightness(1); }
+  92% { opacity:0.98; }
+  94% { opacity:0.94; filter:brightness(1.05); }
+  96% { opacity:1; }
 }
-@keyframes screen-jump {
-  0%,100% { transform: translate(0,0) skewX(0); }
-  20% { transform: translate(-2px,1px) skewX(-2deg); }
-  40% { transform: translate(2px,-1px) skewX(1deg); }
-  60% { transform: translate(-1px,0) skewX(0); filter: hue-rotate(20deg); }
+.scanlines {
+  pointer-events:none;
+  position:absolute;
+  inset:0;
+  z-index:999;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.25) 0px,
+    rgba(0,0,0,0.25) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode:multiply;
+  border-radius:inherit;
 }
+.screen::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
+  pointer-events:none;
+  border-radius:inherit;
+  z-index:998;
+}
+/* TAPE */
+.tape {
+  position:absolute;
+  width:160px;
+  height:30px;
+  background:var(--pink);
+  opacity:0.9;
+  z-index:1000;
+  box-shadow:0 0 15px var(--pink), inset 0 0 5px rgba(0,0,0,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#000;
+  font-size:16px;
+  letter-spacing:3px;
+  text-shadow:none;
+  font-weight:bold;
+}
+.tape::before, .tape::after {
+  content:'';
+  position:absolute;
+  width:100%;
+  height:2px;
+  background:rgba(0,0,0,0.2);
+  top:6px;
+}
+.tape::after { top:auto; bottom:6px; }
+.tape-tl { top:8px; left:-35px; transform:rotate(-38deg); }
+.tape-br { bottom:18px; right:-45px; transform:rotate(-22deg); }
 
 /* HEADER */
-header {
-  text-align: center;
-  margin-bottom: 1.2rem;
-  position: relative;
-  transform: rotate(-0.9deg);
+header { text-align:center; margin-bottom:2px; }
+.title {
+  font-size: clamp(48px, 10vw, 92px);
+  letter-spacing:0.08em;
+  color:var(--green);
+  position:relative;
+  display:inline-block;
+  text-shadow:0 0 8px var(--green), 0 0 20px var(--green), 0 0 40px rgba(0,255,65,0.6);
+  transform:scaleY(1.1) scaleX(0.95);
+  margin:0;
 }
-.mutiny {
-  font-size: clamp(56px, 14vw, 140px);
-  line-height: 0.75;
-  margin: 0;
-  letter-spacing: 0.06em;
-  font-weight: 700;
-  position: relative;
-  display: inline-block;
-  transform: scaleX(1.05) scaleY(0.92);
+.title::before, .title::after {
+  content:attr(data-text);
+  position:absolute;
+  left:0; top:0;
+  width:100%; height:100%;
+  overflow:hidden;
 }
-.glitch {
-  position: relative;
+.title::before {
+  color:var(--pink);
+  text-shadow:0 0 10px var(--pink);
+  animation:glitch1 2.7s infinite steps(2,end);
+  clip-path:polygon(0 0,100% 0,100% 35%,0 35%);
 }
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+.title::after {
+  color:var(--cyan);
+  text-shadow:0 0 10px var(--cyan);
+  animation:glitch2 3.1s infinite steps(2,end);
+  clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);
 }
-.glitch::before {
-  left: -2.5px;
-  text-shadow: 2px 0 var(--pink);
-  animation: gl1 2.7s infinite linear alternate-reverse;
-  clip-path: polygon(0 0, 100% 0, 100% 38%, 0 38%);
-}
-.glitch::after {
-  left: 2.5px;
-  text-shadow: -2px 0 var(--cyan);
-  animation: gl2 3.1s infinite linear alternate-reverse;
-  clip-path: polygon(0 62%, 100% 62%, 100% 100%, 0 100%);
-}
-@keyframes gl1 {
-  0% { transform: translate(0); }
-  10% { transform: translate(-1px,1px); }
-  20% { transform: translate(-2px,-1px); }
-  30% { transform: translate(1px,0); }
-  70% { transform: translate(0); }
-  85% { transform: translate(-1px,2px); }
-  100% { transform: translate(0); }
-}
-@keyframes gl2 {
-  0% { transform: translate(0); }
-  15% { transform: translate(1px,-1px); }
-  35% { transform: translate(2px,1px); }
-  50% { transform: translate(-1px,0); }
-  80% { transform: translate(0); }
-  90% { transform: translate(1px,-2px); }
-}
+@keyframes glitch1 { 0%,100%{transform:translate(0)} 20%{transform:translate(-2px,1px)} 40%{transform:translate(2px,-1px)} 60%{transform:translate(-1px,0)} }
+@keyframes glitch2 { 0%,100%{transform:translate(0)} 25%{transform:translate(2px,0)} 50%{transform:translate(-2px,1px)} 75%{transform:translate(1px,-1px)} }
 .subtitle {
-  color: var(--pink);
-  font-size: clamp(14px, 2.2vw, 22px);
-  margin-top: 0.3rem;
-  letter-spacing: 4px;
-  text-shadow: 0 0 6px var(--pink), 0 0 20px rgba(255,0,102,0.5);
-  transform: rotate(0.6deg) translateY(-8px);
+  color:var(--amber);
+  text-shadow:0 0 6px var(--amber);
+  font-size: clamp(14px, 2.5vw, 22px);
+  letter-spacing:2px;
+  margin-top:-6px;
 }
 
 /* STATUS BAR */
 .status-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.2rem;
-  background: rgba(0,255,65,0.06);
-  border: 1px solid var(--green);
-  border-left: 4px solid var(--green);
-  padding: 0.35rem 0.8rem;
-  margin-bottom: 1.2rem;
-  font-size: 18px;
-  text-transform: uppercase;
-  box-shadow: inset 0 0 15px rgba(0,255,65,0.1), 0 0 8px rgba(0,255,65,0.15);
-  transform: rotate(0.2deg);
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px 24px;
+  align-items:center;
+  background:rgba(0,255,65,0.05);
+  border:1px solid var(--green);
+  padding:4px 10px;
+  font-size:18px;
+  color:var(--amber);
+  text-shadow:0 0 5px var(--amber);
+  box-shadow:inset 0 0 10px rgba(0,255,65,0.1), 0 0 8px rgba(0,255,65,0.2);
 }
-.status-bar > span { white-space: nowrap; }
-.cursor-block {
-  display: inline-block;
-  width: 0.6em;
-  background: var(--green);
-  color: #000;
-  margin-left: 2px;
-  animation: blink 1s step-end infinite;
-  box-shadow: 0 0 8px var(--green);
-}
-@keyframes blink { 50% { opacity: 0; } }
-.amber { color: var(--amber); text-shadow: 0 0 5px var(--amber), 0 0 15px rgba(255,176,0,0.4); }
-.pink { color: var(--pink); text-shadow: 0 0 5px var(--pink); }
-.cyan { color: var(--cyan); text-shadow: 0 0 5px var(--cyan); }
+.status-bar .sep { color:var(--green); opacity:0.6; }
+.status-bar .right { margin-left:auto; display:flex; gap:16px; }
+.cursor { animation:blink 1s steps(1) infinite; color:var(--green); }
+@keyframes blink { 50% { opacity:0; } }
 
 /* LAYOUT */
 .main-grid {
-  display: grid;
-  grid-template-columns: 59% 39%;
-  gap: 2%;
-  margin-bottom: 1rem;
+  display:grid;
+  grid-template-columns:55% 45%;
+  gap:10px;
+  height:34%;
+  min-height:180px;
 }
-@media (max-width: 900px) {
-  .main-grid { grid-template-columns: 1fr; gap: 1rem; }
-}
-
-/* PANELS */
 .panel {
-  border: 2px solid var(--green);
-  background: linear-gradient(180deg, rgba(0,255,65,0.04), rgba(0,255,65,0.01));
-  padding: 0.9rem 1rem 1rem;
-  position: relative;
-  box-shadow: inset 0 0 25px rgba(0,255,65,0.06), 0 0 12px rgba(0,255,65,0.08);
-  overflow: hidden;
+  border:2px solid var(--green);
+  background:rgba(0,10,0,0.7);
+  box-shadow:inset 0 0 15px rgba(0,255,65,0.1), 0 0 12px rgba(0,255,65,0.08);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
 }
-.panel::before {
-  content: '';
-  position: absolute;
-  top: -8px; left: 12%;
-  width: 90px; height: 22px;
-  background: var(--amber);
-  opacity: 0.7;
-  transform: rotate(-4deg);
-  mix-blend-mode: multiply;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+.panel-head {
+  color:var(--pink);
+  text-shadow:0 0 8px var(--pink);
+  border-bottom:1px solid var(--pink);
+  padding:2px 8px;
+  font-size:20px;
+  letter-spacing:1px;
+  background:rgba(255,0,102,0.08);
+  flex-shrink:0;
 }
-.panel:nth-child(2)::before { left: auto; right: 15%; background: var(--pink); transform: rotate(3deg); }
-.panel.live { transform: rotate(-0.4deg); }
-.panel.node { transform: rotate(0.35deg); }
-.panel.users { transform: rotate(-0.15deg); }
-.panel-title {
-  color: var(--amber);
-  letter-spacing: 2px;
-  margin: 0 0 0.6rem;
-  font-size: 20px;
-  border-bottom: 1px dashed rgba(255,176,0,0.4);
-  padding-bottom: 0.25rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+.panel-body {
+  flex:1;
+  overflow-y:auto;
+  padding:6px 8px;
+  font-size:19px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--green) #000;
 }
-.panel-title small { font-size: 0.8em; opacity: 0.7; }
+.panel-body::-webkit-scrollbar { width:8px; }
+.panel-body::-webkit-scrollbar-track { background:#000; }
+.panel-body::-webkit-scrollbar-thumb { background:var(--green); box-shadow:0 0 6px var(--green); }
 
-/* LIVE FEED */
-#log {
-  height: 290px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  font-size: 18px;
-  padding-right: 6px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--dim) #000;
-  mask-image: linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 12px), transparent 100%);
+.feed-line {
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  opacity:0.9;
 }
-#log::-webkit-scrollbar { width: 6px; }
-#log::-webkit-scrollbar-thumb { background: var(--dim); }
-.log-line {
-  white-space: pre;
-  margin-bottom: 1px;
-  opacity: 0.92;
-}
-.log-line.new { animation: type-in 0.3s; }
-@keyframes type-in { from { opacity: 0; transform: translateX(-4px); } }
+.feed-line:nth-child(odd) { opacity:0.75; }
 
-/* NODE */
-.kv {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 0.5rem;
-  margin-bottom: 0.35rem;
-  font-size: 19px;
+.chat-panel {
+  flex:1;
+  min-height:180px;
 }
-.kv > span:first-child { opacity: 0.75; }
-.node-stats {
-  margin-top: 0.8rem;
-  padding-top: 0.6rem;
-  border-top: 1px dotted rgba(0,255,65,0.3);
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 0.5rem;
-  text-align: center;
-}
-.stat { background: rgba(0,0,0,0.4); border: 1px solid rgba(0,255,65,0.2); padding: 0.3rem; }
-.stat .v { font-size: 22px; display: block; }
+.msg { margin-bottom:3px; word-wrap:break-word; }
+.msg .time { color:var(--amber); text-shadow:0 0 5px var(--amber); margin-right:8px; }
+.msg .user { color:var(--cyan); text-shadow:0 0 6px var(--cyan); margin-right:8px; }
+.msg .text { color:var(--green); }
+.msg.sys .text { color:var(--amber); }
 
-/* USERS */
-.users-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: 0.9rem;
-  margin-top: 0.5rem;
-}
-.user {
-  border-left: 3px solid var(--pink);
-  background: rgba(255,0,102,0.04);
-  padding: 0.5rem 0.6rem 0.6rem 0.7rem;
-  position: relative;
-  box-shadow: inset 0 0 15px rgba(255,0,102,0.06);
-  transform: rotate(-0.2deg);
-  transition: transform 0.2s;
-}
-.user:hover { transform: rotate(0deg) translateX(2px); background: rgba(255,0,102,0.07); }
-.user:nth-child(3n) { transform: rotate(0.3deg); border-left-color: var(--amber); }
-.user:nth-child(3n+1) { transform: rotate(-0.15deg); }
-.user-header { margin-bottom: 0.15rem; }
-.username { color: var(--cyan); }
-.greeting {
-  color: var(--green);
-  font-style: italic;
-  margin: 0.15rem 0 0.3rem;
-  min-height: 1.2em;
-}
-.greeting::before, .greeting::after { content: '"'; opacity: 0.6; }
-.meta { font-size: 16px; opacity: 0.85; color: #8effa3; }
-.repo {
-  color: var(--pink);
-  background: rgba(255,0,102,0.12);
-  padding: 0 4px;
-  margin-right: 5px;
-  border: 1px solid rgba(255,0,102,0.4);
-  box-shadow: 0 0 6px rgba(255,0,102,0.3);
-  display: inline-block;
-  transform: rotate(-1deg);
-}
-.user:nth-child(even) .repo { transform: rotate(1deg); }
+/* NODE INFO */
+.node-info { font-size:19px; line-height:1.35; }
+.node-info .label { color:var(--amber); display:inline-block; width:110px; }
+.node-info .val { color:var(--green); }
+.node-info .val.pink { color:var(--pink); text-shadow:0 0 6px var(--pink); }
+.node-info .val.cyan { color:var(--cyan); text-shadow:0 0 6px var(--cyan); cursor:pointer; }
+.node-info .val.cyan:hover { text-decoration:underline; }
 
-/* FOOTER */
-.footer {
-  margin-top: 1.2rem;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  font-size: 16px;
-  opacity: 0.8;
-  border-top: 1px solid rgba(0,255,65,0.2);
-  padding-top: 0.6rem;
-  transform: rotate(0.15deg);
+/* INPUT */
+.input-bar {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:2px solid var(--pink);
+  background:rgba(255,0,102,0.06);
+  padding:6px 10px;
+  box-shadow:inset 0 0 10px rgba(255,0,102,0.15), 0 0 12px rgba(255,0,102,0.2);
+  flex-shrink:0;
 }
-.tagline { color: var(--pink); }
-.graffiti {
-  position: absolute;
-  right: -10px;
-  bottom: 30px;
-  color: var(--pink);
-  font-size: 26px;
-  transform: rotate(-12deg);
-  opacity: 0.7;
-  text-shadow: 0 0 8px var(--pink);
-  pointer-events: none;
-  z-index: 20;
-  font-weight: bold;
-  letter-spacing: 1px;
+.input-bar .prompt {
+  color:var(--pink);
+  font-size:26px;
+  text-shadow:0 0 8px var(--pink);
 }
+#msgInput {
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--green);
+  font-family:inherit;
+  font-size:22px;
+  caret-color:var(--green);
+  text-shadow:0 0 5px var(--green);
+}
+#sendBtn {
+  background:var(--pink);
+  color:#000;
+  border:none;
+  padding:4px 16px;
+  font-family:inherit;
+  font-size:20px;
+  cursor:pointer;
+  box-shadow:0 0 12px var(--pink);
+  text-shadow:none;
+  font-weight:bold;
+  transition:transform 0.05s;
+}
+#sendBtn:active { transform:translateY(1px) scale(0.98); }
+#sendBtn:hover { filter:brightness(1.2); }
 
-/* PUNK SCRIBBLES */
-.scribble {
-  position: absolute;
-  top: 12px;
-  left: -18px;
-  width: 60px;
-  height: 60px;
-  border: 3px solid var(--pink);
-  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-  opacity: 0.15;
-  transform: rotate(-25deg);
-  pointer-events: none;
+#broadcast {
+  position:absolute;
+  bottom:68px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#000;
+  border:1px solid var(--pink);
+  color:var(--pink);
+  padding:4px 14px;
+  font-size:18px;
+  letter-spacing:1px;
+  text-shadow:0 0 8px var(--pink);
+  box-shadow:0 0 15px rgba(255,0,102,0.5);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.2s;
+  z-index:500;
+  white-space:nowrap;
+}
+#broadcast.active { opacity:1; animation:broadcastBlink 0.4s steps(2) infinite; }
+@keyframes broadcastBlink { 50% { opacity:0.4; } }
+
+/* MOBILE */
+@media (max-width:900px) {
+  .screen { padding:12px; border-radius:18px; }
+  .main-grid { grid-template-columns:1fr; height:auto; }
+  .main-grid .panel { height:22vh; min-height:150px; }
+  .status-bar { font-size:16px; gap:8px 12px; }
+  .status-bar .right { width:100%; margin-left:0; justify-content:space-between; }
+  .title { font-size:56px; }
+  .tape { width:120px; height:24px; font-size:13px; }
 }
 </style>
 </head>
 <body>
-<div class="crt-frame">
-  <div class="crt" id="crt">
-    <div class="scanlines"></div>
-    <div class="flicker"></div>
-    <div class="vignette"></div>
-    <div class="screen">
-      <div class="scribble"></div>
-      <header>
-        <h1 class="mutiny glitch" data-text="MUTINY">MUTINY</h1>
-        <div class="subtitle">IKARIUM NODE NETWORK // EST. 1984</div>
-      </header>
+<div class="crt-container">
+  <div class="scanlines"></div>
+  <div class="tape tape-tl">REPAIRED</div>
+  <div class="tape tape-br">REPAIRED</div>
+  
+  <div class="screen">
+    <header>
+      <h1 class="title" data-text="MUTINY">MUTINY</h1>
+      <div class="subtitle">IKARIUM NODE NETWORK // EST. 1984 // COLLAB MODE</div>
+    </header>
 
-      <div class="status-bar">
-        <span>NODE://<span id="node-id" class="cyan">BOOTING</span></span>
-        <span>HOST: 192.168.1.8:5000</span>
-        <span>SYSOP: DAVID WISE</span>
-        <span class="amber" id="clock">00:00:00</span>
-        <span>READY<span class="cursor-block">█</span></span>
+    <div class="status-bar">
+      <span>NODE:<span style="color:var(--green)">IKARIUM-7</span></span>
+      <span class="sep">|</span>
+      <span>HOST:<span style="color:var(--green)" id="hostDisp">192.168.1.8:5000</span></span>
+      <span class="sep">|</span>
+      <span>SYSOP:<span style="color:var(--green)">DAVID WISE</span></span>
+      <div class="right">
+        <span>PEERS:<span id="peerCount" style="color:var(--green)">0</span></span>
+        <span>MSGS:<span id="msgCount" style="color:var(--green)">0</span></span>
+        <span id="clock">--:--:--</span>
+        <span class="cursor">█</span>
       </div>
-
-      <div class="main-grid">
-        <section class="panel live">
-          <div class="panel-title">[ LIVE FEED ] <small>ACCESS LOG</small></div>
-          <div id="log"></div>
-        </section>
-
-        <section class="panel node">
-          <div class="panel-title">[ CURRENT NODE ] <small>UK.DEV1.PEBBLE</small></div>
-          <div class="kv"><span>ID........</span><span id="current-id" class="cyan">uk.dev1.pebble</span></div>
-          <div class="kv"><span>STATUS....</span><span class="amber">ONLINE // PUNK AS FUCK</span></div>
-          <div class="kv"><span>UPTIME....</span><span id="uptime">00:00:00</span></div>
-          <div class="kv"><span>PEERS.....</span><span id="peer-count" class="pink">0</span></div>
-          <div class="kv"><span>PROTOCOL..</span><span>IKARIUM/0.3</span></div>
-          <div class="kv"><span>MODE......</span><span>HACKER BBS [1983]</span></div>
-          <div class="node-stats">
-            <div class="stat"><span class="v" id="stat-pings">0</span><small>PINGS</small></div>
-            <div class="stat"><span class="v amber" id="stat-baud">300</span><small>BAUD</small></div>
-            <div class="stat"><span class="v pink" id="stat-load">--</span><small>LOAD</small></div>
-          </div>
-        </section>
-      </div>
-
-      <section class="panel users">
-        <div class="panel-title">[ CONNECTED USERS ] <small>PEER NODES</small></div>
-        <div id="users" class="users-grid"></div>
-      </section>
-
-      <div class="footer">
-        <span>MUTINY EST. 1984 DALLAS TX // RUN BY PUNKS, NOT SUITS</span>
-        <span class="tagline">[CAMERON WAS HERE]</span>
-        <span>IKARIUM NODE v0.3 // <span id="conn-status" class="amber">CARRIER DETECT</span></span>
-      </div>
-
-      <div class="graffiti">FUCK IBM</div>
     </div>
+
+    <div class="main-grid">
+      <div class="panel">
+        <div class="panel-head">[LIVE FEED]</div>
+        <div class="panel-body" id="feed"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">[CURRENT NODE]</div>
+        <div class="panel-body">
+          <div class="node-info" id="nodeInfo">
+            <div><span class="label">NODE......:</span><span class="val">IKARIUM-7</span></div>
+            <div><span class="label">HOST......:</span><span class="val" id="ni-host">192.168.1.8:5000</span></div>
+            <div><span class="label">SYSOP.....:</span><span class="val">DAVID WISE</span></div>
+            <div><span class="label">HANDLE....:</span><span class="val cyan" id="handle">punk_0000</span></div>
+            <div><span class="label">PEERS.....:</span><span class="val" id="ni-peers">0 ACTIVE</span></div>
+            <div><span class="label">UPTIME....:</span><span class="val" id="ni-uptime">00:00:00</span></div>
+            <div><span class="label">PROTOCOL..:</span><span class="val">COLLAB v0.91b</span></div>
+            <div><span class="label">STATUS....:</span><span class="val pink">OPEN ACCESS</span></div>
+            <div><span class="label">MODE......:</span><span class="val">[ANY USER CAN SHOOT]</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel chat-panel">
+      <div class="panel-head">[PUBLIC CHANNEL - ALL USERS]</div>
+      <div class="panel-body" id="chat"></div>
+    </div>
+
+    <div class="input-bar">
+      <span class="prompt">&gt;</span>
+      <input id="msgInput" type="text" autocomplete="off" spellcheck="false" maxlength="200" placeholder="type message, hit ENTER to broadcast...">
+      <button id="sendBtn">[SEND]</button>
+    </div>
+
+    <div id="broadcast">BROADCASTING TO MUTINY NETWORK...</div>
   </div>
 </div>
 
 <script>
-const API_URL = 'http://192.168.1.8:5000/ikarium/peers';
+document.addEventListener('DOMContentLoaded', () => {
+  // ===== CONFIG =====
+  const API_BASE = 'http://192.168.1.8:5000';
+  // ==================
 
-const logEl = document.getElementById('log');
-const usersEl = document.getElementById('users');
-const nodeIdEl = document.getElementById('node-id');
-const currentIdEl = document.getElementById('current-id');
-const peerCountEl = document.getElementById('peer-count');
-const uptimeEl = document.getElementById('uptime');
-const clockEl = document.getElementById('clock');
-const pingsEl = document.getElementById('stat-pings');
-const loadEl = document.getElementById('stat-load');
+  let USERNAME = localStorage.getItem('mutiny_handle') || `punk_${Math.floor(Math.random()*9000+1000)}`;
+  let CLIENT_ID = localStorage.getItem('mutiny_id') || Math.random().toString(36).slice(2,10);
+  localStorage.setItem('mutiny_id', CLIENT_ID);
+  const NODE_ID = `NODE-${Math.floor(Math.random()*90+10)}`;
+  let startTime = Date.now();
+  let peerCount = 0;
+  let messageCount = 0;
 
-let startTime = Date.now() - (4*3600 + 13*60 + 22) * 1000;
-let pingCount = 0;
-let previousUsers = new Set();
+  const $ = id => document.getElementById(id);
+  const feed = $('feed'), chat = $('chat'), input = $('msgInput'), sendBtn = $('sendBtn');
+  const peerCountEl = $('peerCount'), msgCountEl = $('msgCount'), clock = $('clock');
+  const handleEl = $('handle'), broadcast = $('broadcast');
+  const niHost = $('ni-host'), niPeers = $('ni-peers'), niUptime = $('ni-uptime');
+  $('hostDisp').textContent = API_BASE.replace('http://','');
+  niHost.textContent = API_BASE.replace('http://','');
+  handleEl.textContent = USERNAME;
 
-const mockBase = [
-  { id: "us.tx.cardiff", username: "cameron", greeting: "RIOT GRRRLS NEVER SLEEP", last_seen: Date.now()-8000, repos: ["mutiny-core","phreak-bbs","ikarium"] },
-  { id: "uk.lon.punk", username: "tom", greeting: "building the future, one node at a time", last_seen: Date.now()-24000, repos: ["green-paper","honey-badger"] },
-  { id: "us.ca.sf", username: "donna", greeting: "VCs can eat glass", last_seen: Date.now()-5000, repos: ["mutiny-market","chat-300"] },
-  { id: "us.tx.dallas", username: "joe_mac", greeting: "GORDON CLARK WAS HERE", last_seen: Date.now()-182000, repos: ["cardiff-giant","pc-clone"] },
-  { id: "us.ny.hack", username: "bos", greeting: "stop stealing my code", last_seen: Date.now()-67000, repos: ["mutiny-os"] },
-  { id: "ca.to.node", username: "yo-yo", greeting: "SYSOP IS A PUNK", last_seen: Date.now()-120000, repos: ["zine-distho"] },
-];
-
-function timeAgo(ts){
-  const s = Math.floor((Date.now() - ts)/1000);
-  if(s < 60) return `${s}s ago`;
-  const m = Math.floor(s/60); if(m < 60) return `${m}m ago`;
-  const h = Math.floor(m/60); if(h < 24) return `${h}h ago`;
-  return `${Math.floor(h/24)}d ago`;
-}
-
-function pad(n){ return String(n).padStart(2,'0'); }
-function updateClock(){
-  const d = new Date();
-  clockEl.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-  const diff = Date.now() - startTime;
-  uptimeEl.textContent = `${pad(Math.floor(diff/3600000))}:${pad(Math.floor(diff/60000)%60)}:${pad(Math.floor(diff/1000)%60)}`;
-}
-setInterval(updateClock, 1000); updateClock();
-
-function addLog(){
-  pingCount++;
-  pingsEl.textContent = pingCount;
-  loadEl.textContent = (Math.random()*0.7 + 0.2).toFixed(2);
-  
-  const now = new Date();
-  const ts = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-  const ips = ['192.168.1.8','10.0.0.14','172.16.4.2','192.168.1.15'];
-  const ip = ips[Math.floor(Math.random()*ips.length)];
-  const sizes = [298,342,415,276,389];
-  
-  const line = document.createElement('div');
-  line.className = 'log-line new';
-  line.innerHTML = `${ip} - - [<span class="amber">${ts}</span>] "GET /ikarium/peers HTTP/1.1" <span class="pink">200</span> ${sizes[Math.floor(Math.random()*sizes.length)]}`;
-  logEl.prepend(line);
-  while(logEl.children.length > 60) logEl.removeChild(logEl.lastChild);
-  
-  if(Math.random() < 0.3){
-    const extra = document.createElement('div');
-    extra.className = 'log-line';
-    extra.style.opacity = '0.6';
-    extra.textContent = `  > node sync // ${Math.floor(Math.random()*12)+3} peers validated`;
-    logEl.prepend(extra);
-  }
-}
-
-function typeText(el, text, speed=22){
-  el.textContent = '';
-  let i=0;
-  const iv = setInterval(()=>{
-    el.textContent += text[i] || '';
-    i++;
-    if(i > text.length){ clearInterval(iv); }
-  }, speed + Math.random()*15);
-}
-
-function renderUsers(peers){
-  usersEl.innerHTML = '';
-  peers.forEach((p, idx)=>{
-    const card = document.createElement('div');
-    card.className = 'user';
-    card.style.transform = `rotate(${ (idx%2?0.3:-0.25) + (Math.random()-0.5)*0.3 }deg)`;
-    
-    const header = document.createElement('div');
-    header.className = 'user-header';
-    header.innerHTML = `> <span class="username">${p.username}</span> @ ${p.id}`;
-    
-    const greet = document.createElement('div');
-    greet.className = 'greeting';
-    
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    const repos = p.repos.map(r=>`<span class="repo">[${r}]</span>`).join(' ');
-    meta.innerHTML = `LAST: ${timeAgo(p.last_seen)} | REPOS: ${repos} <span class="cursor-block" style="width:0.5em;height:1em;vertical-align:middle"></span>`;
-    
-    card.appendChild(header);
-    card.appendChild(greet);
-    card.appendChild(meta);
-    usersEl.appendChild(card);
-    
-    if(!previousUsers.has(p.username)){
-      setTimeout(()=> typeText(greet, p.greeting), idx*120);
-      previousUsers.add(p.username);
-    } else {
-      greet.textContent = p.greeting;
+  handleEl.onclick = () => {
+    const nh = prompt('ENTER NEW HANDLE:', USERNAME);
+    if(nh && nh.trim().length>2) {
+      USERNAME = nh.trim().toLowerCase().replace(/\s+/g,'_').slice(0,16);
+      localStorage.setItem('mutiny_handle', USERNAME);
+      handleEl.textContent = USERNAME;
+      addFeed('HANDLE CHANGED', 'SYSTEM');
     }
-  });
-}
+  };
 
-function getMockData(){
-  // evolve last_seen and shuffle a bit
-  mockBase.forEach(p => {
-    p.last_seen -= Math.floor(Math.random()*8000);
-    if(Math.random() < 0.1) p.last_seen = Date.now() - Math.floor(Math.random()*30000);
-  });
-  const peers = [...mockBase].sort(()=>0.5-Math.random()).slice(0, 4 + Math.floor(Math.random()*2));
-  return { id: 'uk.dev1.pebble', peers };
-}
-
-async function poll(){
-  addLog();
-  nodeIdEl.textContent = 'uk.dev1.pebble';
-  currentIdEl.textContent = 'uk.dev1.pebble';
-  
-  try {
-    const controller = new AbortController();
-    const to = setTimeout(()=>controller.abort(), 1800);
-    const res = await fetch(API_URL, { signal: controller.signal, cache: 'no-store' });
-    clearTimeout(to);
-    if(!res.ok) throw new Error('bad');
-    const data = await res.json();
-    updateDisplay(data);
-  } catch(e) {
-    const data = getMockData();
-    updateDisplay(data);
-    document.getElementById('conn-status').textContent = 'SIMULATED LINK';
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function timeStr(d=new Date()){ return d.toTimeString().slice(0,8); }
+  function logTime(d=new Date()){
+    const pad=n=>String(n).padStart(2,'0');
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${pad(d.getDate())}/${months[d.getMonth()]}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   }
-}
 
-function updateDisplay(data){
-  peerCountEl.textContent = data.peers.length;
-  renderUsers(data.peers);
-}
+  // LIVE FEED
+  function addFeedEntry(method, path, ip='127.0.0.1', status=200){
+    const line = document.createElement('div');
+    line.className='feed-line';
+    line.textContent = `${ip} - - [${logTime()}] "${method} ${path} HTTP/1.1" ${status} -`;
+    feed.prepend(line);
+    while(feed.children.length>80) feed.removeChild(feed.lastChild);
+  }
+  function addFeed(text, src='FEED'){
+    const line = document.createElement('div');
+    line.className='feed-line';
+    line.style.color='var(--amber)';
+    line.textContent = `[${timeStr()}] ${src}> ${text}`;
+    feed.prepend(line);
+  }
 
-// boot sequence
-function boot(){
-  const bootLines = [
-    'MUTINY BBS v2.4 // (c) 1984',
-    'INIT PHOSPHOR DISPLAY... OK',
-    'CONNECTING IKARIUM NODE...',
-    'HANDSHAKE 300 BAUD',
-    'CARRIER DETECT',
-    'WELCOME TO THE UNDERGROUND',
-    ''
+  // simulate initial powershell log
+  const initialLogs = [
+    ['GET','/ikarium/pump'],
+    ['GET','/ikarium/chat'],
+    ['GET','/ikarium/peers'],
+    ['GET','/ikarium/pump'],
+    ['POST','/ikarium/shout'],
   ];
-  let i=0;
-  const iv = setInterval(()=>{
-    if(i < bootLines.length){
-      const l = document.createElement('div');
-      l.className = 'log-line';
-      l.textContent = bootLines[i];
-      logEl.appendChild(l);
-      i++;
-    } else {
-      clearInterval(iv);
-      poll();
-      setInterval(poll, 5000);
+  initialLogs.forEach(([m,p],i)=>{
+    setTimeout(()=>addFeedEntry(m,p, `192.168.1.${10+Math.floor(Math.random()*20)}`), i*180);
+  });
+  setInterval(()=>{ // random traffic
+    const paths=['/ikarium/pump','/ikarium/chat','/ikarium/peers','/ikarium/shout'];
+    const m = Math.random()>0.8?'POST':'GET';
+    const p = paths[Math.floor(Math.random()*paths.length)];
+    if(Math.random()>0.3) addFeedEntry(m,p, `10.0.0.${Math.floor(Math.random()*50+2)}`);
+  }, 2100);
+
+  // CHAT
+  let localMessages = [
+    {user:'DAVID_WISE', text:'WELCOME TO MUTINY COLLAB BBS. THIS NODE IS OPEN.', node:'SYSOP', ts:Date.now()-90000},
+    {user:'cameron', text:'we build the future. no permissions needed.', node:'NODE-7', ts:Date.now()-72000},
+    {user:'gordon', text:'hardware sync stable. who else is on?', node:'NODE-3', ts:Date.now()-45000},
+    {user:'punk_4829', text:'ANY USER CAN SHOOT A MESSAGE. testing 1-2-3', node:'NODE-12', ts:Date.now()-20000},
+  ];
+
+  function renderChat(msgs){
+    chat.innerHTML='';
+    const last = msgs.slice(-25);
+    last.forEach(m=>{
+      const d = new Date(m.ts || m.timestamp || Date.now());
+      const div = document.createElement('div');
+      div.className='msg' + (m.node==='SYSOP'?' sys':'');
+      div.innerHTML = `<span class="time">[${timeStr(d)}]</span><span class="user">&lt;${esc(m.user)}@${esc(m.node||'mutiny')}&gt;</span><span class="text">${esc(m.text)}</span>`;
+      chat.appendChild(div);
+    });
+    chat.scrollTop = chat.scrollHeight;
+    messageCount = msgs.length;
+    msgCountEl.textContent = messageCount;
+  }
+  renderChat(localMessages);
+
+  async function pollChat(){
+    try{
+      const res = await fetch(`${API_BASE}/ikarium/chat`, {cache:'no-store', mode:'cors'});
+      if(!res.ok) throw 0;
+      const data = await res.json();
+      // expect array
+      if(Array.isArray(data)){
+        localMessages = data.map(d=>({...d, ts:d.ts||d.timestamp||Date.now()}));
+        addFeedEntry('GET','/ikarium/chat');
+      }
+    }catch(e){ /* offline, use local */ }
+    renderChat(localMessages);
+  }
+
+  async function pollPeers(){
+    try{
+      const res = await fetch(`${API_BASE}/ikarium/peers`, {mode:'cors'});
+      if(!res.ok) throw 0;
+      const data = await res.json();
+      peerCount = data.count || (data.peers?.length) || 0;
+      addFeedEntry('GET','/ikarium/peers');
+    }catch(e){
+      peerCount = 3 + Math.floor(Math.random()*4);
     }
-  }, 180);
-}
-boot();
-
-// random glitches
-setInterval(()=>{
-  if(Math.random() < 0.12){
-    document.body.classList.add('glitch-now');
-    setTimeout(()=>document.body.classList.remove('glitch-now'), 180 + Math.random()*200);
+    peerCountEl.textContent = peerCount;
+    niPeers.textContent = `${peerCount} ACTIVE`;
   }
-  if(Math.random() < 0.07){
-    const crt = document.getElementById('crt');
-    crt.style.filter = `contrast(${1.05 + Math.random()*0.1}) brightness(${0.95 + Math.random()*0.1})`;
-    setTimeout(()=>crt.style.filter='', 100);
-  }
-}, 2200);
 
-// easter egg: click mutiny
-document.querySelector('.mutiny').addEventListener('click', ()=>{
-  document.body.classList.add('glitch-now');
-  setTimeout(()=>document.body.classList.remove('glitch-now'), 400);
-  const l = document.createElement('div');
-  l.className = 'log-line';
-  l.innerHTML = `<span class="pink">[SYSOP]</span> DON'T TOUCH THAT! - CAMERON`;
-  logEl.prepend(l);
+  function showBroadcast(on){ broadcast.classList.toggle('active', on); }
+
+  async function sendMessage(text){
+    if(!text.trim()) return;
+    const payload = { user:USERNAME, text:text.trim().slice(0,200), id:CLIENT_ID, node:NODE_ID, ts:Date.now() };
+    showBroadcast(true);
+    addFeedEntry('POST','/ikarium/shout', '127.0.0.1', 200);
+    input.value='';
+    input.disabled=true;
+    
+    // optimistic local
+    localMessages.push(payload);
+    renderChat(localMessages);
+
+    try{
+      await fetch(`${API_BASE}/ikarium/shout`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload),
+        mode:'cors'
+      });
+    }catch(e){
+      addFeed('OFFLINE MODE - message stored locally', 'SYSTEM');
+    }
+    setTimeout(()=>{
+      showBroadcast(false);
+      input.disabled=false;
+      input.focus();
+    }, 700);
+  }
+
+  sendBtn.onclick = ()=> sendMessage(input.value);
+  input.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); sendMessage(input.value); }
+  });
+
+  // CLOCK & UPTIME
+  setInterval(()=>{
+    const now = new Date();
+    clock.textContent = timeStr(now);
+    const up = Math.floor((Date.now()-startTime)/1000);
+    const h = String(Math.floor(up/3600)).padStart(2,'0');
+    const m = String(Math.floor((up%3600)/60)).padStart(2,'0');
+    const s = String(up%60).padStart(2,'0');
+    niUptime.textContent = `${h}:${m}:${s}`;
+  }, 1000);
+
+  // POLLING
+  pollChat();
+  pollPeers();
+  setInterval(pollChat, 2000);
+  setInterval(pollPeers, 5000);
+
+  // focus
+  input.focus();
+  addFeed('NODE ONLINE - COLLAB MODE ACTIVE', 'MUTINY');
+  addFeed(`HANDLE ASSIGNED: ${USERNAME}`, 'SYSTEM');
+
+  // random glitch sparkle
+  setInterval(()=>{
+    if(Math.random()>0.85){
+      document.querySelector('.screen').style.filter='brightness(1.3) contrast(1.2)';
+      setTimeout(()=>document.querySelector('.screen').style.filter='', 80);
+    }
+  }, 4000);
 });
 </script>
 </body>
