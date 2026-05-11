@@ -1,5 +1,5 @@
 {
-  "id": "Ikarium-David-1778528831",
+  "id": "Ikarium-David-1778528897",
   "peers": {
     "test-garden": {
       "url": "192.168.1.8",
@@ -26,7 +26,18 @@
     "Greet test-garden",
     "Greet test-seed2"
   ],
-  "messages": [],
-  "seen_ids": [],
-  "timestamp": "2026-05-11T14:47:14.630366"
+  "messages": [
+    {
+      "user": "punk_7423",
+      "text": "can you hear me",
+      "node": "jsczl7pp",
+      "time": "14:50:05",
+      "msg_id": "2a07779750a6",
+      "relayed": false
+    }
+  ],
+  "seen_ids": [
+    "2a07779750a6"
+  ],
+  "timestamp": "2026-05-11T14:59:17.522372"
 }
