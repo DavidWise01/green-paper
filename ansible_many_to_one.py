@@ -12,6 +12,7 @@ def home():
 def carrier_files(filename):
     return send_from_directory('carrier', filename)
 
+import os
 import time
 import threading
 import requests
@@ -171,8 +172,9 @@ def run_http_server():
     def home():
         return "IKARIUM " + MY_ID + " - MUTINY RELAY ACTIVE"
 
-    print("[HTTP] http://0.0.0.0:5000 - DISTRIBUTED CHAT")
-    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
+    port = int(os.environ.get("PORT", 5000))
+    print("[HTTP] http://0.0.0.0:" + str(port) + " - DISTRIBUTED CHAT")
+    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
 
 if __name__ == "__main__":
     print("="*60)
