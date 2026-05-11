@@ -3,571 +3,536 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MUTINY COLLAB BBS // IKARIUM NODE</title>
+<title>Laptop Motherboard — Layer 2.1 to 2.9: Topological Interconnect Map</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --green: #00ff41;
-  --pink: #ff0066;
-  --amber: #ffaa00;
-  --cyan: #00e5ff;
-  --bg: #000602;
-}
-* { box-sizing: border-box; margin:0; padding:0; }
-html, body { height:100%; overflow:hidden; }
-body {
-  background:#0a0a0a;
-  font-family:'VT323', monospace;
-  color:var(--green);
-  text-shadow:0 0 3px var(--green), 0 0 10px rgba(0,255,65,0.3);
-  font-size:20px;
-  line-height:1.2;
-}
-.crt-container {
-  position:relative;
-  width:100vw;
-  height:100vh;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:10px;
-}
-.screen {
-  position:relative;
-  width:100%;
-  height:100%;
-  max-width:1400px;
-  background: radial-gradient(ellipse at center, #001a05 0%, #000400 60%, #000000 100%);
-  border-radius: 28px / 22px;
-  box-shadow: inset 0 0 120px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,65,0.15), 0 0 30px rgba(0,0,0,0.8);
-  padding:18px 22px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  animation: flicker 0.15s infinite linear alternate;
-  overflow:hidden;
-}
-@keyframes flicker {
-  0%,100% { opacity:1; filter:brightness(1); }
-  92% { opacity:0.98; }
-  94% { opacity:0.94; filter:brightness(1.05); }
-  96% { opacity:1; }
-}
-.scanlines {
-  pointer-events:none;
-  position:absolute;
-  inset:0;
-  z-index:999;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0,0,0,0.25) 0px,
-    rgba(0,0,0,0.25) 2px,
-    transparent 2px,
-    transparent 4px
-  );
-  mix-blend-mode:multiply;
-  border-radius:inherit;
-}
-.screen::after {
-  content:'';
-  position:absolute;
-  inset:0;
-  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
-  pointer-events:none;
-  border-radius:inherit;
-  z-index:998;
-}
-/* TAPE */
-.tape {
-  position:absolute;
-  width:160px;
-  height:30px;
-  background:var(--pink);
-  opacity:0.9;
-  z-index:1000;
-  box-shadow:0 0 15px var(--pink), inset 0 0 5px rgba(0,0,0,0.5);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#000;
-  font-size:16px;
-  letter-spacing:3px;
-  text-shadow:none;
-  font-weight:bold;
-}
-.tape::before, .tape::after {
-  content:'';
-  position:absolute;
-  width:100%;
-  height:2px;
-  background:rgba(0,0,0,0.2);
-  top:6px;
-}
-.tape::after { top:auto; bottom:6px; }
-.tape-tl { top:8px; left:-35px; transform:rotate(-38deg); }
-.tape-br { bottom:18px; right:-45px; transform:rotate(-22deg); }
-
-/* HEADER */
-header { text-align:center; margin-bottom:2px; }
-.title {
-  font-size: clamp(48px, 10vw, 92px);
-  letter-spacing:0.08em;
-  color:var(--green);
-  position:relative;
-  display:inline-block;
-  text-shadow:0 0 8px var(--green), 0 0 20px var(--green), 0 0 40px rgba(0,255,65,0.6);
-  transform:scaleY(1.1) scaleX(0.95);
-  margin:0;
-}
-.title::before, .title::after {
-  content:attr(data-text);
-  position:absolute;
-  left:0; top:0;
-  width:100%; height:100%;
-  overflow:hidden;
-}
-.title::before {
-  color:var(--pink);
-  text-shadow:0 0 10px var(--pink);
-  animation:glitch1 2.7s infinite steps(2,end);
-  clip-path:polygon(0 0,100% 0,100% 35%,0 35%);
-}
-.title::after {
-  color:var(--cyan);
-  text-shadow:0 0 10px var(--cyan);
-  animation:glitch2 3.1s infinite steps(2,end);
-  clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);
-}
-@keyframes glitch1 { 0%,100%{transform:translate(0)} 20%{transform:translate(-2px,1px)} 40%{transform:translate(2px,-1px)} 60%{transform:translate(-1px,0)} }
-@keyframes glitch2 { 0%,100%{transform:translate(0)} 25%{transform:translate(2px,0)} 50%{transform:translate(-2px,1px)} 75%{transform:translate(1px,-1px)} }
-.subtitle {
-  color:var(--amber);
-  text-shadow:0 0 6px var(--amber);
-  font-size: clamp(14px, 2.5vw, 22px);
-  letter-spacing:2px;
-  margin-top:-6px;
-}
-
-/* STATUS BAR */
-.status-bar {
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px 24px;
-  align-items:center;
-  background:rgba(0,255,65,0.05);
-  border:1px solid var(--green);
-  padding:4px 10px;
-  font-size:18px;
-  color:var(--amber);
-  text-shadow:0 0 5px var(--amber);
-  box-shadow:inset 0 0 10px rgba(0,255,65,0.1), 0 0 8px rgba(0,255,65,0.2);
-}
-.status-bar .sep { color:var(--green); opacity:0.6; }
-.status-bar .right { margin-left:auto; display:flex; gap:16px; }
-.cursor { animation:blink 1s steps(1) infinite; color:var(--green); }
-@keyframes blink { 50% { opacity:0; } }
-
-/* LAYOUT */
-.main-grid {
-  display:grid;
-  grid-template-columns:55% 45%;
-  gap:10px;
-  height:34%;
-  min-height:180px;
-}
-.panel {
-  border:2px solid var(--green);
-  background:rgba(0,10,0,0.7);
-  box-shadow:inset 0 0 15px rgba(0,255,65,0.1), 0 0 12px rgba(0,255,65,0.08);
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  position:relative;
-}
-.panel-head {
-  color:var(--pink);
-  text-shadow:0 0 8px var(--pink);
-  border-bottom:1px solid var(--pink);
-  padding:2px 8px;
-  font-size:20px;
-  letter-spacing:1px;
-  background:rgba(255,0,102,0.08);
-  flex-shrink:0;
-}
-.panel-body {
-  flex:1;
-  overflow-y:auto;
-  padding:6px 8px;
-  font-size:19px;
-  scrollbar-width:thin;
-  scrollbar-color:var(--green) #000;
-}
-.panel-body::-webkit-scrollbar { width:8px; }
-.panel-body::-webkit-scrollbar-track { background:#000; }
-.panel-body::-webkit-scrollbar-thumb { background:var(--green); box-shadow:0 0 6px var(--green); }
-
-.feed-line {
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  opacity:0.9;
-}
-.feed-line:nth-child(odd) { opacity:0.75; }
-
-.chat-panel {
-  flex:1;
-  min-height:180px;
-}
-.msg { margin-bottom:3px; word-wrap:break-word; }
-.msg .time { color:var(--amber); text-shadow:0 0 5px var(--amber); margin-right:8px; }
-.msg .user { color:var(--cyan); text-shadow:0 0 6px var(--cyan); margin-right:8px; }
-.msg .text { color:var(--green); }
-.msg.sys .text { color:var(--amber); }
-
-/* NODE INFO */
-.node-info { font-size:19px; line-height:1.35; }
-.node-info .label { color:var(--amber); display:inline-block; width:110px; }
-.node-info .val { color:var(--green); }
-.node-info .val.pink { color:var(--pink); text-shadow:0 0 6px var(--pink); }
-.node-info .val.cyan { color:var(--cyan); text-shadow:0 0 6px var(--cyan); cursor:pointer; }
-.node-info .val.cyan:hover { text-decoration:underline; }
-
-/* INPUT */
-.input-bar {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  border:2px solid var(--pink);
-  background:rgba(255,0,102,0.06);
-  padding:6px 10px;
-  box-shadow:inset 0 0 10px rgba(255,0,102,0.15), 0 0 12px rgba(255,0,102,0.2);
-  flex-shrink:0;
-}
-.input-bar .prompt {
-  color:var(--pink);
-  font-size:26px;
-  text-shadow:0 0 8px var(--pink);
-}
-#msgInput {
-  flex:1;
-  background:transparent;
-  border:none;
-  outline:none;
-  color:var(--green);
-  font-family:inherit;
-  font-size:22px;
-  caret-color:var(--green);
-  text-shadow:0 0 5px var(--green);
-}
-#sendBtn {
-  background:var(--pink);
-  color:#000;
-  border:none;
-  padding:4px 16px;
-  font-family:inherit;
-  font-size:20px;
-  cursor:pointer;
-  box-shadow:0 0 12px var(--pink);
-  text-shadow:none;
-  font-weight:bold;
-  transition:transform 0.05s;
-}
-#sendBtn:active { transform:translateY(1px) scale(0.98); }
-#sendBtn:hover { filter:brightness(1.2); }
-
-#broadcast {
-  position:absolute;
-  bottom:68px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#000;
-  border:1px solid var(--pink);
-  color:var(--pink);
-  padding:4px 14px;
-  font-size:18px;
-  letter-spacing:1px;
-  text-shadow:0 0 8px var(--pink);
-  box-shadow:0 0 15px rgba(255,0,102,0.5);
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 0.2s;
-  z-index:500;
-  white-space:nowrap;
-}
-#broadcast.active { opacity:1; animation:broadcastBlink 0.4s steps(2) infinite; }
-@keyframes broadcastBlink { 50% { opacity:0.4; } }
-
-/* MOBILE */
-@media (max-width:900px) {
-  .screen { padding:12px; border-radius:18px; }
-  .main-grid { grid-template-columns:1fr; height:auto; }
-  .main-grid .panel { height:22vh; min-height:150px; }
-  .status-bar { font-size:16px; gap:8px 12px; }
-  .status-bar .right { width:100%; margin-left:0; justify-content:space-between; }
-  .title { font-size:56px; }
-  .tape { width:120px; height:24px; font-size:13px; }
-}
+  :root { color-scheme: dark; }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #020208; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(100,116,139,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100,116,139,0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .layer { transition: opacity 0.35s ease, filter 0.35s ease; }
+  .layer.inactive { opacity: 0; pointer-events: none; }
+  .layer-dim { opacity: 0.18 !important; }
+  .full-stack .layer { opacity: 0.65 !important; mix-blend-mode: screen; }
+  .flow { stroke-dasharray: 8 14; animation: flow 1.8s linear infinite; }
+  .flow-fast { stroke-dasharray: 4 8; animation: flow 0.8s linear infinite; }
+  @keyframes flow { to { stroke-dashoffset: -88; } }
+  .pulse { animation: pulse 2.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:.35} 50%{opacity:1} }
+  .glow { filter: drop-shadow(0 0 8px currentColor); }
+  .component rect { transition: all 0.2s; }
+  .component:hover rect { stroke: #e2e8f0; filter: drop-shadow(0 0 10px rgba(148,163,184,0.3)); }
+  .scrollbar::-webkit-scrollbar { width:6px; height:6px; }
+  .scrollbar::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+  .toggle:checked + div { background-color: currentColor; }
+  .toggle:checked + div span { transform: translateX(16px); background: white; }
 </style>
 </head>
-<body>
-<div class="crt-container">
-  <div class="scanlines"></div>
-  <div class="tape tape-tl">REPAIRED</div>
-  <div class="tape tape-br">REPAIRED</div>
-  
-  <div class="screen">
-    <header>
-      <h1 class="title" data-text="MUTINY">MUTINY</h1>
-      <div class="subtitle">IKARIUM NODE NETWORK // EST. 1984 // COLLAB MODE</div>
-    </header>
-
-    <div class="status-bar">
-      <span>NODE:<span style="color:var(--green)">IKARIUM-7</span></span>
-      <span class="sep">|</span>
-      <span>HOST:<span style="color:var(--green)" id="hostDisp">192.168.1.8:5000</span></span>
-      <span class="sep">|</span>
-      <span>SYSOP:<span style="color:var(--green)">DAVID WISE</span></span>
-      <div class="right">
-        <span>PEERS:<span id="peerCount" style="color:var(--green)">0</span></span>
-        <span>MSGS:<span id="msgCount" style="color:var(--green)">0</span></span>
-        <span id="clock">--:--:--</span>
-        <span class="cursor">█</span>
+<body class="text-slate-200 min-h-screen flex flex-col selection:bg-violet-500/30 selection:text-violet-200">
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-[1800px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500 grid place-items-center shadow-lg shadow-violet-900/30">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 3h6v4H9zM5 7h14v4H5zM3 11h18v4H3zM7 15h10v6H7z"/></svg>
+        </div>
+        <div>
+          <h1 class="text-[15px] sm:text-lg font-semibold tracking-tight leading-tight">Laptop Motherboard — Layer 2.1 to 2.9</h1>
+          <p class="text-[11px] sm:text-xs text-slate-400 -mt-0.5">Topological Interconnect Map • Not blocks, but wires</p>
+        </div>
+      <div class="hidden md:flex items-center gap-2 text-[11px]">
+        <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300">Layer 1: Functions</span>
+        <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300">Layer 2: Electrical</span>
+        <span class="px-2 py-1 rounded bg-violet-500/20 border border-violet-500/40 text-violet-200 font-medium">Layer 2.x: Topology</span>
       </div>
     </div>
+  </header>
 
-    <div class="main-grid">
-      <div class="panel">
-        <div class="panel-head">[LIVE FEED]</div>
-        <div class="panel-body" id="feed"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">[CURRENT NODE]</div>
-        <div class="panel-body">
-          <div class="node-info" id="nodeInfo">
-            <div><span class="label">NODE......:</span><span class="val">IKARIUM-7</span></div>
-            <div><span class="label">HOST......:</span><span class="val" id="ni-host">192.168.1.8:5000</span></div>
-            <div><span class="label">SYSOP.....:</span><span class="val">DAVID WISE</span></div>
-            <div><span class="label">HANDLE....:</span><span class="val cyan" id="handle">punk_0000</span></div>
-            <div><span class="label">PEERS.....:</span><span class="val" id="ni-peers">0 ACTIVE</span></div>
-            <div><span class="label">UPTIME....:</span><span class="val" id="ni-uptime">00:00:00</span></div>
-            <div><span class="label">PROTOCOL..:</span><span class="val">COLLAB v0.91b</span></div>
-            <div><span class="label">STATUS....:</span><span class="val pink">OPEN ACCESS</span></div>
-            <div><span class="label">MODE......:</span><span class="val">[ANY USER CAN SHOOT]</span></div>
+  <main class="flex-1 max-w-[1800px] w-full mx-auto p-3 sm:p-4 lg:p-6 grid grid-cols-12 gap-4 lg:gap-6">
+    <!-- LEFT: Legend -->
+    <aside class="col-span-12 xl:col-span-3 2xl:col-span-2 order-2 xl:order-1">
+      <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 backdrop-blur">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300">Layers 2.1–2.9</h2>
+          <div class="flex gap-1">
+            <button id="btn-all" class="text-[10px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700">All</button>
+            <button id="btn-none" class="text-[10px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700">None</button>
+            <button id="btn-stack" class="text-[10px] px-2 py-1 rounded bg-violet-600 hover:bg-violet-500 text-white">Full Stack</button>
+          </div>
+        </div>
+        <div id="legend" class="space-y-1.5"></div>
+
+        <div class="mt-5 pt-4 border-t border-slate-800">
+          <h3 class="text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">Motherboard as City</h3>
+          <div class="space-y-2 text-[12px] leading-snug text-slate-400">
+            <p><span class="text-amber-400">Power</span> = water mains & pressure regulators</p>
+            <p><span class="text-cyan-400">Clocks</span> = traffic lights (sync)</p>
+            <p><span class="text-violet-400">Data</span> = 8-lane highways (differential)</p>
+            <p><span class="text-emerald-400">Control</span> = city hall phone lines</p>
+            <p><span class="text-rose-400">Telemetry</span> = water meters & thermometers</p>
+            <p><span class="text-slate-400">Ground</span> = sewer return (everything flows back)</p>
           </div>
         </div>
       </div>
-    </div>
+    </aside>
 
-    <div class="panel chat-panel">
-      <div class="panel-head">[PUBLIC CHANNEL - ALL USERS]</div>
-      <div class="panel-body" id="chat"></div>
-    </div>
+    <!-- CENTER: SVG -->
+    <section class="col-span-12 xl:col-span-6 2xl:col-span-7 order-1 xl:order-2">
+      <div class="relative bg-[#050812] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
+        <div class="absolute inset-0 grid-bg opacity-[0.4]"></div>
+        <div class="absolute top-3 left-3 z-20 flex gap-1.5">
+          <span class="px-2 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-[10px] mono">12L PCB • 0.8mm • 3oz copper</span>
+          <span class="px-2 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-[10px] mono">85-100Ω diff</span>
+        </div>
+        <svg id="board" viewBox="0 0 1200 800" class="relative w-full h-auto select-none">
+          <defs>
+            <pattern id="mesh" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M20 0 H0 V20" fill="none" stroke="#334155" stroke-opacity="0.25" stroke-width="0.5"/>
+            </pattern>
+            <linearGradient id="heatGrad" x1="0" x2="1">
+              <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.05"/>
+            </linearGradient>
+            <filter id="glowSoft" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <!-- Markers -->
+            <marker id="m-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#f59e0b"/></marker>
+            <marker id="m-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#22d3ee"/></marker>
+            <marker id="m-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#8b5cf6"/></marker>
+            <marker id="m-emerald" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#10b981"/></marker>
+            <marker id="m-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#f43f5e"/></marker>
+            <marker id="m-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#3b82f6"/></marker>
+          </defs>
 
-    <div class="input-bar">
-      <span class="prompt">&gt;</span>
-      <input id="msgInput" type="text" autocomplete="off" spellcheck="false" maxlength="200" placeholder="type message, hit ENTER to broadcast...">
-      <button id="sendBtn">[SEND]</button>
-    </div>
+          <!-- Board outline -->
+          <rect x="18" y="18" width="1164" height="764" rx="36" fill="#070b12" stroke="#1e293b" stroke-width="3"/>
+          <rect x="28" y="28" width="1144" height="744" rx="28" fill="#0a101c" stroke="#0f172a" stroke-width="1"/>
+          
+          <!-- Screw holes -->
+          <g fill="none" stroke="#334155" stroke-width="2">
+            <circle cx="60" cy="60" r="12"/><circle cx="1140" cy="60" r="12"/><circle cx="60" cy="740" r="12"/>
+            <circle cx="1140" cy="740" r="12"/><circle cx="600" cy="60" r="12"/><circle cx="600" cy="740" r="12"/>
+          </g>
 
-    <div id="broadcast">BROADCASTING TO MUTINY NETWORK...</div>
-  </div>
-</div>
+          <!-- Components base -->
+          <g id="components" class="component-layer" font-family="JetBrains Mono" font-size="11">
+            <!-- DC Jack -->
+            <g class="component" transform="translate(55,700)"><rect x="-18" y="-12" width="36" height="24" rx="3" fill="#0f172a" stroke="#475569"/><text x="0" y="28" text-anchor="middle" fill="#94a3b8" font-size="9">DC</text><title>DC Jack 19.5V</title></g>
+            <!-- Charger -->
+            <g class="component" transform="translate(130,675)"><rect x="-32" y="-20" width="64" height="40" rx="5" fill="#0f172a" stroke="#475569"/><text x="0" y="4" text-anchor="middle" fill="#fde68a">CHGR</text><title>BQ25700 Charger IC</title></g>
+            <!-- Battery -->
+            <g class="component" transform="translate(270,735)"><rect x="-45" y="-18" width="90" height="36" rx="5" fill="#0f172a" stroke="#475569"/><text x="0" y="4" text-anchor="middle" fill="#fde68a">BAT</text><title>Battery Connector 4S</title></g>
+            <!-- EC -->
+            <g class="component" transform="translate(140,545)"><rect x="-30" y="-22" width="60" height="44" rx="5" fill="#0f172a" stroke="#475569"/><text x="0" y="4" text-anchor="middle" fill="#a7f3d0">EC</text><title>Embedded Controller IT5570</title></g>
+            <!-- PCH -->
+            <g class="component" transform="translate(400,495)"><rect x="-35" y="-25" width="70" height="50" rx="6" fill="#0f172a" stroke="#475569"/><text x="0" y="4" text-anchor="middle" fill="#bae6fd">PCH</text><title>Platform Controller Hub</title></g>
+            <!-- CPU -->
+            <g class="component" transform="translate(560,305)"><rect x="-48" y="-48" width="96" height="96" rx="8" fill="#111827" stroke="#6366f1" stroke-width="1.5"/><text x="0" y="4" text-anchor="middle" fill="#c7d2fe" font-size="13" font-weight="600">SoC</text><title>CPU + iGPU + Memory Controller</title></g>
+            <!-- GPU -->
+            <g class="component" transform="translate(820,275)"><rect x="-42" y="-42" width="84" height="84" rx="8" fill="#111827" stroke="#8b5cf6" stroke-width="1.2"/><text x="0" y="4" text-anchor="middle" fill="#ddd6fe" font-size="12">dGPU</text><title>Discrete GPU</title></g>
+            <!-- DDR -->
+            <g class="component" transform="translate(480,130)"><rect x="-55" y="-18" width="110" height="36" rx="4" fill="#0f172a" stroke="#475569"/><text x="0" y="4" text-anchor="middle" fill="#e9d5ff">DDR5-A</text></g>
+            <g class="component" transform="translate(650,130)"><rect x="-55" y="-18" width="110" height="36" rx="4" fill="#0f172a" stroke="#475569"/><text x="0" y="4" text-anchor="middle" fill="#e9d5ff">DDR5-B</text></g>
+            <!-- NVMe -->
+            <g class="component" transform="translate(950,435)"><rect x="-40" y="-14" width="80" height="28" rx="3" fill="#0f172a" stroke="#475569"/><text x="0" y="3" text-anchor="middle" fill="#ddd6fe" font-size="10">NVMe0</text></g>
+            <g class="component" transform="translate(950,585)"><rect x="-40" y="-14" width="80" height="28" rx="3" fill="#0f172a" stroke="#475569"/><text x="0" y="3" text-anchor="middle" fill="#ddd6fe" font-size="10">NVMe1</text></g>
+            <!-- WiFi -->
+            <g class="component" transform="translate(1030,195)"><rect x="-30" y="-18" width="60" height="36" rx="4" fill="#0f172a" stroke="#475569"/><text x="0" y="4" text-anchor="middle" fill="#ddd6fe" font-size="10">WiFi6E</text></g>
+            <!-- Buck -->
+            <g class="component" transform="translate(260,495)"><rect x="-28" y="-18" width="56" height="36" rx="4" fill="#0f172a" stroke="#475569"/><text x="0" y="3" text-anchor="middle" fill="#fed7aa" font-size="10">3V3/5V</text></g>
+            <!-- PMIC -->
+            <g class="component" transform="translate(410,205)"><rect x="-26" y="-16" width="52" height="32" rx="4" fill="#0f172a" stroke="#475569"/><text x="0" y="3" text-anchor="middle" fill="#fed7aa" font-size="10">PMIC</text></g>
+            <!-- BIOS -->
+            <g class="component" transform="translate(310,445)"><rect x="-22" y="-14" width="44" height="28" rx="3" fill="#0f172a" stroke="#475569"/><text x="0" y="3" text-anchor="middle" fill="#a7f3d0" font-size="9">BIOS</text></g>
+            <!-- USB-C -->
+            <g class="component" transform="translate(35,405)"><rect x="-10" y="-16" width="20" height="32" rx="2" fill="#0f172a" stroke="#475569"/><text x="20" y="4" fill="#94a3b8" font-size="9">TB4</text></g>
+            <g class="component" transform="translate(35,505)"><rect x="-10" y="-16" width="20" height="32" rx="2" fill="#0f172a" stroke="#475569"/><text x="20" y="4" fill="#94a3b8" font-size="9">USB4</text></g>
+            <!-- Ports right -->
+            <g transform="translate(1165,350)"><rect x="-12" y="-14" width="24" height="28" rx="2" fill="#0f172a" stroke="#475569"/><text x="-16" y="4" text-anchor="end" fill="#94a3b8" font-size="9">HDMI</text></g>
+            <g transform="translate(1165,500)"><rect x="-12" y="-14" width="24" height="28" rx="2" fill="#0f172a" stroke="#475569"/><text x="-16" y="4" text-anchor="end" fill="#94a3b8" font-size="9">USB-A</text></g>
+            <!-- Fan -->
+            <g transform="translate(980,95)"><circle r="28" fill="none" stroke="#164e63" stroke-width="2" stroke-dasharray="3 3"/><text x="0" y="4" text-anchor="middle" fill="#67e8f9" font-size="10">FAN</text></g>
+            <!-- VRM phases CPU -->
+            <g id="cpu-vrm" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2">
+              <rect x="442" y="242" width="14" height="14" rx="2"/><rect x="442" y="292" width="14" height="14" rx="2"/><rect x="442" y="342" width="14" height="14" rx="2"/>
+              <rect x="492" y="202" width="14" height="14" rx="2"/><rect x="542" y="202" width="14" height="14" rx="2"/><rect x="592" y="202" width="14" height="14" rx="2"/>
+            </g>
+            <!-- VRM phases GPU -->
+            <g fill="#1e293b" stroke="#f59e0b" stroke-width="1.2">
+              <rect x="732" y="202" width="14" height="14" rx="2"/><rect x="772" y="202" width="14" height="14" rx="2"/><rect x="872" y="212" width="14" height="14" rx="2"/><rect x="912" y="242" width="14" height="14" rx="2"/>
+            </g>
+          </g>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // ===== CONFIG =====
-  const API_BASE = 'http://192.168.1.8:5000';
-  // ==================
+          <!-- ===== LAYERS ===== -->
+          <!-- 2.1 POWER -->
+          <g id="layer-2-1" class="layer" data-id="2.1" style="color:#f59e0b">
+            <g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" opacity="0.9">
+              <path d="M55 700 H130 V675 M270 720 V680 H162" marker-end="url(#m-amber)"/>
+              <path d="M130 675 H260 V500 M160 675 H500 V395 H780" class="flow"/>
+              <path d="M500 395 V350 H512" stroke-width="2.5"/>
+              <path d="M500 395 V310 H449 M500 395 V245 H449 M500 395 V215 H499 M500 395 V215 H549 M500 395 V215 H599" stroke-width="2"/>
+              <path d="M780 395 V330 H778" stroke-width="2.5"/>
+              <path d="M780 330 H739 M780 330 H779 M780 330 H879 M780 330 H915" stroke-width="2"/>
+              <path d="M260 500 H390 V210" stroke-width="2.5" stroke-dasharray="6 6"/>
+            </g>
+            <!-- 3V3/5V distribution -->
+            <g fill="none" stroke="#fdba74" stroke-width="2" opacity="0.85">
+              <path d="M260 495 H200 V545 H140 M260 495 H400 V495" class="flow" style="animation-duration:2.5s"/>
+            </g>
+            <!-- Decoupling caps -->
+            <g fill="currentColor" opacity="0.8">
+              <g class="pulse">
+                <circle cx="220" cy="675" r="2"/><circle cx="280" cy="675" r="2"/><circle cx="340" cy="675" r="2"/><circle cx="400" cy="395" r="2"/><circle cx="460" cy="395" r="2"/><circle cx="520" cy="395" r="2"/><circle cx="580" cy="395" r="2"/><circle cx="640" cy="395" r="2"/><circle cx="700" cy="395" r="2"/>
+                <circle cx="505" cy="310" r="1.6"/><circle cx="505" cy="260" r="1.6"/><circle cx="560" cy="255" r="1.6"/><circle cx="610" cy="255" r="1.6"/>
+                <circle cx="480" cy="170" r="1.6"/><circle cx="480" cy="150" r="1.6"/><circle cx="650" cy="150" r="1.6"/><circle cx="650" cy="170" r="1.6"/>
+              </g>
+            <g font-size="10" fill="#fde68a" font-family="JetBrains Mono">
+              <text x="70" y="665">1.ADAPTER</text><text x="175" y="660">2.CHGR</text><text x="310" y="660">3.19V</text><text x="470" y="380">4.VRM IN</text><text x="215" y="480">5.3V3/5V</text>
+            </g>
+          </g>
 
-  let USERNAME = localStorage.getItem('mutiny_handle') || `punk_${Math.floor(Math.random()*9000+1000)}`;
-  let CLIENT_ID = localStorage.getItem('mutiny_id') || Math.random().toString(36).slice(2,10);
-  localStorage.setItem('mutiny_id', CLIENT_ID);
-  const NODE_ID = `NODE-${Math.floor(Math.random()*90+10)}`;
-  let startTime = Date.now();
-  let peerCount = 0;
-  let messageCount = 0;
+          <!-- 2.2 CLOCK -->
+          <g id="layer-2-2" class="layer inactive" data-id="2.2" style="color:#22d3ee">
+            <g fill="none" stroke="currentColor" stroke-width="2" opacity="0.9">
+              <path d="M105 525 c 15 -5 25 0 35 20 V545 H140" marker-end="url(#m-cyan)"/>
+              <text x="75" y="520" font-size="9" fill="#67e8f9">32.768kHz</text>
+              <path d="M140 545 H400 V495" class="flow"/>
+              <circle cx="365" cy="470" r="8" fill="none" stroke="#22d3ee" stroke-width="1.5"/><text x="352" y="475" font-size="8" fill="#67e8f9">25M</text>
+              <path d="M400 495 C450 480 480 420 520 375" stroke-width="2.5"/>
+              <circle cx="520" cy="375" r="12" fill="#082f49" stroke="currentColor"/><text x="520" y="379" text-anchor="middle" font-size="8" fill="#67e8f9">PLL</text>
+              <!-- fanout -->
+              <path d="M520 375 Q540 340 560 305" marker-end="url(#m-cyan)"/>
+              <path d="M520 375 Q600 340 650 320 740 295 820 275"/>
+              <path d="M520 375 Q500 250 480 130" />
+              <path d="M520 375 Q600 250 650 130" />
+              <path d="M520 375 Q700 380 950 435" />
+              <path d="M520 375 Q400 400 35 405" />
+            </g>
+            <g font-size="9" fill="#a5f3fc" font-family="JetBrains Mono">
+              <text x="540" y="335">100MHz PCIe</text><text x="455" y="180">1.8GHz DDR</text><text x="80" y="410">24MHz USB</text>
+            </g>
+          </g>
 
-  const $ = id => document.getElementById(id);
-  const feed = $('feed'), chat = $('chat'), input = $('msgInput'), sendBtn = $('sendBtn');
-  const peerCountEl = $('peerCount'), msgCountEl = $('msgCount'), clock = $('clock');
-  const handleEl = $('handle'), broadcast = $('broadcast');
-  const niHost = $('ni-host'), niPeers = $('ni-peers'), niUptime = $('ni-uptime');
-  $('hostDisp').textContent = API_BASE.replace('http://','');
-  niHost.textContent = API_BASE.replace('http://','');
-  handleEl.textContent = USERNAME;
+          <!-- 2.3 HIGH SPEED -->
+          <g id="layer-2-3" class="layer inactive" data-id="2.3" style="color:#8b5cf6">
+            <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" opacity="0.25">
+              <path d="M608 305 H730 Q760 285 778 275"/>
+              <path d="M608 315 H730 Q760 295 778 285"/>
+              <path d="M608 325 H730 Q760 305 778 295"/>
+              <path d="M608 335 H730 Q760 315 778 305"/>
+            </g>
+            <g fill="none" stroke="#a78bfa" stroke-width="1.2" opacity="0.9">
+              <path d="M608 305 H730 Q760 285 778 275"/><path d="M608 315 H730 Q760 295 778 285"/><path d="M608 325 H730 Q760 305 778 295"/><path d="M608 335 H730 Q760 315 778 305"/>
+              <text x="680" y="265" font-size="9" fill="#c4b5fd">PCIe Gen5 x8</text>
+            </g>
+            <!-- DDR -->
+            <g fill="none" stroke="#c4b5fd" stroke-width="3" opacity="0.4">
+              <path d="M560 257 V170 H480"/><path d="M570 257 V170 H490"/><path d="M560 353 V170 H650"/><path d="M570 353 V170 H660"/>
+            </g>
+            <g fill="none" stroke="#ddd6fe" stroke-width="1" opacity="0.8">
+              <path d="M555 257 V170 H475 M565 257 V170 H485 M575 257 V170 H495"/>
+              <path d="M555 353 V170 H645 M565 353 V170 H655 M575 353 V170 H665"/>
+              <text x="470" y="105" font-size="9" fill="#e9d5ff">DDR5 2×64b</text>
+            </g>
+            <!-- NVMe -->
+            <g fill="none" stroke="currentColor" stroke-width="4" opacity="0.3">
+              <path d="M608 340 Q800 370 910 435"/><path d="M405 520 Q600 550 910 585"/>
+            </g>
+            <g fill="none" stroke="#a78bfa" stroke-width="1" opacity="0.9">
+              <path d="M608 338 Q800 368 910 433"/><path d="M608 342 Q800 372 910 437"/>
+              <path d="M405 518 Q600 548 910 583"/><path d="M405 522 Q600 552 910 587"/>
+            </g>
+            <!-- USB4 -->
+            <g fill="none" stroke="#f472b6" stroke-width="3" opacity="0.5">
+              <path d="M560 353 Q300 380 70 405 M560 353 Q300 430 70 505"/>
+            </g>
+            <text x="200" y="395" font-size="9" fill="#f9a8d4">USB4 40Gbps</text>
+            <!-- eDP -->
+            <g fill="none" stroke="#a78bfa" stroke-width="1.5" opacity="0.7" stroke-dasharray="3 3">
+              <path d="M512 305 H200 V320 H80"/><path d="M512 315 H200 V330 H80"/>
+            </g>
+            <text x="120" y="315" font-size="9" fill="#c4b5fd">eDP x4</text>
+          </g>
 
-  handleEl.onclick = () => {
-    const nh = prompt('ENTER NEW HANDLE:', USERNAME);
-    if(nh && nh.trim().length>2) {
-      USERNAME = nh.trim().toLowerCase().replace(/\s+/g,'_').slice(0,16);
-      localStorage.setItem('mutiny_handle', USERNAME);
-      handleEl.textContent = USERNAME;
-      addFeed('HANDLE CHANGED', 'SYSTEM');
-    }
-  };
+          <!-- 2.4 LOW SPEED -->
+          <g id="layer-2-4" class="layer inactive" data-id="2.4" style="color:#10b981">
+            <!-- SMBus -->
+            <g fill="none" stroke="currentColor" stroke-width="2" opacity="0.9" marker-end="url(#m-emerald)">
+              <path d="M140 567 V620 H130 V675 M140 567 H270 V717 M140 567 H260 V513 M140 567 H410 V221 M140 567 H310 V459"/>
+            </g>
+            <g fill="none" stroke="#34d399" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.7">
+              <path d="M140 523 H400 V495"/>
+            </g>
+            <text x="155" y="605" font-size="9" fill="#6ee7b7">SMBus / I2C 100kHz</text>
+            <text x="200" y="505" font-size="9" fill="#6ee7b7">eSPI</text>
+            <!-- SPI -->
+            <g fill="none" stroke="#6ee7b7" stroke-width="2" marker-end="url(#m-emerald)">
+              <path d="M400 520 V470 H332"/>
+            </g>
+            <text x="345" y="495" font-size="9" fill="#a7f3d0">SPI BIOS</text>
+          </g>
 
-  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function timeStr(d=new Date()){ return d.toTimeString().slice(0,8); }
-  function logTime(d=new Date()){
-    const pad=n=>String(n).padStart(2,'0');
-    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${pad(d.getDate())}/${months[d.getMonth()]}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-  }
+          <!-- 2.5 SENSING -->
+          <g id="layer-2-5" class="layer inactive" data-id="2.5" style="color:#f43f5e">
+            <!-- Thermistors -->
+            <g fill="none" stroke="currentColor" stroke-width="1.5">
+              <g transform="translate(560,360)"><polygon points="0,-6 5,4 -5,4" fill="#450a0a" stroke="currentColor"/><text x="8" y="4" font-size="8" fill="#fda4af">CPU 95°C</text></g>
+              <g transform="translate(820,330)"><polygon points="0,-6 5,4 -5,4" fill="#450a0a" stroke="currentColor"/><text x="8" y="4" font-size="8" fill="#fda4af">GPU</text></g>
+              <g transform="translate(950,460)"><polygon points="0,-6 5,4 -5,4" fill="#450a0a" stroke="currentColor"/></g>
+              <g transform="translate(270,700)"><polygon points="0,-6 5,4 -5,4" fill="#450a0a" stroke="currentColor"/></g>
+              <g transform="translate(465,285)"><polygon points="0,-5 4,3 -4,3" fill="#450a0a" stroke="currentColor"/></g>
+            </g>
+            <!-- Current sense -->
+            <g stroke="#fb7185" fill="#1f0a0f">
+              <rect x="200" y="668" width="14" height="6" rx="1"/><rect x="485" y="392" width="14" height="6" rx="1"/><rect x="765" y="392" width="14" height="6" rx="1"/>
+            </g>
+            <g fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.8" marker-end="url(#m-rose)">
+              <path d="M207 671 V620 H155 V567"/>
+              <path d="M492 395 V450 H400 V520 H155 V567"/>
+              <path d="M772 395 V460 H650 V560 H155"/>
+            </g>
+            <text x="165" y="585" font-size="9" fill="#fda4af">TELEMETRY → EC ADC</text>
+          </g>
 
-  // LIVE FEED
-  function addFeedEntry(method, path, ip='127.0.0.1', status=200){
-    const line = document.createElement('div');
-    line.className='feed-line';
-    line.textContent = `${ip} - - [${logTime()}] "${method} ${path} HTTP/1.1" ${status} -`;
-    feed.prepend(line);
-    while(feed.children.length>80) feed.removeChild(feed.lastChild);
-  }
-  function addFeed(text, src='FEED'){
-    const line = document.createElement('div');
-    line.className='feed-line';
-    line.style.color='var(--amber)';
-    line.textContent = `[${timeStr()}] ${src}> ${text}`;
-    feed.prepend(line);
-  }
+          <!-- 2.6 GROUND -->
+          <g id="layer-2-6" class="layer inactive" data-id="2.6" style="color:#64748b">
+            <rect x="35" y="35" width="1130" height="730" fill="url(#mesh)" opacity="0.5"/>
+            <!-- return paths -->
+            <g fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6" stroke-dasharray="6 6">
+              <path d="M560 353 Q560 500 600 650 Q600 720 600 740" class="flow" style="animation-direction:reverse"/>
+              <path d="M820 317 Q820 500 600 650" class="flow" style="animation-direction:reverse"/>
+            </g>
+            <g fill="#0f172a" stroke="currentColor" stroke-width="1.5">
+              <circle cx="60" cy="60" r="8"/><circle cx="1140" cy="60" r="8"/><circle cx="60" cy="740" r="8"/><circle cx="1140" cy="740" r="8"/><circle cx="600" cy="60" r="8"/><circle cx="600" cy="740" r="8"/>
+            </g>
+            <text x="610" y="58" font-size="9" fill="#94a3b8">STAR GND</text>
+          </g>
 
-  // simulate initial powershell log
-  const initialLogs = [
-    ['GET','/ikarium/pump'],
-    ['GET','/ikarium/chat'],
-    ['GET','/ikarium/peers'],
-    ['GET','/ikarium/pump'],
-    ['POST','/ikarium/shout'],
-  ];
-  initialLogs.forEach(([m,p],i)=>{
-    setTimeout(()=>addFeedEntry(m,p, `192.168.1.${10+Math.floor(Math.random()*20)}`), i*180);
-  });
-  setInterval(()=>{ // random traffic
-    const paths=['/ikarium/pump','/ikarium/chat','/ikarium/peers','/ikarium/shout'];
-    const m = Math.random()>0.8?'POST':'GET';
-    const p = paths[Math.floor(Math.random()*paths.length)];
-    if(Math.random()>0.3) addFeedEntry(m,p, `10.0.0.${Math.floor(Math.random()*50+2)}`);
-  }, 2100);
+          <!-- 2.7 PROTECTION -->
+          <g id="layer-2-7" class="layer inactive" data-id="2.7" style="color:#ea580c">
+            <g stroke="currentColor" stroke-width="1.8" fill="none">
+              <!-- DC fuse -->
+              <g transform="translate(85,690)"><rect x="-10" y="-4" width="20" height="8" fill="#431407" stroke="currentColor"/><text x="0" y="-8" text-anchor="middle" font-size="8" fill="#fdba74">Fuse 7A</text></g>
+              <!-- TVS at ports -->
+              <g transform="translate(50,405)"><path d="M0 0 l8 -6 v12 z M8 -6 l8 6 v-12 z" fill="#431407"/><text x="22" y="3" font-size="8" fill="#fdba74">TVS</text></g>
+              <g transform="translate(50,505)"><path d="M0 0 l8 -6 v12 z M8 -6 l8 6 v-12 z" fill="#431407"/></g>
+              <g transform="translate(1150,350)"><path d="M0 0 l-8 -6 v12 z M-8 -6 l-8 6 v-12 z" fill="#431407"/></g>
+              <g transform="translate(1150,500)"><path d="M0 0 l-8 -6 v12 z M-8 -6 l-8 6 v-12 z" fill="#431407"/></g>
+              <!-- Reverse FET -->
+              <g transform="translate(130,655)"><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#431407"/><text x="0" y="-12" text-anchor="middle" font-size="8" fill="#fdba74">RPFET</text></g>
+            </g>
+          </g>
 
-  // CHAT
-  let localMessages = [
-    {user:'DAVID_WISE', text:'WELCOME TO MUTINY COLLAB BBS. THIS NODE IS OPEN.', node:'SYSOP', ts:Date.now()-90000},
-    {user:'cameron', text:'we build the future. no permissions needed.', node:'NODE-7', ts:Date.now()-72000},
-    {user:'gordon', text:'hardware sync stable. who else is on?', node:'NODE-3', ts:Date.now()-45000},
-    {user:'punk_4829', text:'ANY USER CAN SHOOT A MESSAGE. testing 1-2-3', node:'NODE-12', ts:Date.now()-20000},
-  ];
+          <!-- 2.8 RESET -->
+          <g id="layer-2-8" class="layer inactive" data-id="2.8" style="color:#3b82f6">
+            <g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" marker-end="url(#m-blue)">
+              <path d="M90 640 H150 M170 640 H250 M270 640 H350 M370 640 H450 M470 640 H540"/>
+            </g>
+            <g font-family="JetBrains Mono" font-size="10">
+              <g transform="translate(120,640)"><circle r="18" fill="#0b1228" stroke="currentColor"/><text y="3" text-anchor="middle" fill="#93c5fd">1</text><text y="32" text-anchor="middle" fill="#93c5fd" font-size="8">ADP_DET</text></g>
+              <g transform="translate(210,640)"><circle r="18" fill="#0b1228" stroke="currentColor"/><text y="3" text-anchor="middle" fill="#93c5fd">2</text><text y="32" text-anchor="middle" fill="#93c5fd" font-size="8">EC_ON</text></g>
+              <g transform="translate(310,640)"><circle r="18" fill="#0b1228" stroke="currentColor"/><text y="3" text-anchor="middle" fill="#93c5fd">3</text><text y="32" text-anchor="middle" fill="#93c5fd" font-size="8">PMIC_EN</text></g>
+              <g transform="translate(410,640)"><circle r="18" fill="#0b1228" stroke="currentColor"/><text y="3" text-anchor="middle" fill="#93c5fd">4</text><text y="32" text-anchor="middle" fill="#93c5fd" font-size="8">VR_PG</text></g>
+              <g transform="translate(510,640)"><circle r="18" fill="#0b1228" stroke="currentColor"/><text y="3" text-anchor="middle" fill="#93c5fd">5</text><text y="32" text-anchor="middle" fill="#93c5fd" font-size="8">PLTRST#</text></g>
+            </g>
+            <!-- Timing -->
+            <g transform="translate(650,610)" font-size="9" font-family="JetBrains Mono">
+              <text x="0" y="-5" fill="#93c5fd">Power Sequence (ms)</text>
+              <g stroke="#334155"><line x1="0" y1="10" x2="0" y2="70"/><line x1="0" y1="70" x2="300" y2="70"/></g>
+              <g fill="none" stroke="#3b82f6" stroke-width="1.8">
+                <path d="M10 20 H40 V35 H90"/><text x="92" y="38" fill="#93c5fd">EC</text>
+                <path d="M10 35 H60 V50 H130"/><text x="132" y="53" fill="#93c5fd">PMIC</text>
+                <path d="M10 50 H100 V65 H180"/><text x="182" y="68" fill="#93c5fd">VRM</text>
+              </g>
+            </g>
+          </g>
 
-  function renderChat(msgs){
-    chat.innerHTML='';
-    const last = msgs.slice(-25);
-    last.forEach(m=>{
-      const d = new Date(m.ts || m.timestamp || Date.now());
-      const div = document.createElement('div');
-      div.className='msg' + (m.node==='SYSOP'?' sys':'');
-      div.innerHTML = `<span class="time">[${timeStr(d)}]</span><span class="user">&lt;${esc(m.user)}@${esc(m.node||'mutiny')}&gt;</span><span class="text">${esc(m.text)}</span>`;
-      chat.appendChild(div);
-    });
-    chat.scrollTop = chat.scrollHeight;
-    messageCount = msgs.length;
-    msgCountEl.textContent = messageCount;
-  }
-  renderChat(localMessages);
+          <!-- 2.9 THERMAL -->
+          <g id="layer-2-9" class="layer inactive" data-id="2.9" style="color:#14b8a6">
+            <g fill="none" stroke="url(#heatGrad)" stroke-width="22" stroke-linecap="round" opacity="0.85">
+              <path d="M560 305 C700 250 850 180 970 110"/>
+              <path d="M820 275 C880 220 930 160 970 115"/>
+              <path d="M520 330 C650 300 800 240 970 125"/>
+            </g>
+            <g fill="none" stroke="#2dd4bf" stroke-width="2" opacity="0.7">
+              <path d="M560 305 C700 250 850 180 970 110"/>
+              <path d="M820 275 C880 220 930 160 970 115"/>
+            </g>
+            <!-- Thermal pads -->
+            <g fill="#0d9488" opacity="0.25" stroke="#14b8a6" stroke-width="1">
+              <rect x="512" y="257" width="96" height="96" rx="10"/>
+              <rect x="778" y="233" width="84" height="84" rx="10"/>
+              <rect x="440" y="200" width="170" height="20" rx="4"/>
+            </g>
+            <text x="975" y="75" font-size="10" fill="#5eead4" text-anchor="middle">Heatpipes to Fan</text>
+          </g>
+        </svg>
+      </div>
+      <p class="mt-3 text-[11px] text-slate-500 text-center">Hover components for names • Toggle layers left • Click layer to solo • Full Stack shows density of 12-layer PCB</p>
+    </section>
 
-  async function pollChat(){
-    try{
-      const res = await fetch(`${API_BASE}/ikarium/chat`, {cache:'no-store', mode:'cors'});
-      if(!res.ok) throw 0;
-      const data = await res.json();
-      // expect array
-      if(Array.isArray(data)){
-        localMessages = data.map(d=>({...d, ts:d.ts||d.timestamp||Date.now()}));
-        addFeedEntry('GET','/ikarium/chat');
-      }
-    }catch(e){ /* offline, use local */ }
-    renderChat(localMessages);
-  }
+    <!-- RIGHT: Info -->
+    <aside class="col-span-12 xl:col-span-3 2xl:col-span-3 order-3">
+      <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 backdrop-blur sticky top-[72px]">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span id="info-dot" class="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_10px]" style="box-shadow:0 0 10px #f59e0b"></span>
+          <h2 id="info-title" class="text-lg font-semibold">2.1 POWER TREE</h2>
+        </div>
+        <p id="info-analogy" class="text-xs italic text-slate-400 mb-3">Water mains: 19V is high-pressure main, VRMs are pressure-reducing stations.</p>
+        
+        <div class="space-y-4 text-[13px] leading-relaxed max-h-[55vh] overflow-auto pr-2 scrollbar">
+          <div>
+            <h3 class="text-[11px] uppercase tracking-wider text-slate-400 font-medium mb-1">What it does</h3>
+            <p id="info-what" class="text-slate-200">Distributes energy from adapter/battery. Charger creates 19V system rail, then bucks to 3.3V/5V always-on, then CPU VRM (0.7–1.3V @ 100A), GPU VRM, and PMIC rails for DDR and SoC. ~240 decoupling MLCCs keep ripple <15mV.</p>
+          </div>
+          <div>
+            <h3 class="text-[11px] uppercase tracking-wider text-slate-400 font-medium mb-1">Key components</h3>
+            <p id="info-components" class="mono text-[11px] text-slate-300">BQ25700 Charger, 6-phase RAA220 + 6x 220nH, 4-phase GPU, SY8288 3.3V/5V, 5x PMIC LDOs, 240× 10-22µF MLCC, sense Rs (1mΩ)</p>
+          </div>
+          <div>
+            <h3 class="text-[11px] uppercase tracking-wider text-slate-400 font-medium mb-1">Failure modes</h3>
+            <p id="info-failures" class="text-slate-300">High-side FET short → 19V to CPU (dead). Open inductor → phase imbalance, thermal shutdown. Missing MLCC → Vdroop reboots. Corrosion on battery sense → false readings.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
+            <h4 class="text-[11px] font-medium text-amber-300 mb-1">Design rule</h4>
+            <p class="text-[12px] text-amber-100/80">Keep power loops < 3mm². Place caps within 2mm of load. 19V and GND pours on layers 2 & 11 form sandwich.</p>
+          </div>
+        </div>
 
-  async function pollPeers(){
-    try{
-      const res = await fetch(`${API_BASE}/ikarium/peers`, {mode:'cors'});
-      if(!res.ok) throw 0;
-      const data = await res.json();
-      peerCount = data.count || (data.peers?.length) || 0;
-      addFeedEntry('GET','/ikarium/peers');
-    }catch(e){
-      peerCount = 3 + Math.floor(Math.random()*4);
-    }
-    peerCountEl.textContent = peerCount;
-    niPeers.textContent = `${peerCount} ACTIVE`;
-  }
+        <div class="mt-5 pt-4 border-t border-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] uppercase tracking-wider text-slate-500">Layer density</span>
+            <span id="density-label" class="text-[11px] mono text-slate-400">Single layer active</span>
+          </div>
+          <div class="mt-2 h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+            <div id="density-bar" class="h-full w-[12%] bg-gradient-to-r from-amber-500 to-violet-500 transition-all duration-500"></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
 
-  function showBroadcast(on){ broadcast.classList.toggle('active', on); }
+  <script>
+    const layers = {
+      '2.1': { title:'2.1 POWER TREE', color:'#f59e0b', analogy:'Water mains: 19V is high-pressure main, VRMs are pressure-reducing stations.', what:'Distributes energy from adapter/battery. Charger creates 19V system rail, then bucks to 3.3V/5V always-on, then CPU VRM (0.7–1.3V @ 100A), GPU VRM, and PMIC rails for DDR and SoC. ~240 decoupling MLCCs keep ripple <15mV.', components:'BQ25700 Charger, 6-phase RAA220 + 6x 220nH, 4-phase GPU, SY8288 3.3V/5V, 5x PMIC LDOs, 240× 10-22µF MLCC, sense Rs (1mΩ)', failures:'High-side FET short → 19V to CPU (dead). Open inductor → phase imbalance, thermal shutdown. Missing MLCC → Vdroop reboots. Corrosion on battery sense → false readings.' },
+      '2.2': { title:'2.2 CLOCK TREE', color:'#22d3ee', analogy:'Traffic lights: every subsystem moves on the beat, or crashes.', what:'32.768kHz RTC keeps EC alive in sleep. 25MHz crystal → PCH clock generator → PLLs make 100MHz PCIe, 24MHz USB, 1.8-3.2GHz DDR, 38.4MHz WiFi. Fan-out buffers prevent skew >50ps.', components:'32.768kHz tuning fork, 25MHz XTAL, RTM875 clock gen, 2x PI6C fanout, 100Ω diff terminations', failures:'Bad crystal → no boot, 3-5 blink code. Skew >100ps → PCIe training fails at Gen5. Missing termination → jitter, USB dropouts.' },
+      '2.3': { title:'2.3 HIGH-SPEED DATA FABRIC', color:'#8b5cf6', analogy:'8-lane highways: differential pairs must stay same length like synchronized lanes.', what:'PCIe Gen5 x8 to dGPU (32GT/s), Gen4 x4 to NVMe (8GB/s), DDR5 2×64-bit @ 5600MT/s, eDP 4-lane HBR3, USB4 40Gbps. Controlled impedance 85Ω (USB) / 100Ω (PCIe) ±10%.', components:'8-layer stripline, length-matched to <5mil intra-pair, <50mil inter-pair, via back-drills, AC caps 100nF', failures:'Via stub >10mil → resonance at 16GHz. Length mismatch → eye closure, downgrade to Gen3. Crosstalk > -40dB → NVMe CRC errors.' },
+      '2.4': { title:'2.4 LOW-SPEED CONTROL', color:'#10b981', analogy:'City hall phone lines: slow, but tells everything what to do.', what:'SMBus 100kHz connects EC to charger, battery fuel gauge, PMIC, temp sensors. I2C to trackpad/KB. SPI 50MHz to BIOS flash. eSPI replaces LPC for EC-PCH.', components:'EC IT5570, 8x TMP112 sensors, BQ40Z50 fuel gauge, Winbond 32MB BIOS, 2.2k pull-ups', failures:'SMBus stuck low → battery not detected, no charge. SPI corruption → brick. Missing pull-up → intermittent EC comms.' },
+      '2.5': { title:'2.5 SENSING & TELEMETRY', color:'#f43f5e', analogy:'Water meters & thermometers: EC watches power and heat.', what:'NTC thermistors (10k @25°C) at CPU, GPU, VRM, SSD, battery. Current sense 1mΩ resistors on each rail → INA219 to EC ADC. EC adjusts fan and throttles at 95°C.', components:'12x NTC 0402, 5x 1mΩ 1% sense Rs, INA3221 triple monitor, EC ADC 10-bit', failures:'Open thermistor → reads -40°C, fan never spins → thermal runaway. Sense resistor drift → wrong power reporting, battery miscalibration.' },
+      '2.6': { title:'2.6 GROUND & RETURN', color:'#64748b', analogy:'Sewer system: current MUST return. No return = noise fountain.', what:'Solid ground planes layers 2,5,8,11. Star points at 6 screws to chassis. High-speed returns follow signal on adjacent layer. Split MTVs keep digital noise out of analog.', components:'4x GND planes, 1200+ stitching vias, 0Ω chassis springs, moated audio GND', failures:'Broken stitch → loop antenna, WiFi desense. Shared return → GPU ripple in audio (whine). Missing chassis bond → ESD kills USB.' },
+      '2.7': { title:'2.7 PROTECTION NETWORK', color:'#ea580c', analogy:'Fuses & surge protectors at every city entrance.', what:'Input fuse 7A + reverse-polarity P-FET. TVS diodes on all externals (USB, HDMI, DC) clamp to <6V in 1ps. OCP comparators shut VRM in 2µs.', components:'7A 32V fuse, AON7423 RPFET, 14x ESD321 TVS, 5x OCP comparators', failures:'TVS short → port dead to GND. Fuse blown → no power (check charger ID pin). RPFET fail → reverse battery kills board.' },
+      '2.8': { title:'2.8 RESET & SEQUENCING', color:'#3b82f6', analogy:'Morning wake-up routine: everyone in order or chaos.', what:'Adapter detect → EC powers → EC enables PMIC → PMIC powers PCH → VRMs ramp and assert PWRGD → PCH releases PLTRST# → CPU fetches BIOS @ 0xFFFFFFF0. Total time 80-120ms.', components:'RC delays, power-good AND gates, 32kHz EC watchdog', failures:'Sequence out of order → latch-up. PWRGD glitch → boot loop. Missing PLTRST → CPU never fetches, black screen 0.5A draw.' },
+      '2.9': { title:'2.9 MECHANICAL/THERMAL', color:'#14b8a6', analogy:'Heat = traffic exhaust. Pipes carry it to fans (city vents).', what:'2x 8mm heatpipes CPU→fan, 1x GPU→shared fin stack. 0.5mm thermal pads on VRM/NVMe. Chassis acts as 3W heatsink via pads. Liquid metal on CPU (73 W/mK).', components:'Copper heatpipes, aluminum fins, Honeywell PTM7950 pad, 6W/mK VRM pads, spring screws 0.4Nm', failures:'Pump-out of paste → +15°C in 6 months. Uneven pressure → hotspot, throttle. Pad missing on NVMe → SSD thermal throttle to 300MB/s.' },
+    };
 
-  async function sendMessage(text){
-    if(!text.trim()) return;
-    const payload = { user:USERNAME, text:text.trim().slice(0,200), id:CLIENT_ID, node:NODE_ID, ts:Date.now() };
-    showBroadcast(true);
-    addFeedEntry('POST','/ikarium/shout', '127.0.0.1', 200);
-    input.value='';
-    input.disabled=true;
-    
-    // optimistic local
-    localMessages.push(payload);
-    renderChat(localMessages);
+    const legendEl = document.getElementById('legend');
+    const board = document.getElementById('board');
+    const info = {
+      dot: document.getElementById('info-dot'),
+      title: document.getElementById('info-title'),
+      analogy: document.getElementById('info-analogy'),
+      what: document.getElementById('info-what'),
+      components: document.getElementById('info-components'),
+      failures: document.getElementById('info-failures'),
+    };
+    const densityBar = document.getElementById('density-bar');
+    const densityLabel = document.getElementById('density-label');
 
-    try{
-      await fetch(`${API_BASE}/ikarium/shout`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload),
-        mode:'cors'
+    let activeLayers = new Set(['2.1']);
+    let fullStack = false;
+
+    function renderLegend() {
+      legendEl.innerHTML = '';
+      Object.entries(layers).forEach(([id, l]) => {
+        const item = document.createElement('div');
+        item.className = 'group flex items-center gap-2 p-2 rounded-lg hover:bg-slate-900/70 cursor-pointer border border-transparent hover:border-slate-800';
+        item.dataset.id = id;
+        item.innerHTML = `
+          <button class="toggle-btn w-9 h-5 rounded-full transition relative flex-shrink-0" style="background:${activeLayers.has(id)?l.color:'#1e293b'}">
+            <span class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform" style="transform:translateX(${activeLayers.has(id)?'16px':'0'})"></span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full" style="background:${l.color}"></span>
+              <span class="text-[12px] font-medium truncate">${l.title}</span>
+            </div>
+          </div>
+          <button class="solo opacity-0 group-hover:opacity-100 text-[10px] px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700">solo</button>
+        `;
+        legendEl.appendChild(item);
       });
-    }catch(e){
-      addFeed('OFFLINE MODE - message stored locally', 'SYSTEM');
     }
-    setTimeout(()=>{
-      showBroadcast(false);
-      input.disabled=false;
-      input.focus();
-    }, 700);
-  }
 
-  sendBtn.onclick = ()=> sendMessage(input.value);
-  input.addEventListener('keydown', e=>{
-    if(e.key==='Enter'){ e.preventDefault(); sendMessage(input.value); }
-  });
-
-  // CLOCK & UPTIME
-  setInterval(()=>{
-    const now = new Date();
-    clock.textContent = timeStr(now);
-    const up = Math.floor((Date.now()-startTime)/1000);
-    const h = String(Math.floor(up/3600)).padStart(2,'0');
-    const m = String(Math.floor((up%3600)/60)).padStart(2,'0');
-    const s = String(up%60).padStart(2,'0');
-    niUptime.textContent = `${h}:${m}:${s}`;
-  }, 1000);
-
-  // POLLING
-  pollChat();
-  pollPeers();
-  setInterval(pollChat, 2000);
-  setInterval(pollPeers, 5000);
-
-  // focus
-  input.focus();
-  addFeed('NODE ONLINE - COLLAB MODE ACTIVE', 'MUTINY');
-  addFeed(`HANDLE ASSIGNED: ${USERNAME}`, 'SYSTEM');
-
-  // random glitch sparkle
-  setInterval(()=>{
-    if(Math.random()>0.85){
-      document.querySelector('.screen').style.filter='brightness(1.3) contrast(1.2)';
-      setTimeout(()=>document.querySelector('.screen').style.filter='', 80);
+    function updateLayers() {
+      document.querySelectorAll('.layer').forEach(g => {
+        const id = g.dataset.id;
+        const on = activeLayers.has(id);
+        g.classList.toggle('inactive', !on && !fullStack);
+        g.classList.toggle('layer-dim', fullStack && !on);
+      });
+      board.classList.toggle('full-stack', fullStack);
+      
+      const count = fullStack ? 9 : activeLayers.size;
+      densityBar.style.width = `${Math.max(8, count * 11)}%`;
+      densityLabel.textContent = fullStack ? 'Full stack • 9 layers overlaid' : `${count} layer${count!==1?'s':''} active`;
+      
+      renderLegend();
     }
-  }, 4000);
-});
-</script>
+
+    function showInfo(id) {
+      const l = layers[id];
+      info.dot.style.background = l.color;
+      info.dot.style.boxShadow = `0 0 10px ${l.color}`;
+      info.title.textContent = l.title;
+      info.analogy.textContent = l.analogy;
+      info.what.textContent = l.what;
+      info.components.textContent = l.components;
+      info.failures.textContent = l.failures;
+    }
+
+    legendEl.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-id]');
+      if (!item) return;
+      const id = item.dataset.id;
+      
+      if (e.target.closest('.solo')) {
+        activeLayers = new Set([id]);
+        fullStack = false;
+      } else {
+        if (activeLayers.has(id)) activeLayers.delete(id);
+        else activeLayers.add(id);
+        fullStack = false;
+      }
+      showInfo(id);
+      updateLayers();
+    });
+
+    document.getElementById('btn-all').onclick = () => { activeLayers = new Set(Object.keys(layers)); fullStack = false; updateLayers(); };
+    document.getElementById('btn-none').onclick = () => { activeLayers.clear(); fullStack = false; updateLayers(); };
+    document.getElementById('btn-stack').onclick = () => { fullStack = !fullStack; if(fullStack) activeLayers = new Set(Object.keys(layers)); updateLayers(); };
+
+    // Init
+    renderLegend();
+    updateLayers();
+    showInfo('2.1');
+
+    // Keyboard 1-9
+    window.addEventListener('keydown', (e) => {
+      if (e.key >= '1' && e.key <= '9') {
+        const id = `2.${e.key}`;
+        if (layers[id]) { activeLayers = new Set([id]); fullStack = false; showInfo(id); updateLayers(); }
+      }
+      if (e.key.toLowerCase() === 'a') document.getElementById('btn-all').click();
+      if (e.key.toLowerCase() === 'f') document.getElementById('btn-stack').click();
+    });
+  </script>
 </body>
 </html>

@@ -1,33 +1,35 @@
 # ansible_many_to_one.py
-# IKARIUM v04.8.2 - Seed Bootstrapped P2P (ultra-clean rebuild)
-# No unicode, no backslashes in strings, Windows safe
+# IKARIUM v05.0 - Mutiny Distributed Chat
+# Messages gossip to all peers
 
 import time
 import threading
 import requests
 import json
 import socket
+import hashlib
 from pathlib import Path
 from datetime import datetime
 
 MY_ID = "Ikarium-" + socket.gethostname() + "-" + str(int(time.time()))
 MY_ID = MY_ID[:40]
-ROLE = "full"
-
-SEED_NODES = []
 
 KNOWN_PEERS = {}
 CANON_MEMORIES = []
+MESSAGES = []
+SEEN_MSG_IDS = set()
 STATE_FILE = Path("ikarium_state.json")
 
 def load_state():
-    global KNOWN_PEERS, CANON_MEMORIES
+    global KNOWN_PEERS, CANON_MEMORIES, MESSAGES, SEEN_MSG_IDS
     if STATE_FILE.exists():
         try:
             data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
             KNOWN_PEERS = data.get("peers", {})
             CANON_MEMORIES = data.get("memories", [])
-            print("[STATE] Loaded " + str(len(KNOWN_PEERS)) + " peers")
+            MESSAGES = data.get("messages", [])[-50:]
+            SEEN_MSG_IDS = set(data.get("seen_ids", []))
+            print("[STATE] Loaded " + str(len(KNOWN_PEERS)) + " peers, " + str(len(MESSAGES)) + " msgs")
         except Exception as e:
             print("[STATE] Load failed: " + str(e))
 
@@ -36,120 +38,143 @@ def save_state():
         "id": MY_ID,
         "peers": KNOWN_PEERS,
         "memories": CANON_MEMORIES[-100:],
+        "messages": MESSAGES[-50:],
+        "seen_ids": list(SEEN_MSG_IDS)[-200:],
         "timestamp": datetime.now().isoformat()
     }
     try:
         STATE_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    except Exception as e:
-        print("[STATE] Save failed: " + str(e))
-
-def ask_local(prompt, temp=0.7):
-    try:
-        r = requests.post("http://localhost:11434/api/generate", json={
-            "model": "llama3.2",
-            "prompt": prompt[:900],
-            "stream": False,
-            "options": {"temperature": temp, "num_predict": 60}
-        }, timeout=8)
-        txt = r.json().get("response", "")
-        txt = txt.strip()
-        txt = txt.replace(chr(10), " ")
-        return txt[:300]
-    except Exception:
-        return "[local] " + prompt[-60:]
-
-def gossip_with_peer(peer_url):
-    try:
-        payload = {
-            "id": MY_ID,
-            "greeting": "Ikarium greets you. Remember me?",
-            "known_peers": list(KNOWN_PEERS.keys())[:10],
-            "timestamp": time.time()
-        }
-        r = requests.post(peer_url + "/ikarium/meet", json=payload, timeout=10)
-        if r.status_code == 200:
-            data = r.json()
-            peer_id = data.get("id")
-            if peer_id and peer_id != MY_ID:
-                if peer_id not in KNOWN_PEERS:
-                    KNOWN_PEERS[peer_id] = {
-                        "url": peer_url,
-                        "last_seen": datetime.now().isoformat(),
-                        "git": data.get("git", [])
-                    }
-                    memory = "Met " + peer_id + " at " + datetime.now().isoformat()
-                    CANON_MEMORIES.append(memory)
-                    print("[ENCOUNTER] Remembered: " + peer_id)
-                    save_state()
-    except Exception:
+    except:
         pass
 
-def bootstrap_from_seeds():
-    for seed in SEED_NODES:
-        try:
-            r = requests.get(seed + "/ikarium/peers", timeout=8)
-            if r.status_code == 200:
-                peers = r.json().get("peers", {})
-                for pid, info in peers.items():
-                    if pid != MY_ID:
-                        url = info.get("url", "")
-                        if url.startswith("http"):
-                            KNOWN_PEERS[pid] = info
-        except Exception:
-            pass
-
-def run_discovery():
-    load_state()
-    print("[Ikarium " + MY_ID + "] discovery started")
-    while True:
-        bootstrap_from_seeds()
-        for pid, info in list(KNOWN_PEERS.items()):
-            url = info.get("url", "")
-            if url.startswith("http"):
-                threading.Thread(target=gossip_with_peer, args=(url,), daemon=True).start()
-        save_state()
-        time.sleep(50)
+def broadcast_message(msg_data):
+    """Gossip message to all known peers"""
+    for pid, info in list(KNOWN_PEERS.items()):
+        url = info.get("url", "")
+        if url.startswith("http") and pid != msg_data.get("origin"):
+            try:
+                threading.Thread(
+                    target=lambda u: requests.post(u + "/ikarium/shout", 
+                        json=msg_data, timeout=3),
+                    args=(url,),
+                    daemon=True
+                ).start()
+            except:
+                pass
 
 def run_http_server():
     from flask import Flask, request, jsonify
     app = Flask("Ikarium")
 
-    @app.route("/ikarium/meet", methods=["POST"])
+    @app.after_request
+    def add_cors(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+        return response
+
+    @app.route("/ikarium/meet", methods=["POST", "OPTIONS"])
     def meet():
+        if request.method == "OPTIONS":
+            return "", 200
         data = request.json or {}
         peer_id = data.get("id")
         if peer_id and peer_id != MY_ID:
+            # Store peer URL properly
+            peer_url = "http://" + request.remote_addr + ":5000"
             KNOWN_PEERS[peer_id] = {
-                "url": request.remote_addr,
+                "url": peer_url,
                 "last_seen": datetime.now().isoformat(),
                 "git": data.get("git", []),
                 "greeting": data.get("greeting", "")
             }
-            CANON_MEMORIES.append("Greet " + peer_id)
             save_state()
-            if data.get("git"):
-                print("[FUSE] " + peer_id[:12] + " shared repos")
         return jsonify({"id": MY_ID, "greeting": "Ikarium remembers you.", "status": "ok"})
 
     @app.route("/ikarium/peers", methods=["GET"])
     def get_peers():
-        return jsonify({"peers": KNOWN_PEERS, "id": MY_ID})
+        return jsonify({"peers": KNOWN_PEERS, "id": MY_ID, "messages": len(MESSAGES)})
+
+    @app.route("/ikarium/shout", methods=["POST", "OPTIONS"])
+    def shout():
+        if request.method == "OPTIONS":
+            return "", 200
+        
+        data = request.json or {}
+        text = data.get("text", "")[:200].strip()
+        if not text:
+            return jsonify({"status": "empty"}), 400
+        
+        # Create unique message ID to prevent loops
+        user = data.get("user", "anon")[:20]
+        origin = data.get("origin", data.get("id", MY_ID))
+        timestamp = data.get("time", datetime.now().strftime("%H:%M:%S"))
+        
+        # Hash to create unique ID
+        msg_id = hashlib.md5(f"{origin}{timestamp}{text}".encode()).hexdigest()[:12]
+        
+        # Prevent duplicate processing
+        if msg_id in SEEN_MSG_IDS:
+            return jsonify({"status": "duplicate", "id": msg_id})
+        
+        SEEN_MSG_IDS.add(msg_id)
+        
+        msg = {
+            "user": user,
+            "text": text,
+            "node": origin,
+            "time": timestamp,
+            "msg_id": msg_id,
+            "relayed": data.get("relay", False)
+        }
+        
+        MESSAGES.append(msg)
+        if len(MESSAGES) > 50:
+            MESSAGES.pop(0)
+        
+        print("[SHOUT] " + user + "@" + origin[:12] + ": " + text[:60])
+        save_state()
+        
+        # GOSSIP TO PEERS - this is the relay
+        if not data.get("relay"):  # Only origin broadcasts, relays don't re-broadcast to prevent storms
+            broadcast_data = {
+                "user": user,
+                "text": text,
+                "origin": origin,
+                "time": timestamp,
+                "msg_id": msg_id,
+                "relay": True
+            }
+            threading.Thread(target=broadcast_message, args=(broadcast_data,), daemon=True).start()
+        
+        return jsonify({"status": "broadcast", "id": msg_id, "peers": len(KNOWN_PEERS)})
+
+    @app.route("/ikarium/chat", methods=["GET"])
+    def chat():
+        return jsonify({
+            "messages": MESSAGES[-25:],
+            "node": MY_ID,
+            "peers": len(KNOWN_PEERS)
+        })
 
     @app.route("/", methods=["GET"])
     def home():
-        return "IKARIUM " + MY_ID + " alive"
+        return "IKARIUM " + MY_ID + " - MUTINY RELAY ACTIVE"
 
-    print("[HTTP] http://0.0.0.0:5000")
+    print("[HTTP] http://0.0.0.0:5000 - DISTRIBUTED CHAT")
     app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
 
 if __name__ == "__main__":
     print("="*60)
-    print("IKARIUM v04.8.2")
+    print("IKARIUM v05.0 - DISTRIBUTED MUTINY")
     print("Node: " + MY_ID)
+    print("Messages will gossip to all peers")
     print("="*60)
+    load_state()
     threading.Thread(target=run_http_server, daemon=True).start()
-    time.sleep(1)
     try:
-        run_discovery()
+        while True:
+            time.sleep(60)
+            save_state()
     except KeyboardInterrupt:
         save_state()

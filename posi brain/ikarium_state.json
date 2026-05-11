@@ -1,5 +1,5 @@
 {
-  "id": "Ikarium-David-1778524602",
+  "id": "Ikarium-David-1778528831",
   "peers": {
     "test-garden": {
       "url": "192.168.1.8",
@@ -26,5 +26,7 @@
     "Greet test-garden",
     "Greet test-seed2"
   ],
-  "timestamp": "2026-05-11T14:35:53.840185"
+  "messages": [],
+  "seen_ids": [],
+  "timestamp": "2026-05-11T14:47:14.630366"
 }
