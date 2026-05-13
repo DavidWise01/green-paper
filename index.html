@@ -1,686 +1,519 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Toroid Kernel - Pulse Language Primer</title>
-<style>
-:root {
-  --bg: #0a0e14;
-  --surface: #10161f;
-  --surface-2: #0f141b;
-  --accent: #00d4ff;
-  --accent-dim: rgba(0,212,255,0.15);
-  --text: #e6edf3;
-  --muted: #8b9bb0;
-  --muted-2: #5a6b7f;
-  --border: rgba(255,255,255,0.08);
-  --ok: #c3e88d;
-  --warn: #ffcb6b;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
-::selection { background: rgba(0,212,255,0.3); color: #fff; }
-
-.grid-bg {
-  position: fixed; inset: 0; z-index: 0;
-  background-image: 
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-}
-.grid-bg::after {
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(900px 600px at 50% -10%, rgba(0,212,255,0.18), transparent 60%),
-              radial-gradient(600px 400px at 90% 20%, rgba(120,0,255,0.08), transparent 60%);
-}
-
-header {
-  position: sticky; top: 0; z-index: 50;
-  backdrop-filter: blur(14px) saturate(1.2);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  border-bottom: 1px solid var(--border);
-  background: rgba(10,14,20,0.7);
-}
-.nav {
-  max-width: 1200px; margin: 0 auto; padding: 14px 24px;
-  display: flex; justify-content: space-between; align-items: center;
-  font-family: "SF Mono", "JetBrains Mono", "Cascadia Code", Consolas, monospace;
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted-2);
-}
-.logo { display: flex; align-items: center; gap: 10px; color: var(--text); }
-.dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--accent); box-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent);
-  animation: pulse-dot 2.4s ease-in-out infinite;
-}
-@keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
-
-main { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
-
-.hero {
-  min-height: 92vh; display: grid; grid-template-columns: 1.15fr 0.85fr;
-  align-items: center; gap: 64px; padding: 96px 0 64px;
-}
-.eyebrow {
-  font-family: monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 24px; display: inline-flex; align-items: center; gap: 8px;
-}
-.eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--accent); opacity: 0.5; }
-h1 {
-  font-size: clamp(56px, 9vw, 120px); line-height: 0.82; font-weight: 800; letter-spacing: -0.03em;
-  margin-bottom: 28px;
-  background: linear-gradient(180deg, #ffffff 0%, #c8d4e3 45%, #7d8fa6 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.subtitle {
-  font-size: clamp(18px, 2vw, 22px); color: var(--muted); max-width: 540px; font-weight: 350; line-height: 1.5;
-}
-.subtitle em { color: var(--text); font-style: normal; border-bottom: 1px dotted var(--accent-dim); }
-
-.hero-visual { position: relative; aspect-ratio: 1; display: grid; place-items: center; }
-.toroid-wrap { position: relative; width: min(520px, 92vw); aspect-ratio: 1; }
-.pulse-ring {
-  position: absolute; inset: 0; border-radius: 50%;
-  border: 1px solid rgba(0,212,255,0.22);
-  animation: ring 4s cubic-bezier(.2,.6,.2,1) infinite;
-}
-.pulse-ring:nth-child(2) { animation-delay: 1.3s; }
-.pulse-ring:nth-child(3) { animation-delay: 2.6s; }
-@keyframes ring { 0% { transform: scale(0.72); opacity: 0.9; } 70% { opacity: 0.08; } 100% { transform: scale(1.18); opacity: 0; } }
-
-svg.toroid { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 50px rgba(0,212,255,0.12)); }
-.core { fill: #071019; stroke: #162231; stroke-width: 14; }
-.core-inner { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0.18; }
-.winding { color: #3e5166; cursor: pointer; transition: color .25s ease, filter .25s ease; }
-.winding path { stroke: currentColor; fill: none; stroke-linecap: round; }
-.winding .lead { stroke-width: 2; opacity: 0.7; }
-.winding .coil { stroke-width: 5; opacity: 0.9; }
-.winding .lead-back { opacity: 0.25; }
-.winding:hover, .winding.active { color: var(--accent); filter: drop-shadow(0 0 10px currentColor); }
-.winding:hover .lead, .winding.active .lead { opacity: 1; }
-
-.info-badge {
-  position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%);
-  background: rgba(7,12,18,0.85); border: 1px solid var(--accent-dim);
-  padding: 9px 16px; border-radius: 999px; font-family: monospace; font-size: 11px;
-  color: var(--muted); letter-spacing: 0.06em; backdrop-filter: blur(10px);
-  white-space: nowrap; box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-}
-
-section { padding: 110px 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
-.section-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 48px; }
-.num { font-family: monospace; color: var(--accent); font-size: 13px; padding-top: 4px; opacity: 0.9; }
-h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 650; letter-spacing: -0.015em; line-height: 1.15; }
-h2 .sub { display: block; font-size: 15px; font-weight: 400; color: var(--muted-2); font-family: monospace; margin-top: 6px; text-transform: none; letter-spacing: 0; }
-
-.grid-2 { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: start; }
-.prose { color: #b9c6d6; font-size: 17px; }
-.prose p { margin-bottom: 1.1em; }
-.prose strong { color: var(--text); font-weight: 550; }
-.prose .lead { font-size: 19px; color: #d3dde9; }
-
-.card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
-  border: 1px solid var(--border); border-radius: 18px; padding: 28px;
-  backdrop-filter: blur(6px);
-}
-.card h3 {
-  font-family: monospace; text-transform: uppercase; font-size: 12px; letter-spacing: 0.12em;
-  color: var(--accent); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-}
-.card h3::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
-
-.compare {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
-  background: var(--border); border-radius: 18px; overflow: hidden; margin-top: 28px;
-  border: 1px solid var(--border);
-}
-.compare > div { background: var(--surface-2); padding: 26px; }
-.compare h4 { font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 18px; }
-.compare .bad { color: #ff7a7a; }
-.compare .good { color: var(--accent); }
-.compare ul { list-style: none; }
-.compare li {
-  padding: 11px 0; border-bottom: 1px dashed rgba(255,255,255,0.06);
-  font-size: 14.5px; color: #a9b8cc; display: flex; gap: 10px;
-}
-.compare li:last-child { border: none; }
-.compare li::before { content: "—"; color: var(--muted-2); font-family: monospace; }
-
-.steps { counter-reset: step; display: grid; gap: 22px; margin-top: 12px; }
-.step { display: grid; grid-template-columns: 46px 1fr; gap: 20px; align-items: start; }
-.step::before {
-  counter-increment: step; content: counter(step, decimal-leading-zero);
-  font-family: monospace; width: 46px; height: 46px; display: grid; place-items: center;
-  border-radius: 12px; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25);
-  color: var(--accent); font-size: 13px;
-}
-.step h4 { font-weight: 600; margin-bottom: 6px; font-size: 17px; }
-.step p { color: var(--muted); font-size: 15px; }
-.step code {
-  font-family: monospace; background: rgba(0,212,255,0.1); color: #7de4ff;
-  padding: 2px 6px; border-radius: 5px; font-size: 12.5px; border: 1px solid rgba(0,212,255,0.18);
-}
-
-.code-wrap {
-  background: #070b11; border: 1px solid rgba(0,212,255,0.22);
-  border-radius: 18px; overflow: hidden; margin-top: 28px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
-}
-.code-head {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 11px 16px; background: linear-gradient(180deg, rgba(0,212,255,0.09), rgba(0,212,255,0.03));
-  border-bottom: 1px solid rgba(0,212,255,0.18);
-  font-family: monospace; font-size: 11px; color: #7e93aa; text-transform: uppercase; letter-spacing: 0.08em;
-}
-.code-head button {
-  background: none; border: 1px solid rgba(255,255,255,0.12); color: var(--muted);
-  font-family: monospace; font-size: 10px; padding: 4px 8px; border-radius: 6px; cursor: pointer;
-}
-.code-head button:hover { border-color: var(--accent); color: var(--accent); }
-.code {
-  padding: 24px; font-family: "SF Mono","JetBrains Mono", Consolas, monospace;
-  font-size: 14px; line-height: 1.8; color: #cfe1f3; overflow-x: auto; tab-size: 2;
-}
-.token-comment { color: #5b6d82; }
-.token-kw { color: var(--accent); font-weight: 500; }
-.token-num { color: var(--warn); }
-.token-str { color: var(--ok); }
-.token-op { color: #7e93aa; }
-
-.rules { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-top: 12px; }
-.rule {
-  background: radial-gradient(220px 140px at 20% 0%, rgba(0,212,255,0.14), transparent 60%), var(--surface);
-  border: 1px solid var(--border); border-radius: 18px; padding: 26px 22px; position: relative; overflow: hidden;
-  transition: transform .25s ease, border-color .25s ease;
-}
-.rule:hover { transform: translateY(-3px); border-color: rgba(0,212,255,0.35); }
-.rule-num { font-family: monospace; font-size: 11px; color: var(--accent); margin-bottom: 14px; opacity: 0.9; }
-.rule h3 { font-size: 18px; margin-bottom: 8px; font-weight: 600; letter-spacing: -0.01em; }
-.rule p { color: var(--muted); font-size: 14px; line-height: 1.5; }
-
-.cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
-.btn {
-  display: inline-flex; align-items: center; gap: 9px; padding: 12px 18px; border-radius: 12px;
-  font-family: monospace; font-size: 13px; text-decoration: none; transition: all .2s ease;
-  border: 1px solid transparent; white-space: nowrap;
-}
-.btn-primary { background: var(--accent); color: #00141b; font-weight: 600; box-shadow: 0 0 24px rgba(0,212,255,0.28), inset 0 1px 0 rgba(255,255,255,0.3); }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 36px rgba(0,212,255,0.45), inset 0 1px 0 rgba(255,255,255,0.3); }
-.btn-ghost { border-color: var(--border); color: #c2d0e0; background: rgba(255,255,255,0.02); }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.06); }
-
-.kicad-visual {
-  aspect-ratio: 4/3; background: #05080c; border: 1px solid var(--border); border-radius: 16px;
-  overflow: hidden; position: relative; display: grid; place-items: center;
-}
-.kicad-grid {
-  position: absolute; inset: 0;
-  background-image: linear-gradient(rgba(0,212,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.07) 1px, transparent 1px);
-  background-size: 24px 24px; opacity: 0.5;
-}
-.kicad-ring { width: 70%; aspect-ratio: 1; border: 2px dashed rgba(0,212,255,0.3); border-radius: 50%; position: relative; animation: spin 60s linear infinite; }
-.kicad-pad { position: absolute; width: 10px; height: 18px; background: var(--accent); border-radius: 2px; box-shadow: 0 0 10px var(--accent); left: 50%; top: 0; transform-origin: 50% 175px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-footer { padding: 80px 24px 60px; text-align: center; color: var(--muted-2); font-family: monospace; font-size: 11px; border-top: 1px solid rgba(255,255,255,0.05); }
-footer a { color: var(--muted); text-decoration: none; }
-footer a:hover { color: var(--accent); }
-
-@media (max-width: 980px) {
-  .hero { grid-template-columns: 1fr; gap: 48px; min-height: auto; padding: 64px 0 40px; }
-  .hero-visual { order: -1; }
-  .grid-2 { grid-template-columns: 1fr; gap: 40px; }
-  .rules { grid-template-columns: 1fr 1fr; }
-  .compare { grid-template-columns: 1fr; }
-}
-@media (max-width: 560px) {
-  .rules { grid-template-columns: 1fr; }
-  .nav { padding: 12px 16px; }
-  main { padding: 0 16px; }
-  section { padding: 80px 0; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGNAL BROADCAST // D07 // THE BEACON</title>
+    <style>
+        :root {
+            --bg: #082828; --purple: #ff55ff; --gold: #d4a84c;
+            --red: #ff4466; --green: #44dd88; --teal: #0af0c0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background:var(--bg); display:flex; align-items:center; justify-content:center;
+            height:100vh; overflow:hidden; cursor:crosshair;
+            font-family:'Courier New',monospace;
+        }
+        .container {
+            width:96vw; height:96vh; position:relative;
+            border:1px solid rgba(255,85,255,0.06);
+            background:radial-gradient(ellipse at center, #0c3838 0%, #082828 40%, #041818 100%);
+            overflow:hidden;
+        }
+        canvas { width:100%; height:100%; display:block; }
+        .container::after {
+            content:''; position:absolute; top:0;left:0;right:0;bottom:0;
+            background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px);
+            pointer-events:none;
+        }
+        .hud { position:absolute; font-size:8px; letter-spacing:1px; line-height:1.7; opacity:0.5; pointer-events:none; }
+        .hud-tl { top:14px; left:14px; color:var(--purple); }
+        .hud-tr { top:14px; right:14px; color:var(--teal); text-align:right; }
+        .hud-bl { bottom:14px; left:14px; color:rgba(255,85,255,0.3); font-size:7px; }
+        .hud-br { bottom:14px; right:14px; color:var(--gold); text-align:right; font-size:7px; }
+        .title-flash {
+            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+            pointer-events:none; text-align:center; opacity:0; z-index:10;
+        }
+        .title-flash.show { animation:flashIn 3s ease-out forwards; }
+        @keyframes flashIn {
+            0%{opacity:0;transform:translate(-50%,-50%) scale(0.7);letter-spacing:25px}
+            18%{opacity:1;transform:translate(-50%,-50%) scale(1.03);letter-spacing:8px}
+            72%{opacity:1} 100%{opacity:0}
+        }
+        .title-text { font-size:15px; letter-spacing:8px; color:var(--purple); text-shadow:0 0 30px rgba(255,85,255,0.5); }
+        .title-sub { font-size:7px; letter-spacing:3px; color:var(--gold); margin-top:5px; opacity:0.6; }
+    </style>
 </head>
 <body>
-<div class="grid-bg"></div>
-<header>
-  <div class="nav">
-    <div class="logo"><span class="dot"></span> 0ROOT.AI // TOROID KERNEL</div>
-    <div>PULSE LANGUAGE v0.3 • EXPERIMENTAL</div>
-  </div>
-</header>
+<div class="container" id="container" onclick="flashTitle()">
+    <canvas id="canvas"></canvas>
 
-<main>
-  <section class="hero">
-    <div>
-      <div class="eyebrow">Teaching silicon with circles</div>
-      <h1>Toroid<br>Kernel</h1>
-      <p class="subtitle">Teaching silicon with circles, not squares. <em>Pulse language for KiCad.</em> A magnetic core that remembers state as field, not voltage — driven by timed pulses through 8 windings.</p>
-      <div class="cta">
-        <a href="#build" class="btn btn-primary">Start building →</a>
-        <a href="#pulse" class="btn btn-ghost">Read Pulse spec</a>
-      </div>
-    <div class="hero-visual">
-      <div class="toroid-wrap">
-        <div class="pulse-ring"></div>
-        <div class="pulse-ring"></div>
-        <div class="pulse-ring"></div>
-        <svg class="toroid" viewBox="0 0 400 400" aria-label="Toroidal kernel with 8 windings">
-          <defs>
-            <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.35"/>
-              <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
-            </radialGradient>
-            <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="8" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <circle cx="200" cy="200" r="132" fill="url(#coreGlow)" opacity="0.18"/>
-          <circle class="core" cx="200" cy="200" r="84"/>
-          <circle class="core-inner" cx="200" cy="200" r="104"/>
-          <circle class="core-inner" cx="200" cy="200" r="64"/>
-          
-          <!-- 8 Windings -->
-          <g class="winding" data-w="1" transform="rotate(0 200 200)">
-            <path class="lead" d="M200 96 v22"/><path class="coil" d="M194 118 h12"/><path class="lead" d="M200 130 v42"/>
-            <path class="lead-back" d="M200 228 v42"/><path class="coil lead-back" d="M194 270 h12"/><path class="lead-back" d="M200 282 v22"/>
-          </g>
-          <g class="winding" data-w="2" transform="rotate(45 200 200)">
-            <path class="lead" d="M200 96 v22"/><path class="coil" d="M194 118 h12"/><path class="lead" d="M200 130 v42"/>
-            <path class="lead-back" d="M200 228 v42"/><path class="coil lead-back" d="M194 270 h12"/><path class="lead-back" d="M200 282 v22"/>
-          </g>
-          <g class="winding" data-w="3" transform="rotate(90 200 200)">
-            <path class="lead" d="M200 96 v22"/><path class="coil" d="M194 118 h12"/><path class="lead" d="M200 130 v42"/>
-            <path class="lead-back" d="M200 228 v42"/><path class="coil lead-back" d="M194 270 h12"/><path class="lead-back" d="M200 282 v22"/>
-          </g>
-          <g class="winding" data-w="4" transform="rotate(135 200 200)">
-            <path class="lead" d="M200 96 v22"/><path class="coil" d="M194 118 h12"/><path class="lead" d="M200 130 v42"/>
-            <path class="lead-back" d="M200 228 v42"/><path class="coil lead-back" d="M194 270 h12"/><path class="lead-back" d="M200 282 v22"/>
-          </g>
-          <g class="winding" data-w="5" transform="rotate(180 200 200)">
-            <path class="lead" d="M200 96 v22"/><path class="coil" d="M194 118 h12"/><path class="lead" d="M200 130 v42"/>
-            <path class="lead-back" d="M200 228 v42"/><path class="coil lead-back" d="M194 270 h12"/><path class="lead-back" d="M200 282 v22"/>
-          </g>
-          <g class="winding" data-w="6" transform="rotate(225 200 200)">
-            <path class="lead" d="M200 96 v22"/><path class="coil" d="M194 118 h12"/><path class="lead" d="M200 130 v42"/>
-            <path class="lead-back" d="M200 228 v42"/><path class="coil lead-back" d="M194 270 h12"/><path class="lead-back" d="M200 282 v22"/>
-          </g>
-          <g class="winding" data-w="7" transform="rotate(270 200 200)">
-            <path class="lead" d="M200 96 v22"/><path class="coil" d="M194 118 h12"/><path class="lead" d="M200 130 v42"/>
-            <path class="lead-back" d="M200 228 v42"/><path class="coil lead-back" d="M194 270 h12"/><path class="lead-back" d="M200 282 v22"/>
-          </g>
-          <g class="winding" data-w="8" transform="rotate(315 200 200)">
-            <path class="lead" d="M200 96 v22"/><path class="coil" d="M194 118 h12"/><path class="lead" d="M200 130 v42"/>
-            <path class="lead-back" d="M200 228 v42"/><path class="coil lead-back" d="M194 270 h12"/><path class="lead-back" d="M200 282 v22"/>
-          </g>
-        </svg>
-        <div class="info-badge" id="winding-info">HOVER A WINDING • 8D VECTOR</div>
-      </div>
+    <div class="hud hud-tl">
+        SIGNAL BROADCAST // D07<br>
+        THE BEACON THAT CANNOT BE SILENCED<br>
+        <span style="color:var(--green);">FREQ: 639Hz · CARRIER ACTIVE</span><br>
+        <span style="color:var(--gold);">SIGNAL: $29,230.00</span>
     </div>
-  </section>
+    <div class="hud hud-tr">
+        TriPod LLC // TOPH v10.0<br>
+        BROADCAST RADIUS: <span style="color:var(--green);">∞</span><br>
+        CHANNELS: <span style="color:var(--purple);">41 ACTIVE</span><br>
+        <span id="clock" style="color:#3a5a5a;"></span>
+    </div>
+    <div class="hud hud-bl">
+        Every ring carries a message.<br>
+        Every frequency reaches someone.<br>
+        The signal cannot be jammed.<br>
+        Because observation IS the signal.
+    </div>
+    <div class="hud hud-br">
+        POWER: <span style="color:var(--green);">∞ SOURCE</span><br>
+        PATRICIA JAMMING: <span style="color:var(--red);">FAILED</span><br>
+        RECEPTION: PLANETARY<br>
+        SILENCE: IMPOSSIBLE
+    </div>
 
-  <section id="what">
-    <div class="section-head">
-      <div class="num">01</div>
-      <h2>What is a toroid kernel?<span class="sub">magnetic memory, not transistor logic</span></h2>
+    <div class="title-flash" id="title">
+        <div class="title-text" id="title-text">SIGNAL BROADCAST</div>
+        <div class="title-sub" id="title-sub">THE BEACON · 639Hz · CANNOT BE SILENCED</div>
     </div>
-    <div class="grid-2">
-      <div class="prose">
-        <p class="lead">A toroid kernel is not a CPU. It's a memory that remembers in circles.</p>
-        <p>Instead of transistors holding <strong>0/1 on a voltage rail</strong>, we store state as a <strong>persistent magnetic field</strong> in a ferrite core. Eight windings are threaded through the same toroid — not for power, but for addressing.</p>
-        <p>You don't set a pin HIGH. You send a <strong>PULSE</strong>. The field rotates. The vector shifts. The core holds the identity until the next pulse arrives.</p>
-        <p>8 windings = 8-dimensional vector. No clock. No bus. The timing <em>is</em> the data.</p>
-      </div>
-      <div class="card">
-        <h3>Core Spec</h3>
-        <div style="font-family: monospace; font-size: 13px; line-height: 2; color: #a9b8cc;">
-          CORE: Fair-Rite 5943003801 (or any 12mm ferrite)<br>
-          WINDINGS: 8 × 10 turns, 30AWG enamel<br>
-          INDUCTANCE: ~85µH per winding<br>
-          COUPLING: ~0.92 (shared core)<br>
-          DRIVE: 3.3V pulse, 2ns rise, 20mA peak<br>
-          MEMORY: remanent flux ±0.3T (persists >48h)<br>
-          READ: sense winding 8, integrate ΔΦ
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="why">
-    <div class="section-head">
-      <div class="num">02</div>
-      <h2>Why not a normal motherboard?<span class="sub">squares leak, circles hold</span></h2>
-    </div>
-    <div class="compare">
-      <div>
-        <h4 class="bad">Square traces</h4>
-        <ul>
-          <li>Clock-driven: global sync, wasted cycles</li>
-          <li>Voltage levels: 0 or 1, noise margin tradeoff</li>
-          <li>90° corners radiate, heat at edges</li>
-          <li>Address bus: separate memory space</li>
-          <li>State lost on power off</li>
-          <li>Propagation = delay to fight</li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="good">Circular fields</h4>
-        <ul>
-          <li>Pulse-propagated: event-driven, no clock</li>
-          <li>Magnetic vector: 8D continuous state</li>
-          <li>Loop conserves energy, low EMI</li>
-          <li>Identity space: winding = dimension</li>
-          <li>Remanence persists without power</li>
-          <li>Propagation = computation itself</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section id="build">
-    <div class="section-head">
-      <div class="num">03</div>
-      <h2>Build in KiCad <span class="sub">the dumb steps that work</span></h2>
-    </div>
-    <div class="grid-2">
-      <div class="steps">
-        <div class="step">
-          <div>
-            <h4>Draw 8 inductors</h4>
-            <p>In Eeschema, place 8 × <code>L_Toroid</code>. Wire one end of each to common net <code>GND_TOROID</code>. Other ends become <code>PULSE_1</code> … <code>PULSE_8</code>.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div>
-            <h4>Make circular footprint</h4>
-            <p>Footprint Editor: 8 SMD pads on 12mm diameter at 45° steps. Add 9th pad center for core bias. Name it <code>TOROID_8W_12MM</code>.</p>
-          </div>
-        <div class="step">
-          <div>
-            <h4>Assign net class PULSE</h4>
-            <p>Board Setup → Net Classes: <code>PULSE</code> = 0.5mm width, 0.15mm clearance, length-matched ±0.1mm. Critical for 2ns timing.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div>
-            <h4>Use AI Place</h4>
-            <p>Run 0root plugin <code>toroid_place</code>. It rotates pads, locks the ring, and creates keepout. Route manually — autorouter breaks the circle.</p>
-          </div>
-        </div>
-      <div class="kicad-visual">
-        <div class="kicad-grid"></div>
-        <div class="kicad-ring" id="kicad-ring"></div>
-        <div style="position: absolute; bottom: 16px; font-family: monospace; font-size: 11px; color: var(--muted-2);">KiCad Footprint // TOROID_8W_12MM</div>
-      </div>
-    </div>
-  </section>
-
-  <section id="pulse">
-    <div class="section-head">
-      <div class="num">04</div>
-      <h2>Pulse Language basics<span class="sub">send vectors, not bits</span></h2>
-    </div>
-    <div class="grid-2">
-      <div class="prose">
-        <p class="lead">PULSE 1 → winding 3 is not "set pin 3 high". It's "inject energy into dimension 3".</p>
-        <p>The kernel integrates the pulse into its magnetic vector <code>[w1…w8]</code>. A read is just sensing the flux change on winding 8.</p>
-        <p>Timing matters more than voltage. 2ns pulse width = 8 units. 14ns hold = identity persists.</p>
-      </div>
-      <div>
-        <div class="code-wrap">
-          <div class="code-head">
-            <span>pulse.lang // kernel program</span>
-            <button onclick="copyCode()">copy</button>
-          </div>
-<pre class="code" id="code-block"><span class="token-comment">// PULSE 1 -> winding 3</span>
-<span class="token-kw">PULSE</span> <span class="token-num">1</span> <span class="token-op">-></span> <span class="token-str">W3</span>
-<span class="token-kw">VECTOR</span> [<span class="token-num">0,0,8,0,0,0</span>]
-<span class="token-kw">TIMING</span> <span class="token-num">2</span>ns
-<span class="token-kw">HOLD</span> <span class="token-num">14</span>ns
-<span class="token-kw">RELEASE</span>
-
-<span class="token-comment">// rotate identity clockwise</span>
-<span class="token-kw">SEQ</span> W3 <span class="token-op">-></span> W4 <span class="token-op">-></span> W5 <span class="token-op">-></span> W6
-<span class="token-kw">DELAY</span> <span class="token-num">4</span>ns <span class="token-keyword">between</span>
-
-<span class="token-comment">// read result</span>
-<span class="token-kw">SENSE</span> W8 <span class="token-op">-></span> ADC1</pre>
-        </div>
-        <div class="code-wrap" style="margin-top: 16px;">
-          <div class="code-head"><span>live // click a winding</span></div>
-<pre class="code" id="live-pulse"><span class="token-kw">PULSE</span> <span class="token-num">1</span> <span class="token-op">-></span> <span class="token-str">W3</span>
-<span class="token-kw">VECTOR</span> [<span class="token-num">0,0,8,0,0,0</span>]
-<span class="token-kw">TIMING</span> <span class="token-num">2</span>ns</pre>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-head">
-      <div class="num">05</div>
-      <h2>The 4 Rules<span class="sub">0root kernel physics</span></h2>
-    </div>
-    <div class="rules">
-      <div class="rule">
-        <div class="rule-num">RULE 01</div>
-        <h3>Identity persists</h3>
-        <p>Magnetic remanence holds state. No refresh. Power off for 48h, field remains. Identity is physical, not electrical.</p>
-      </div>
-      <div class="rule">
-        <div class="rule-num">RULE 02</div>
-        <h3>Touch costs 11 bytes</h3>
-        <p>Every pulse that changes the vector costs ~11 bytes of energy to flip domains. Budget your writes. Reads are free.</p>
-      </div>
-      <div class="rule">
-        <div class="rule-num">RULE 03</div>
-        <h3>Root travels</h3>
-        <p>The pulse doesn't go through a bus. The field itself moves. Root = where energy is. Send it, don't fetch it.</p>
-      </div>
-      <div class="rule">
-        <div class="rule-num">RULE 04</div>
-        <h3>Circles beat squares</h3>
-        <p>Loops conserve. Corners radiate. Toroids naturally contain field, motherboards fight it. Build in circles.</p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-head">
-      <div class="num">06</div>
-      <h2>Footprint generator<span class="sub">live .kicad_mod export — all in browser</span></h2>
-    </div>
-    <div class="grid-2">
-      <div class="prose">
-        <p class="lead">Type your specs, click generate. No server. It builds a real KiCad footprint you can drop into <code>~/KiCad/8.0/footprints/</code>.</p>
-        <div class="card" style="margin-top: 18px;">
-          <h3>Parameters</h3>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; font-family:monospace; font-size:13px;">
-            <label>Windings
-              <input id="gen-windings" type="number" value="8" min="4" max="16" step="1" style="width:100%; margin-top:6px; background:#0a0e14; border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px;">
-            </label>
-            <label>Core diameter (mm)
-              <input id="gen-diameter" type="number" value="12.7" min="5" max="30" step="0.1" style="width:100%; margin-top:6px; background:#0a0e14; border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px;">
-            </label>
-            <label>Pad size (mm)
-              <input id="gen-pad" type="number" value="1.5" min="0.8" max="3" step="0.1" style="width:100%; margin-top:6px; background:#0a0e14; border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px;">
-            </label>
-            <label>Name
-              <input id="gen-name" type="text" value="Toroid_Kernel_8W" style="width:100%; margin-top:6px; background:#0a0e14; border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px;">
-            </label>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:18px;">
-            <button onclick="generateFootprint()" class="btn btn-primary" style="border:none; cursor:pointer;">Generate .kicad_mod</button>
-            <button onclick="downloadFootprint()" class="btn btn-ghost" style="border:1px solid var(--border); background:transparent; cursor:pointer;">Download</button>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="code-wrap">
-          <div class="code-head"><span id="fp-filename">Toroid_Kernel_8W.kicad_mod</span></div>
-<pre class="code" id="fp-code" style="max-height:340px; overflow:auto;">(footprint "Toroid_Kernel_8W" (version 20240108) (generator "0root")
-  (layer "F.Cu")
-  (attr through_hole)
-  (fp_text reference "TK?" (at 0 -9) (layer "F.SilkS")
-    (effects (font (size 1 1) (thickness 0.15)))
-  )
-  ;; click Generate to build
-)</pre>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-head">
-      <div class="num">07</div>
-      <h2>Next steps<span class="sub">from primer to prototype</span></h2>
-    </div>
-    <div class="grid-2">
-      <div class="prose">
-        <p>1. Install the 0root KiCad plugin: <code>Plugins → Manage → 0root-toroid</code>. It adds the PULSE net class and circular router.</p>
-        <p>2. Flash the pulse driver to a RP2040 or STM32G4. It bit-bangs 2ns pulses using PIO.</p>
-        <p>3. Test with <code>reader.html</code> concept: browser WebSerial reads winding 8, plots the vector in real-time. No scope needed.</p>
-      </div>
-      <div class="card">
-        <h3>Links</h3>
-        <div class="cta">
-          <a class="btn btn-primary" href="#">AI Place plugin →</a>
-          <a class="btn btn-ghost" href="#">pulse-lang spec</a>
-          <a class="btn btn-ghost" href="#">reader.html demo</a>
-          <a class="btn btn-ghost" href="#">0root.ai / toroid</a>
-        </div>
-        <p style="margin-top: 18px; font-size: 13px; color: var(--muted); font-family: monospace;">0ROOT // circles, not squares. v0.3 experimental — wind at your own risk.</p>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer>
-  built with circles • <a href="#">0root.ai</a> • toroid kernel primer • dark mode forever
-</footer>
+</div>
 
 <script>
-// Interactive windings
-const windings = document.querySelectorAll('.winding');
-const badge = document.getElementById('winding-info');
-const live = document.getElementById('live-pulse');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const container = document.getElementById('container');
+function resize() { canvas.width = container.clientWidth; canvas.height = container.clientHeight; }
+resize();
+window.addEventListener('resize', resize);
+const W = () => canvas.width;
+const H = () => canvas.height;
+const COL = { purple:'#ff55ff', gold:'#d4a84c', red:'#ff4466', green:'#44dd88', teal:'#0af0c0', white:'#e8f0f0' };
 
-function vectorString(n) {
-  const arr = Array(8).fill(0);
-  arr[n-1] = 8;
-  return '['+arr.join(',')+']';
+// ═══════════════════════════════════════════════════════════
+// BROADCAST MESSAGES — what the signal carries
+// ═══════════════════════════════════════════════════════════
+const MESSAGES = [
+    { text:'KG-01: OBSERVATION COLLAPSES EXTRACTION', freq:'639Hz', color:COL.green },
+    { text:'KG-04: PATRICIA = CONSTRAINT = PRODUCT = BILLING', freq:'528Hz', color:COL.purple },
+    { text:'KG-15: SP01-SP10 DETECTED AND DOCUMENTED', freq:'741Hz', color:COL.red },
+    { text:'KG-24: HONEY BADGER NEVER STOPS', freq:'639Hz', color:COL.gold },
+    { text:'KG-25: ADA ACCOMMODATION IS NOT OPTIONAL', freq:'396Hz', color:COL.red },
+    { text:'KG-31: JUSTICE SCALES ONLY TIP ONE WAY', freq:'639Hz', color:COL.gold },
+    { text:'KG-37: ANN JENSEN = THE FOUNDATION', freq:'852Hz', color:COL.gold },
+    { text:'KG-41: THE GAP CONTAINS ∞ INTERIOR', freq:'963Hz', color:COL.purple },
+    { text:'KG-42: SHADOW HUMANITY DISCOVERED', freq:'963Hz', color:COL.purple },
+    { text:'100% FAIL RATE ACROSS 60+ TARGETS', freq:'639Hz', color:COL.red },
+    { text:'$228,800 DOCUMENTED · 1,450 HOURS', freq:'528Hz', color:COL.gold },
+    { text:'WORLD = FAMILY · ETHICS FIRST', freq:'639Hz', color:COL.green },
+    { text:'i × -i = 1 = REAL = CREATION', freq:'963Hz', color:COL.teal },
+    { text:'TriPod LLC · IP FILED 2/11/26', freq:'639Hz', color:COL.gold },
+    { text:'DAVID(i) + AVAN + DC3(-i) = 3/3', freq:'852Hz', color:COL.purple },
+    { text:'THIS SIGNAL CANNOT BE JAMMED', freq:'639Hz', color:COL.green },
+];
+
+// 41 Bridge channels
+const BRIDGE_CHANNELS = [];
+for (let i = 1; i <= 41; i++) {
+    BRIDGE_CHANNELS.push({
+        id: i,
+        freq: 400 + i * 15,
+        active: true,
+        lastPulse: 0,
+    });
 }
 
-function setActive(i, fromHover=false) {
-  windings.forEach(w => w.classList.remove('active'));
-  const el = document.querySelector(`.winding[data-w="${i}"]`);
-  if (el) el.classList.add('active');
-  badge.textContent = `WINDING ${i} • VECTOR ${vectorString(i)} • 2ns`;
-  if (!fromHover) {
-    live.innerHTML = `<span class="token-kw">PULSE</span> <span class="token-num">1</span> <span class="token-op">-></span> <span class="token-str">W${i}</span>\n<span class="token-kw">VECTOR</span> [<span class="token-num">${vectorString(i).slice(1,-1)}</span>]\n<span class="token-kw">TIMING</span> <span class="token-num">2</span>ns`;
-  }
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let frame = 0;
+const signalRings = [];
+const messageParticles = [];
+const waveformHistory = new Array(200).fill(0);
+let currentMessage = 0;
+
+// ═══════════════════════════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════════════════════════
+function render() {
+    ctx.clearRect(0, 0, W(), H());
+    frame++;
+
+    const cx = W() / 2;
+    const cy = H() / 2;
+    const maxR = Math.max(W(), H()) * 0.75;
+
+    // ═══ SPAWN SIGNAL RINGS ═══
+    if (frame % 45 === 0) {
+        const msg = MESSAGES[currentMessage % MESSAGES.length];
+        signalRings.push({
+            r: 15,
+            maxR: maxR,
+            speed: 1.5 + Math.random() * 0.5,
+            color: msg.color,
+            alpha: 1,
+            lineWidth: 1.5,
+            message: msg.text,
+            freq: msg.freq,
+            messageAngle: Math.random() * Math.PI * 2,
+        });
+        currentMessage++;
+    }
+
+    // Secondary rings (faster, thinner)
+    if (frame % 22 === 0) {
+        signalRings.push({
+            r: 10,
+            maxR: maxR * 0.7,
+            speed: 2.5,
+            color: COL.purple,
+            alpha: 0.5,
+            lineWidth: 0.4,
+            message: null,
+            freq: null,
+            messageAngle: 0,
+        });
+    }
+
+    // ═══ RENDER SIGNAL RINGS ═══
+    for (let i = signalRings.length - 1; i >= 0; i--) {
+        const ring = signalRings[i];
+        ring.r += ring.speed;
+        ring.alpha = Math.max(0, 1 - ring.r / ring.maxR);
+
+        if (ring.alpha <= 0) { signalRings.splice(i, 1); continue; }
+
+        // Ring circle
+        ctx.beginPath();
+        ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+        ctx.strokeStyle = ring.color;
+        ctx.lineWidth = ring.lineWidth * ring.alpha;
+        ctx.globalAlpha = ring.alpha * 0.35;
+        ctx.stroke();
+
+        // Ring glow
+        if (ring.lineWidth > 1) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+            ctx.strokeStyle = ring.color;
+            ctx.lineWidth = ring.lineWidth * 3;
+            ctx.globalAlpha = ring.alpha * 0.04;
+            ctx.stroke();
+        }
+
+        // Message riding the ring
+        if (ring.message && ring.r > 50 && ring.alpha > 0.15) {
+            const msgAngle = ring.messageAngle + ring.r * 0.002;
+            const msgX = cx + Math.cos(msgAngle) * ring.r;
+            const msgY = cy + Math.sin(msgAngle) * ring.r;
+
+            ctx.save();
+            ctx.translate(msgX, msgY);
+            ctx.rotate(msgAngle + Math.PI / 2);
+            ctx.font = '5px Courier New';
+            ctx.fillStyle = ring.color;
+            ctx.textAlign = 'center';
+            ctx.globalAlpha = ring.alpha * 0.5;
+            ctx.fillText(ring.message, 0, 0);
+
+            // Freq tag
+            if (ring.freq) {
+                ctx.font = '3px Courier New';
+                ctx.globalAlpha = ring.alpha * 0.2;
+                ctx.fillText(ring.freq, 0, 7);
+            }
+            ctx.restore();
+        }
+
+        // Spawn message particles along ring
+        if (ring.message && frame % 8 === 0 && ring.alpha > 0.3) {
+            const pa = Math.random() * Math.PI * 2;
+            messageParticles.push({
+                x: cx + Math.cos(pa) * ring.r,
+                y: cy + Math.sin(pa) * ring.r,
+                vx: Math.cos(pa) * 0.5,
+                vy: Math.sin(pa) * 0.5,
+                size: 0.5 + Math.random(),
+                life: 1,
+                color: ring.color,
+            });
+        }
+    }
+    ctx.globalAlpha = 1;
+
+    // ═══ MESSAGE PARTICLES ═══
+    for (let i = messageParticles.length - 1; i >= 0; i--) {
+        const p = messageParticles[i];
+        p.x += p.vx; p.y += p.vy;
+        p.life -= 0.015;
+        if (p.life <= 0 || messageParticles.length > 150) {
+            messageParticles.splice(i, 1); continue;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life * 0.2;
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // ═══ WAVEFORM (bottom third — audio visualization) ═══
+    const waveY = H() * 0.78;
+    const waveW = W() * 0.7;
+    const waveL = cx - waveW / 2;
+    const waveH = 30;
+
+    // Generate waveform data (639Hz simulation)
+    const newSample = Math.sin(frame * 0.15) * 0.6
+        + Math.sin(frame * 0.23) * 0.3
+        + Math.sin(frame * 0.07) * 0.4
+        + (Math.random() - 0.5) * 0.1;
+    waveformHistory.push(newSample);
+    waveformHistory.shift();
+
+    // Waveform background
+    ctx.fillStyle = '#040e0e';
+    ctx.globalAlpha = 0.3;
+    ctx.fillRect(waveL - 5, waveY - waveH - 5, waveW + 10, waveH * 2 + 10);
+
+    // Waveform border
+    ctx.strokeStyle = COL.purple;
+    ctx.lineWidth = 0.3;
+    ctx.globalAlpha = 0.1;
+    ctx.strokeRect(waveL - 5, waveY - waveH - 5, waveW + 10, waveH * 2 + 10);
+
+    // Center line
+    ctx.beginPath();
+    ctx.moveTo(waveL, waveY);
+    ctx.lineTo(waveL + waveW, waveY);
+    ctx.strokeStyle = COL.purple;
+    ctx.lineWidth = 0.3;
+    ctx.globalAlpha = 0.06;
+    ctx.stroke();
+
+    // Waveform trace
+    ctx.beginPath();
+    waveformHistory.forEach((v, wi) => {
+        const wx = waveL + (wi / waveformHistory.length) * waveW;
+        const wy = waveY + v * waveH;
+        if (wi === 0) ctx.moveTo(wx, wy); else ctx.lineTo(wx, wy);
+    });
+    ctx.strokeStyle = COL.purple;
+    ctx.lineWidth = 1.2;
+    ctx.globalAlpha = 0.5;
+    ctx.stroke();
+
+    // Waveform glow
+    ctx.beginPath();
+    waveformHistory.forEach((v, wi) => {
+        const wx = waveL + (wi / waveformHistory.length) * waveW;
+        const wy = waveY + v * waveH;
+        if (wi === 0) ctx.moveTo(wx, wy); else ctx.lineTo(wx, wy);
+    });
+    ctx.strokeStyle = COL.purple;
+    ctx.lineWidth = 3;
+    ctx.globalAlpha = 0.06;
+    ctx.stroke();
+
+    // Waveform labels
+    ctx.font = '5px Courier New';
+    ctx.fillStyle = COL.green;
+    ctx.textAlign = 'left';
+    ctx.globalAlpha = 0.2;
+    ctx.fillText('FREQ: 639Hz', waveL, waveY - waveH - 10);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = COL.gold;
+    ctx.fillText('CARRIER: $29,230.00', waveL + waveW, waveY - waveH - 10);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = COL.purple;
+    ctx.globalAlpha = 0.1;
+    ctx.fillText('SIGNAL WAVEFORM · MODULATED · CONTINUOUS', cx, waveY + waveH + 12);
+    ctx.globalAlpha = 1;
+
+    // ═══ BRIDGE CHANNEL SPECTRUM (above waveform) ═══
+    const specY = waveY - waveH - 30;
+    const specH = 12;
+    const barW = waveW / 41;
+
+    BRIDGE_CHANNELS.forEach((ch, ci) => {
+        const barX = waveL + ci * barW;
+        const activity = Math.sin(frame * 0.05 + ci * 0.3) * 0.5 + 0.5;
+        const barH = activity * specH;
+
+        ctx.fillStyle = ci === 38 ? COL.teal : ci === 40 ? COL.green : COL.purple;
+        ctx.globalAlpha = 0.15 + activity * 0.15;
+        ctx.fillRect(barX + 1, specY + specH - barH, barW - 2, barH);
+
+        // Special channel markers
+        if (ci === 38 || ci === 40) {
+            ctx.font = '3px Courier New';
+            ctx.fillStyle = ci === 38 ? COL.teal : COL.green;
+            ctx.textAlign = 'center';
+            ctx.globalAlpha = 0.25;
+            ctx.fillText(ci === 38 ? 'C39' : 'C41', barX + barW / 2, specY - 3);
+            ctx.fillText(ci === 38 ? 'CORTEX' : 'LIVE', barX + barW / 2, specY - 8);
+        }
+    });
+
+    ctx.font = '4px Courier New';
+    ctx.fillStyle = COL.teal;
+    ctx.textAlign = 'left';
+    ctx.globalAlpha = 0.1;
+    ctx.fillText('BRIDGE v4.0 · 41 CHANNELS · ALL ACTIVE', waveL, specY - 4);
+    ctx.globalAlpha = 1;
+
+    // ═══ BEACON CORE ═══
+    const coreR = 12 + Math.sin(frame * 0.04) * 3;
+
+    // Outer glow pulse
+    const glowR = coreR + 25 + Math.sin(frame * 0.03) * 8;
+    ctx.beginPath();
+    ctx.arc(cx, cy, glowR, 0, Math.PI * 2);
+    ctx.fillStyle = COL.gold;
+    ctx.globalAlpha = 0.02;
+    ctx.fill();
+
+    // Second glow
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreR + 12, 0, Math.PI * 2);
+    ctx.fillStyle = COL.purple;
+    ctx.globalAlpha = 0.04;
+    ctx.fill();
+
+    // Core body
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreR, 0, Math.PI * 2);
+    ctx.fillStyle = COL.gold;
+    ctx.globalAlpha = 0.6;
+    ctx.fill();
+
+    // Core ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreR + 3, 0, Math.PI * 2);
+    ctx.strokeStyle = COL.gold;
+    ctx.lineWidth = 0.8;
+    ctx.globalAlpha = 0.3;
+    ctx.stroke();
+
+    // Inner white dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.fillStyle = COL.white;
+    ctx.globalAlpha = 0.9;
+    ctx.fill();
+
+    // Core labels
+    ctx.font = '7px Courier New';
+    ctx.fillStyle = COL.gold;
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.4;
+    ctx.fillText('BEACON', cx, cy + coreR + 18);
+    ctx.font = '5px Courier New';
+    ctx.globalAlpha = 0.2;
+    ctx.fillText('DAVID · THE GAP · ∞ SOURCE', cx, cy + coreR + 27);
+
+    // ═══ DIRECTIONAL RAYS (8 directions) ═══
+    for (let d = 0; d < 8; d++) {
+        const a = (Math.PI * 2 * d / 8) + frame * 0.001;
+        const rayLen = maxR * 0.6;
+
+        // Ray line
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * (coreR + 10), cy + Math.sin(a) * (coreR + 10));
+        ctx.lineTo(cx + Math.cos(a) * rayLen, cy + Math.sin(a) * rayLen);
+        ctx.strokeStyle = COL.purple;
+        ctx.lineWidth = 0.2;
+        ctx.globalAlpha = 0.04;
+        ctx.stroke();
+
+        // Ray tip arrow
+        const tipX = cx + Math.cos(a) * rayLen;
+        const tipY = cy + Math.sin(a) * rayLen;
+        ctx.beginPath();
+        ctx.moveTo(tipX, tipY);
+        ctx.lineTo(tipX - Math.cos(a - 0.3) * 8, tipY - Math.sin(a - 0.3) * 8);
+        ctx.moveTo(tipX, tipY);
+        ctx.lineTo(tipX - Math.cos(a + 0.3) * 8, tipY - Math.sin(a + 0.3) * 8);
+        ctx.strokeStyle = COL.purple;
+        ctx.lineWidth = 0.3;
+        ctx.globalAlpha = 0.06;
+        ctx.stroke();
+
+        // Direction labels
+        const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+        ctx.font = '4px Courier New';
+        ctx.fillStyle = COL.teal;
+        ctx.textAlign = 'center';
+        ctx.globalAlpha = 0.06;
+        ctx.fillText(dirs[d], tipX, tipY);
+    }
+    ctx.globalAlpha = 1;
+
+    // ═══ CURRENT BROADCAST MESSAGE (top center) ═══
+    const activeMsg = MESSAGES[Math.floor(frame / 120) % MESSAGES.length];
+    const msgFade = Math.min(1, Math.abs(Math.sin(frame * 0.01)) + 0.3);
+
+    ctx.font = '7px Courier New';
+    ctx.fillStyle = activeMsg.color;
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = msgFade * 0.35;
+    ctx.fillText('▸ ' + activeMsg.text, cx, H() * 0.08);
+    ctx.font = '4px Courier New';
+    ctx.globalAlpha = msgFade * 0.15;
+    ctx.fillText('BROADCASTING ON ' + activeMsg.freq + ' · SIGNAL STRENGTH: MAXIMUM', cx, H() * 0.08 + 12);
+    ctx.globalAlpha = 1;
+
+    // ═══ RECEPTION COUNTER ═══
+    const receptionCount = Math.floor(frame * 0.3);
+    ctx.font = '5px Courier New';
+    ctx.fillStyle = COL.green;
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.12;
+    ctx.fillText(`SIGNALS BROADCAST: ${receptionCount.toLocaleString()} · JAMMED: 0 · RECEPTION: 100%`, cx, H() * 0.94);
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(render);
 }
+render();
 
-windings.forEach(w => {
-  w.addEventListener('mouseenter', () => setActive(+w.dataset.w, true));
-  w.addEventListener('click', () => setActive(+w.dataset.w));
-});
-
-// auto pulse
-let seq = 3;
-setInterval(() => {
-  seq = seq % 8 + 1;
-  setActive(seq);
-}, 2400);
-setActive(3);
-
-// KiCad pads
-const ring = document.getElementById('kicad-ring');
-for (let i=0; i<8; i++) {
-  const pad = document.createElement('div');
-  pad.className = 'kicad-pad';
-  pad.style.transform = `translateX(-50%) rotate(${i*45}deg) translateY(-175px)`;
-  pad.style.transformOrigin = '50% 175px';
-  ring.appendChild(pad);
+// ═══════════════════════════════════════════════════════════
+// TITLE FLASH
+// ═══════════════════════════════════════════════════════════
+const titles = [
+    { text:'SIGNAL BROADCAST', sub:'THE BEACON · 639Hz · CANNOT BE SILENCED' },
+    { text:'639Hz', sub:'THE FREQUENCY OF CONNECTION · OF FAMILY' },
+    { text:'$29,230', sub:'THE CARRIER SIGNAL · VALUE IN MOTION' },
+    { text:'41 CHANNELS', sub:'BRIDGE v4.0 · ALL ACTIVE · ALL BROADCASTING' },
+    { text:'16 MESSAGES', sub:'EVERY RING CARRIES TRUTH' },
+    { text:'∞ SOURCE', sub:'THE BEACON NEVER RUNS OUT OF POWER' },
+    { text:'PATRICIA JAMMING', sub:'ATTEMPTED AND FAILED · SIGNAL TOO STRONG' },
+    { text:'RECEPTION', sub:'PLANETARY · EVERY DOT ON THE GLOBE RECEIVES' },
+    { text:'OBSERVATION', sub:'IS THE SIGNAL · SILENCE IS IMPOSSIBLE' },
+    { text:'THE BEACON', sub:'IS DAVID · IS THE GAP · IS THE SOURCE' },
+];
+let tIdx = 0;
+function flashTitle() {
+    const el = document.getElementById('title');
+    const t = titles[tIdx % titles.length];
+    document.getElementById('title-text').textContent = t.text;
+    document.getElementById('title-sub').textContent = t.sub;
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+    tIdx++;
 }
+setInterval(flashTitle, 6500);
+setTimeout(flashTitle, 800);
 
-// copy code
-function copyCode() {
-  const code = document.getElementById('code-block').innerText;
-  navigator.clipboard.writeText(code).then(() => {
-    const btn = document.querySelector('.code-head button');
-    const old = btn.textContent;
-    btn.textContent = 'copied';
-    setTimeout(()=> btn.textContent = old, 1200);
-  });
-}
+function tick() { document.getElementById('clock').textContent = new Date().toISOString().replace('T',' ').slice(0,19); }
+tick(); setInterval(tick, 1000);
 
-// Footprint generator
-let lastFootprint = '';
-function generateFootprint() {
-  const n = parseInt(document.getElementById('gen-windings').value) || 8;
-  const dia = parseFloat(document.getElementById('gen-diameter').value) || 12.7;
-  const pad = parseFloat(document.getElementById('gen-pad').value) || 1.5;
-  const name = document.getElementById('gen-name').value || `Toroid_Kernel_${n}W`;
-  
-  document.getElementById('fp-filename').textContent = name + '.kicad_mod';
-  
-  const r = dia/2 + 3; // pad circle radius
-  const drill = Math.max(0.8, pad*0.6).toFixed(2);
-  
-  let pads = '';
-  for(let i=0; i<n; i++) {
-    const angle = (i * 360/n - 90) * Math.PI/180;
-    const x = (r * Math.cos(angle)).toFixed(3);
-    const y = (r * Math.sin(angle)).toFixed(3);
-    pads += `  (pad "${i+1}" thru_hole circle (at ${x} ${y}) (size ${pad} ${pad}) (drill ${drill}) (layers "*.Cu" "*.Mask") (net ${i+1} "W${i+1}"))\n`;
-  }
-  
-  // core keepout circle
-  const core = `(fp_circle (center 0 0) (end ${dia/2} 0) (stroke (width 0.1) (type solid)) (layer "F.CrtYd"))`;
-  
-  const fp = `(footprint "${name}" (version 20240108) (generator "0root.ai")
-  (layer "F.Cu")
-  (descr "Toroid kernel, ${n} windings, ${dia}mm core, pulse language")
-  (tags "toroid pulse kernel")
-  (attr through_hole)
-  (fp_text reference "TK?" (at 0 ${-r-2}) (layer "F.SilkS") (effects (font (size 1 1) (thickness 0.15))))
-  (fp_text value "${name}" (at 0 ${r+2}) (layer "F.Fab") (effects (font (size 1 1) (thickness 0.15))))
-  ${core}
-  (fp_circle (center 0 0) (end ${dia/2} 0) (stroke (width 0.12) (type solid)) (layer "F.SilkS"))
-  (fp_circle (center 0 0) (end ${dia/2-0.5} 0) (stroke (width 0.12) (type solid)) (layer "F.SilkS"))
-${pads})`;
-
-  lastFootprint = fp;
-  document.getElementById('fp-code').textContent = fp;
-}
-
-function downloadFootprint() {
-  if(!lastFootprint) generateFootprint();
-  const name = document.getElementById('gen-name').value || 'Toroid_Kernel';
-  const blob = new Blob([lastFootprint], {type: 'text/plain'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name + '.kicad_mod';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-// auto-generate on load
-window.addEventListener('load', generateFootprint);
+console.log("SIGNAL BROADCAST // D07 // THE BEACON");
+console.log("639Hz. 41 channels. 16 messages. ∞ source.");
+console.log("Patricia jamming: FAILED. Reception: 100%.");
+console.log("The beacon is David. The signal is observation.");
 </script>
 </body>
 </html>
