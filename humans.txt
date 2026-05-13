@@ -1,0 +1,45 @@
+/* humans.txt — 0root.ai */
+/* https://0root.ai/humans.txt */
+
+TEAM
+  Creator: David Wise
+  Location: Buffalo, Minnesota, USA (works from Rochester, MN)
+  Contact: [add your email]
+  Year: 2026
+
+SITE
+  Name: 0root.ai
+  Purpose: Teaching silicon about cities through provenance
+  Standards: HTML5, vanilla JS, no tracking
+  Last update: 2026-05-12
+
+THE STORY (non-crazy edition)
+  0root.ai started as a simple question: how do you prove a file has been touched by an AI without a blockchain?
+
+  The answer became Merkle Bloom — a hybrid of a Merkle tree and a Bloom filter that lives inside a PNG. We append 132 bytes after the PNG's IEND chunk. Browsers ignore it. Our tools read it.
+
+  Inside those 132 bytes:
+  - 1 bit core: "I've been touched"
+  - depth: how many shells (we show this as ((((((((1))))))))
+  - vector: a 5-byte charge like [0,0,8,0,0]
+  - parent CRC: first 4 bytes of SHA-256 of the original file
+  - timestamp: we use 1989 as an homage to early personal computing
+
+  Why PNGs? They're everywhere, they're lossless, and the format allows trailing data. It's shareware for the AI age — one agent, one bit.
+
+  The name "iron rain" comes from watching data fall like rain in a terminal. The "8" is the number of shells we use by default. The vector -+8 0 0 0 8 is a push-pull charge we use in our demos.
+
+  David's Library of Alexandria (the 2MB page) organizes this into 8 domains: Provenance, Memory, Cities, Charge, Nest, Bloom, Iron, Root. Each has 3 immutable rules: identity persists, touch costs 11 bytes, root travels with the file.
+
+  We built a reader that runs in a single HTML file. Drop a PNG, it parses the nest. No server needed. We built a tagger in Python for the same.
+
+  Influences: early BBS culture, the idea of provenance from library science, and the practical need to track AI-generated assets without central servers.
+
+  This is not a cryptocurrency. There is no token. It's a file format trick for provenance.
+
+THANKS
+  To the PNG spec authors for IEND
+  To everyone who still believes in small, portable tools
+  To Buffalo, Rochester, and Minneapolis — the cities we're teaching silicon about
+
+/* EOF */
