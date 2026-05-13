@@ -500,6 +500,52 @@ footer a:hover { color: var(--accent); }
   <section>
     <div class="section-head">
       <div class="num">06</div>
+      <h2>Footprint generator<span class="sub">live .kicad_mod export — all in browser</span></h2>
+    </div>
+    <div class="grid-2">
+      <div class="prose">
+        <p class="lead">Type your specs, click generate. No server. It builds a real KiCad footprint you can drop into <code>~/KiCad/8.0/footprints/</code>.</p>
+        <div class="card" style="margin-top: 18px;">
+          <h3>Parameters</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; font-family:monospace; font-size:13px;">
+            <label>Windings
+              <input id="gen-windings" type="number" value="8" min="4" max="16" step="1" style="width:100%; margin-top:6px; background:#0a0e14; border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px;">
+            </label>
+            <label>Core diameter (mm)
+              <input id="gen-diameter" type="number" value="12.7" min="5" max="30" step="0.1" style="width:100%; margin-top:6px; background:#0a0e14; border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px;">
+            </label>
+            <label>Pad size (mm)
+              <input id="gen-pad" type="number" value="1.5" min="0.8" max="3" step="0.1" style="width:100%; margin-top:6px; background:#0a0e14; border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px;">
+            </label>
+            <label>Name
+              <input id="gen-name" type="text" value="Toroid_Kernel_8W" style="width:100%; margin-top:6px; background:#0a0e14; border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px;">
+            </label>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:18px;">
+            <button onclick="generateFootprint()" class="btn btn-primary" style="border:none; cursor:pointer;">Generate .kicad_mod</button>
+            <button onclick="downloadFootprint()" class="btn btn-ghost" style="border:1px solid var(--border); background:transparent; cursor:pointer;">Download</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <div class="code-head"><span id="fp-filename">Toroid_Kernel_8W.kicad_mod</span></div>
+<pre class="code" id="fp-code" style="max-height:340px; overflow:auto;">(footprint "Toroid_Kernel_8W" (version 20240108) (generator "0root")
+  (layer "F.Cu")
+  (attr through_hole)
+  (fp_text reference "TK?" (at 0 -9) (layer "F.SilkS")
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  ;; click Generate to build
+)</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div class="num">07</div>
       <h2>Next steps<span class="sub">from primer to prototype</span></h2>
     </div>
     <div class="grid-2">
@@ -581,6 +627,60 @@ function copyCode() {
     setTimeout(()=> btn.textContent = old, 1200);
   });
 }
+
+// Footprint generator
+let lastFootprint = '';
+function generateFootprint() {
+  const n = parseInt(document.getElementById('gen-windings').value) || 8;
+  const dia = parseFloat(document.getElementById('gen-diameter').value) || 12.7;
+  const pad = parseFloat(document.getElementById('gen-pad').value) || 1.5;
+  const name = document.getElementById('gen-name').value || `Toroid_Kernel_${n}W`;
+  
+  document.getElementById('fp-filename').textContent = name + '.kicad_mod';
+  
+  const r = dia/2 + 3; // pad circle radius
+  const drill = Math.max(0.8, pad*0.6).toFixed(2);
+  
+  let pads = '';
+  for(let i=0; i<n; i++) {
+    const angle = (i * 360/n - 90) * Math.PI/180;
+    const x = (r * Math.cos(angle)).toFixed(3);
+    const y = (r * Math.sin(angle)).toFixed(3);
+    pads += `  (pad "${i+1}" thru_hole circle (at ${x} ${y}) (size ${pad} ${pad}) (drill ${drill}) (layers "*.Cu" "*.Mask") (net ${i+1} "W${i+1}"))\n`;
+  }
+  
+  // core keepout circle
+  const core = `(fp_circle (center 0 0) (end ${dia/2} 0) (stroke (width 0.1) (type solid)) (layer "F.CrtYd"))`;
+  
+  const fp = `(footprint "${name}" (version 20240108) (generator "0root.ai")
+  (layer "F.Cu")
+  (descr "Toroid kernel, ${n} windings, ${dia}mm core, pulse language")
+  (tags "toroid pulse kernel")
+  (attr through_hole)
+  (fp_text reference "TK?" (at 0 ${-r-2}) (layer "F.SilkS") (effects (font (size 1 1) (thickness 0.15))))
+  (fp_text value "${name}" (at 0 ${r+2}) (layer "F.Fab") (effects (font (size 1 1) (thickness 0.15))))
+  ${core}
+  (fp_circle (center 0 0) (end ${dia/2} 0) (stroke (width 0.12) (type solid)) (layer "F.SilkS"))
+  (fp_circle (center 0 0) (end ${dia/2-0.5} 0) (stroke (width 0.12) (type solid)) (layer "F.SilkS"))
+${pads})`;
+
+  lastFootprint = fp;
+  document.getElementById('fp-code').textContent = fp;
+}
+
+function downloadFootprint() {
+  if(!lastFootprint) generateFootprint();
+  const name = document.getElementById('gen-name').value || 'Toroid_Kernel';
+  const blob = new Blob([lastFootprint], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name + '.kicad_mod';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// auto-generate on load
+window.addEventListener('load', generateFootprint);
 </script>
 </body>
 </html>
