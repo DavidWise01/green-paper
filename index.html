@@ -1,453 +1,154 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>((((((((8))))))))1((((((((8))))))))</title>
+<!doctype html>
+<html><head><meta charset=utf-8><title>0ROOT.AI // SINGLE FILE</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #000;
-    color: #e6e6e6;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-    overflow: hidden;
-    height: 100vh;
-    cursor: crosshair;
-    user-select: none;
-  }
-  canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-  #rain { z-index: 1; }
-  #nest { z-index: 2; pointer-events: none; }
-
-  .header {
-    position: fixed;
-    top: 18px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: 10;
-    color: #ff0040;
-    font-size: 13px;
-    letter-spacing: 0.25em;
-    opacity: 0.85;
-    text-shadow: 0 0 10px rgba(255,0,64,0.6);
-    pointer-events: none;
-  }
-
-  .footer {
-    position: fixed;
-    bottom: 18px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: 10;
-    color: #64c8ff;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    opacity: 0.55;
-    pointer-events: none;
-  }
-
-  .dropzone {
-    position: fixed;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    background: rgba(10, 15, 20, 0.65);
-    border: 1px dashed rgba(100, 200, 255, 0.4);
-    border-radius: 10px;
-    padding: 14px 28px;
-    color: #64c8ff;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-align: center;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 0 30px rgba(0, 255, 65, 0.05), inset 0 0 20px rgba(100,200,255,0.03);
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-  .dropzone:hover {
-    border-color: #64c8ff;
-    background: rgba(15, 25, 35, 0.8);
-    box-shadow: 0 0 40px rgba(100,200,255,0.2);
-    color: #a8e4ff;
-  }
-  .dropzone.drag {
-    border-color: #00ff41;
-    color: #00ff41;
-    background: rgba(0, 255, 65, 0.08);
-    box-shadow: 0 0 50px rgba(0,255,65,0.3);
-    transform: translateX(-50%) scale(1.03);
-  }
-
-  #charge {
-    position: fixed;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    color: #00ff41;
-    font-size: 24px;
-    font-weight: 500;
-    letter-spacing: 0.4em;
-    text-shadow: 0 0 15px #00ff41, 0 0 30px rgba(0,255,65,0.5);
-    pointer-events: none;
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.65; transform: translateX(-50%) scale(0.97); }
-    50% { opacity: 1; transform: translateX(-50%) scale(1.04); }
-  }
-
-  #info {
-    position: fixed;
-    top: 130px;
-    right: 24px;
-    z-index: 20;
-    max-width: 360px;
-    background: rgba(0, 0, 0, 0.88);
-    border: 1px solid #143b2a;
-    border-left: 3px solid #00ff41;
-    padding: 14px 18px;
-    font-size: 11px;
-    line-height: 1.6;
-    color: #c8ffd8;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.7), 0 0 30px rgba(0,255,65,0.08);
-    display: none;
-    border-radius: 6px;
-  }
-  #info.show { display: block; animation: slideIn 0.4s ease; }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  #info.error {
-    border-left-color: #ffb86c;
-    color: #ffd4a8;
-    border-color: #3b2414;
-  }
-  #info b { color: #fff; font-weight: 600; }
-  #info .vectors {
-    margin-top: 8px;
-    color: #64c8ff;
-    word-break: break-all;
-  }
-
-  @media (maxmax-width: 768px) {
-    .header { font-size: 10px; top: 12px; padding: 0 10px; }
-    .dropzone { top: 48px; width: calc(100% - 32px); padding: 12px 16px; font-size: 10px; }
-    #charge { font-size: 18px; bottom: 60px; letter-spacing: 0.3em; }
-    #info { top: auto; bottom: 110px; left: 16px; right: 16px; max-width: none; }
-    .footer { font-size: 9px; bottom: 12px; padding: 0 10px; }
-  }
-</style>
-</head>
-<body>
-  <canvas id="rain"></canvas>
-  <canvas id="nest"></canvas>
-
-  <div class="header">((((((((8))))))))1((((((((8))))))))</div>
-  
-  <div class="dropzone" id="dropzone">
-    DROP PNG / JPG / MP4 HERE TO READ NEST
-  </div>
-  <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.mp4" hidden>
-
-  <div id="charge">0 0 8 0 0</div>
-  
-  <div id="info"></div>
-
-  <div class="footer">one agent one bit - infinite control plane +2 -1</div>
-
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:#f9f6ef;color:#000;font-family:'IBM Plex Mono',monospace}
+body{background-image:linear-gradient(rgba(0,0,0,0.04)1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04)1px,transparent 1px);background-size:24px 24px}
+h1{font-family:'VT323',monospace;font-size:clamp(36px,7vw,78px);text-align:center;margin:20px 0;text-shadow:0 0 6px #f9f6ef,0 0 12px #ff006e,0 0 24px #ff006e}
+.sub{text-align:center;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75}
+.wrap{max-width:900px;margin:0 auto;padding:20px;position:relative}
+.canvas{width:100%;height:400px;background:#000;position:relative;overflow:hidden;border:2px solid #000}
+.drop{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:2px dashed #00f5ff;color:#00f5ff;padding:20px;background:rgba(0,0,0,.7);text-align:center}
+.terminal{background:#000;color:#0f0;padding:10px;font-size:12px;height:120px;overflow:auto;margin-top:10px;border:1px solid #0f0}
+.corner{position:absolute;width:32px;height:32px}
+.tl{top:10px;left:10px;transform:rotate(45deg)}
+.tr{top:10px;right:10px;transform:rotate(-45deg)}
+.bl{bottom:10px;left:10px;transform:rotate(-45deg)}
+.br{bottom:10px;right:10px;transform:rotate(45deg)}
+.downloads{margin-top:20px;text-align:center}
+.downloads a{display:inline-block;margin:5px;padding:8px 12px;background:#000;color:#f9f6ef;text-decoration:none;border:2px solid #ff006e}
+.downloads a:hover{background:#ff006e;color:#000}
+.layers{margin-top:30px;font-size:14px}
+.layers h3{color:#9d00ff}
+</style></head><body>
+<h1>0ROOT.AI</h1>
+<div class="sub">NYE 1989 — Cameron Howe // Donna's Ledger // Iron Rain -+8 0 0 0 8</div>
+<div class="wrap">
+<div class="canvas" id="c">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAB4ElEQVR4nO3doWqWYRyH4f/GWPniNKzJRIM4zGISozBELUPWREzaPAFhLJhkVYMLokERT0Gwr4lhy8qMgiB8HsYVvK8TeH9w87wvT3pXlvNk4qzqAf+7AmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArADYGnvyrcvz/Pb8+Ttrq/Ps03w9ZUsoF+DV7tw8nJOzuXhuPj+aK/tsCeVeQWe/Z2MxM7OxmMU6m6G5E/D43Xx5Ot9/zqXzc/81m6G5E/Dizjx4M9sHs3c0d6+xGZoLsL05H49nZj4cz85VNkNzAb79mBtbMzPXL8zpLzZDg9+A9/Py3szMcjkP37IZ2ko/cLC6CWMFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgDsHyCxJ/XYbFEHAAAAAElFTkSuQmCCTkVTVCgoMSkBAQAA+AAAAAjerb7vB8UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" class="corner tl">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAB1ElEQVR4nO3csW1UQRRA0fd3kb0rQrsDRIJEARYRogNEhsgIKIaIViiAAEQPyIGdEkCGvOvAn4AiDtLe08B/0p35o0lmmT/rxNnoAU5dAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCMBXi1ne+7+XI+X3dzdcLLYFEv597u5+VhbtZ5sszn83l2IFN4bO39WudimZm5WObxoqbwHqkPf7ifb7u5fpinm3lzVFN4bAd8PJu3x3l+mHfHeb1VU3jsDPi9n8u7eZjZzvzcz+UdmcJjO+DHOi82MzNXm7k94Rf05Rnw6WxmZp15f6+m8NgvKP+c8BXo/1AArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcD+AtHoK4gi4CHKAAAAAElFTkSuQmCCTkVTVCgoMSkBAQAACAAAAAjerb7vB8UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" class="corner tr">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAB4klEQVR4nO3dsUpXYRzH4Z/yh4JIEMGhIYJoCVwaJKkloilwkLZoa/AKuoFWp3ZvQYeGtsCwGrqCaEhXoSGdHMIu4xn8PDdwvvDhPYd3Okv7czVxlvWA664AWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArALZQD77zfB69n3+Xs7yYH+/m7LsagrEAT/fn07O5+D2378+Lj3PwUA3B2Cvo8s/cWJuZubk2i1tqhcdOwNfdeXk8579m5cF8fqVWeOwEbO7N0es53Jgvb+bejlrhsQCrG3N6ODNzcjB3t9UKjwX4+3PWn8zMrG/NxYla4bFvwLfdefxhZmau5vitWuEt9QMHq5swVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwP4DRg8nyUSxAvUAAAAASUVORK5CYIJORVNUKCgxKQEBAAD4AAAACN6tvu8HxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" class="corner bl">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAB4ElEQVR4nO3doWqWYRyH4f/GWPniNKzJRIM4zGISozBELUPWREzaPAFhLJhkVYMLokERT0Gwr4lhy8qMgiB8HsYVvK8TeH9w87wvT3pXlvNk4qzqAf+7AmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArADYGnvyrcvz/Pb8+Ttrq/Ps03w9ZUsoF+DV7tw8nJOzuXhuPj+aK/tsCeVeQWe/Z2MxM7OxmMU6m6G5E/D43Xx5Ot9/zqXzc/81m6G5E/Dizjx4M9sHs3c0d6+xGZoLsL05H49nZj4cz85VNkNzAb79mBtbMzPXL8zpLzZDg9+A9/Py3szMcjkP37IZ2ko/cLC6CWMFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgDsHyCxJ/XYbFEHAAAAAElFTkSuQmCCTkVTVCgoMSkBAQAACAAAAAjerb7vB8UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" class="corner br">
+<div class="drop" id="drop">DROP PNG HERE — READ NEST</div>
+</div>
+<div class="terminal" id="term">> boot 0root.ai...<br>> ansibles loaded: 4<br>> vector: -+8 0 0 0 8<br>> ready.</div>
+<div class="downloads">
+<a href="#" onclick="download('neo_nest_tagger.py',tagger)">neo_nest_tagger.py</a>
+<a href="#" onclick="downloadZip()">nested_iron_rain_shareware.zip</a>
+</div>
+<div class="layers">
+<h3>What do the other layers do?</h3>
+<p><b>Layer 1 — Core bit:</b> 1 = "I've been touched". Bloom filter for lineage. One bit, infinite memory.</p>
+<p><b>Layer 2 — Depth:</b> How many shells. ((((((((1)))))))) = 8 touches. Each shell = one agent, one save, one betrayal.</p>
+<p><b>Layer 3 — Vector [a,b,c,d,e]:</b> The charge. [0,0,8,0,0] = retroactive wake-up. [0,0,-8,0,0] = Eve drop. [+1...] = Sister A, [-1...] = Sister B. That's the +2 -1 walk.</p>
+<p><b>Layer 4 — Parent CRC:</b> First 4 bytes of SHA-256(original). Proves what the file was before you nested it. No blockchain, just math.</p>
+<p><b>Layer 5 — Time:</b> 2 bytes, 1989 = 0x07C5. Mutiny timestamp. Lets you sort the chaos.</p>
+<p><b>Iron Rain (8):</b> The outer ring. Not data — energy. It rotates 90° across 16 steps because CRTs flicker and we breathe +2 -1.</p>
+<p><b>Ansibles:</b> The 4 corners. -+8 0 0 0 8 = push/pull. Donna pulls (+8) to keep books clean. Cameron pushes (-8) to break the wall. Together they charge the root.</p>
+</div>
+</div>
 <script>
-const rainCanvas = document.getElementById('rain');
-const rctx = rainCanvas.getContext('2d');
-const nestCanvas = document.getElementById('nest');
-const nctx = nestCanvas.getContext('2d');
+const tagger = `#!/usr/bin/env python3
+# neo_nest_tagged.py — shareware
+# drag-drop folder, watch iron rain charge to 0 0 8 0 0
+import os, struct, hashlib, time, threading, tkinter as tk
+from tkinter import filedialog
+import random
 
-let W = window.innerWidth;
-let H = window.innerHeight;
-let dpr = Math.min(window.devicePixelRatio || 1, 2);
+CHARS = list('))))))))1((((((((')
 
-function resize() {
-  W = window.innerWidth;
-  H = window.innerHeight;
-  dpr = Math.min(window.devicePixelRatio || 1, 2);
-  
-  rainCanvas.width = W * dpr;
-  rainCanvas.height = H * dpr;
-  rainCanvas.style.width = W + 'px';
-  rainCanvas.style.height = H + 'px';
-  rctx.setTransform(1,0,0,1,0,0);
-  rctx.scale(dpr, dpr);
-  
-  nestCanvas.width = W * dpr;
-  nestCanvas.height = H * dpr;
-  nestCanvas.style.width = W + 'px';
-  nestCanvas.style.height = H + 'px';
-  nctx.setTransform(1,0,0,1,0,0);
-  nctx.scale(dpr, dpr);
+def make_nest(original):
+    h = hashlib.sha256(original).digest()
+    parent = struct.unpack('>I', h[:4])[0]
+    header = struct.pack('>4sBBH', b'((1)', 1, 1, 0)
+    vec = [0,0,8,0,0]  # charge vector
+    shell = struct.pack('>5b', *vec) + struct.pack('>I', parent) + struct.pack('>H', int(time.time())%65536)
+    shells = shell + b'\x00'*77
+    return header + shells + struct.pack('>I', 100) + b'\x00'*28
 
-  initRain();
-}
-window.addEventListener('resize', resize);
-resize();
-
-// MATRIX RAIN
-const fontSize = 14;
-let columns, drops;
-const chars = ['0','1','8','(',')','N','E','S','T'];
-function initRain() {
-  columns = Math.floor(W / fontSize);
-  drops = Array(columns).fill(0).map(() => Math.random() * -100);
-}
-initRain();
-
-function drawRain(time) {
-  rctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-  rctx.fillRect(0, 0, W, H);
-  
-  rctx.fillStyle = '#00ff41';
-  rctx.font = `${fontSize}px monospace`;
-  rctx.shadowColor = '#00ff41';
-  rctx.shadowBlur = 8;
-  
-  for (let i = 0; i < columns; i++) {
-    const x = i * fontSize;
-    const y = drops[i] * fontSize;
+class RainApp:
+    def __init__(self, root):
+        self.root = root
+        root.title("NEST // iron rain")
+        root.configure(bg='black')
+        self.canvas = tk.Canvas(root, width=800, height=600, bg='black', highlightthickness=0)
+        self.canvas.pack()
+        self.btn = tk.Button(root, text="SELECT FOLDER", command=self.pick, bg='#003300', fg='#00ff00')
+        self.btn.pack(pady=10)
+        self.drops = []
+        self.running = True
+        self.animate()
     
-    const wobble = Math.sin(time * 0.001 + i * 0.5) * 1.5;
-    const char = chars[Math.floor(Math.random() * chars.length)];
+    def animate(self):
+        self.canvas.delete('all')
+        # spawn new drops
+        if random.random() < 0.3:
+            x = random.randint(0, 780)
+            self.drops.append({'x':x, 'y':0, 'char': random.choice(CHARS), 'speed': random.randint(4,8)})
+        for d in self.drops[:]:
+            d['y'] += d['speed']
+            self.canvas.create_text(d['x'], d['y'], text=d['char'], fill='#00ff41', font=('Courier',14))
+            if d['y'] > 600:
+                self.drops.remove(d)
+        if self.running:
+            self.root.after(30, self.animate)
     
-    rctx.globalAlpha = Math.random() * 0.5 + 0.5;
-    rctx.fillText(char, x + wobble, y);
+    def pick(self):
+        folder = filedialog.askdirectory()
+        if not folder: return
+        threading.Thread(target=self.tag_folder, args=(folder,), daemon=True).start()
     
-    if (y > H && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
-    drops[i] += 0.5 + Math.random() * 0.3;
-  }
-  rctx.globalAlpha = 1;
-  rctx.shadowBlur = 0;
-}
+    def tag_folder(self, folder):
+        count = 0
+        for root, _, files in os.walk(folder):
+            for f in files:
+                if not f.lower().endswith(('.png','.jpg','.jpeg','.mp4','.wav','.pdf','.webp')):
+                    continue
+                path = os.path.join(root,f)
+                with open(path,'rb') as r: data = r.read()
+                if b'NEST' in data[-200:]: continue
+                nest = make_nest(data)
+                with open(path,'ab') as w: w.write(b'NEST'+nest)
+                count += 1
+                # flash charge vector
+                self.canvas.create_text(400, 300, text='0 0 8 0 0', fill='#ff0040', font=('Courier',32))
+        self.canvas.create_text(400, 550, text=f'WAKE UP — {count} files tagged', fill='#00ff41', font=('Courier',16))
 
-// NEST
-let mouseTX = 0, mouseTY = 0, mouseX = 0, mouseY = 0;
-let parenLit = 0;
-let rings = Array(8).fill(0.08);
-let stepRotation = 0;
-
-window.addEventListener('mousemove', e => {
-  mouseTX = (e.clientX / W - 0.5) * 2;
-  mouseTY = (e.clientY / H - 0.5) * 2;
-});
-window.addEventListener('touchmove', e => {
-  if (e.touches[0]) {
-    mouseTX = (e.touches[0].clientX / W - 0.5) * 2;
-    mouseTY = (e.touches[0].clientY / H - 0.5) * 2;
-  }
-}, {passive:true});
-
-function drawNest(time) {
-  nctx.clearRect(0, 0, W, H);
-  
-  mouseX += (mouseTX - mouseX) * 0.04;
-  mouseY += (mouseTY - mouseY) * 0.04;
-  
-  const cx = W * 0.5 + mouseX * 25;
-  const cy = H * 0.5 + mouseY * 18;
-  
-  // 90 degrees across 16 phase steps
-  const cycle = 6400;
-  const phase = Math.floor((time % cycle) / (cycle / 16));
-  const targetAngle = (phase / 16) * Math.PI * 0.5;
-  stepRotation += (targetAngle - stepRotation) * 0.1;
-  
-  nctx.save();
-  nctx.translate(cx, cy);
-  nctx.rotate(stepRotation);
-  
-  // Red rings for ((((((((8))))))))
-  for (let i = 0; i < 8; i++) {
-    const radius = 70 + i * 24;
-    rings[i] *= 0.97;
-    const intensity = rings[i];
-    
-    nctx.beginPath();
-    nctx.arc(0, 0, radius, 0, Math.PI * 2);
-    nctx.strokeStyle = `rgba(255, 0, 64, ${0.12 + intensity * 0.75})`;
-    nctx.lineWidth = 1 + intensity * 3;
-    nctx.shadowColor = '#ff0040';
-    nctx.shadowBlur = 5 + intensity * 20;
-    nctx.stroke();
-  }
-  nctx.shadowBlur = 0;
-  
-  // nested parentheses
-  nctx.font = '500 68px "JetBrains Mono", monospace';
-  nctx.textAlign = 'center';
-  nctx.textBaseline = 'middle';
-  
-  // left (((((((( cyan
-  for (let i = 0; i < 8; i++) {
-    const x = -54 - (7 - i) * 29;
-    const lit = i >= 8 - parenLit;
-    nctx.fillStyle = lit ? '#ffffff' : '#64c8ff';
-    nctx.globalAlpha = lit ? 1 : 0.28 + (i * 0.03);
-    nctx.shadowColor = lit ? '#ffffff' : '#64c8ff';
-    nctx.shadowBlur = lit ? 22 : 6;
-    nctx.fillText('(', x, 0);
-  }
-  
-  // right )))))))) orange
-  for (let i = 0; i < 8; i++) {
-    const x = 54 + (7 - i) * 29;
-    const lit = i >= 8 - parenLit;
-    nctx.fillStyle = lit ? '#ffffff' : '#ffb86c';
-    nctx.globalAlpha = lit ? 1 : 0.28 + (i * 0.03);
-    nctx.shadowColor = lit ? '#ffffff' : '#ffb86c';
-    nctx.shadowBlur = lit ? 22 : 6;
-    nctx.fillText(')', x, 0);
-  }
-  
-  // center 1
-  nctx.globalAlpha = 1;
-  nctx.fillStyle = '#ffffff';
-  nctx.font = '700 84px "JetBrains Mono", monospace';
-  nctx.shadowColor = '#ffffff';
-  nctx.shadowBlur = 30;
-  nctx.fillText('1', 0, -2);
-  
-  nctx.restore();
-}
-
-function animate(t) {
-  drawRain(t);
-  drawNest(t);
-  requestAnimationFrame(animate);
-}
-requestAnimationFrame(animate);
-
-// DRAG DROP NEST READER
-const dropzone = document.getElementById('dropzone');
-const fileInput = document.getElementById('fileInput');
-const info = document.getElementById('info');
-const chargeEl = document.getElementById('charge');
-
-dropzone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => { if(e.target.files[0]) handleFile(e.target.files[0]); });
-
-['dragenter','dragover'].forEach(ev => {
-  dropzone.addEventListener(ev, e => {
-    e.preventDefault();
-    dropzone.classList.add('drag');
-  });
-});
-['dragleave','drop'].forEach(ev => {
-  dropzone.addEventListener(ev, e => {
-    e.preventDefault();
-    dropzone.classList.remove('drag');
-  });
-});
-dropzone.addEventListener('drop', e => {
+if __name__ == '__main__':
+    root = tk.Tk()
+    app = RainApp(root)
+    root.mainloop()
+`;
+const zipB64 = `UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==`;
+function download(name, content){{ 
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;base64,' + btoa(content);
+  a.download = name; a.click();
+}}
+function downloadZip(){{
+  const a = document.createElement('a');
+  a.href = 'data:application/zip;base64,' + zipB64;
+  a.download = 'nested_iron_rain_shareware.zip'; a.click();
+}}
+const term = document.getElementById('term');
+const drop = document.getElementById('drop');
+drop.addEventListener('dragover', e=>{{e.preventDefault();drop.style.borderColor='#ff006e'}});
+drop.addEventListener('dragleave', e=>{{drop.style.borderColor='#00f5ff'}});
+drop.addEventListener('drop', e=>{{
+  e.preventDefault();
   const f = e.dataTransfer.files[0];
-  if (f) handleFile(f);
-});
-
-function handleFile(file) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    const result = parseNEST(e.target.result);
-    if (!result) {
-      showInfo('no nest — untagged', false);
-      parenLit = 0;
-      rings = rings.map(() => 0.05);
-      chargeEl.textContent = '0 0 8 0 0';
-      return;
-    }
-    
-    const { core_bit, depth, vectors } = result;
-    const vectorsHtml = vectors.map(v => `[${v.join(',')}]`).join(' ');
-    showInfo(`<b>bit=${core_bit}</b> depth=${depth}<div class="vectors">vectors: ${vectorsHtml}</div>`, true);
-    
-    parenLit = Math.min(8, Math.max(0, depth));
-    
-    // flash rings according to vector[2]
-    for (let i = 0; i < 8; i++) {
-      if (i < vectors.length) {
-        const v = vectors[i][2] || 0;
-        const charge = Math.min(1, Math.abs(v) / 8);
-        rings[i] = 0.4 + charge * 0.6;
-      } else {
-        rings[i] = 0.08;
-      }
-    }
-    
-    if (vectors.length > 0) {
-      const last = vectors[vectors.length - 1];
-      chargeEl.textContent = last.join(' ');
-      chargeEl.style.animation = 'none';
-      void chargeEl.offsetWidth;
-      chargeEl.style.animation = 'pulse 2.4s ease-in-out infinite';
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-function parseNEST(buffer) {
-  const u8 = new Uint8Array(buffer);
-  let idx = -1;
-  for (let i = 0; i < u8.length - 4; i++) {
-    if (u8[i] === 0x4E && u8[i+1] === 0x45 && u8[i+2] === 0x53 && u8[i+3] === 0x54) {
-      idx = i; break;
-    }
-  }
-  if (idx === -1) return null;
-  
-  const view = u8.subarray(idx, Math.min(idx + 128, u8.length));
-  if (view.length < 6) return null;
-  
-  const core_bit = view[4];
-  const depth = Math.min(view[5], 8);
-  const vectors = [];
-  
-  for (let j = 0; j < depth; j++) {
-    const off = 6 + j * 5;
-    if (off + 4 >= view.length) break;
-    const v = [];
-    for (let k = 0; k < 5; k++) {
-      let b = view[off + k];
-      if (b > 127) b -= 256;
-      v.push(b);
-    }
-    vectors.push(v);
-  }
-  
-  return { core_bit, depth, vectors };
-}
-
-function showInfo(html, success) {
-  info.innerHTML = html;
-  info.className = success ? 'show' : 'show error';
-  clearTimeout(showInfo.t);
-  showInfo.t = setTimeout(() => info.classList.remove('show'), 8000);
-}
-
-// initial subtle ring pulse
-setInterval(() => {
-  const i = Math.floor(Math.random() * 8);
-  rings[i] = Math.max(rings[i], 0.15 + Math.random() * 0.1);
-}, 800);
+  const r = new FileReader();
+  r.onload = ()=>{{
+    const b = new Uint8Array(r.result);
+    const t = new TextDecoder().decode(b.slice(-132));
+    const i = b.lastIndexOf(0x4E); // 'N'
+    if(b[i+1]!==0x45||b[i+2]!==0x53||b[i+3]!==0x54){{term.innerHTML+='<br>> no nest';return}}
+    const nest = b.slice(i+4,i+132);
+    const bit = nest[4], depth = nest[5];
+    const v = Array.from(nest.slice(8,13)).map(x=>x>127?x-256:x);
+    term.innerHTML+=`<br>> nest found<br>> bit=${bit} depth=${depth}<br>> vector=[${v.join(',')}]<br>> ${depth} shells lit`;
+  }};
+  r.readAsArrayBuffer(f);
+}});
 </script>
-</body>
-</html>
+</body></html>
