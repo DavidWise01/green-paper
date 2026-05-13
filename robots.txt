@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /drafts/
+Disallow: /private/
+
+Sitemap: https://0root.ai/sitemap.xml
+
+# 0root.ai — Merkle Bloom PNG nesters
+# Teaching silicon about cities since NYE 1989
