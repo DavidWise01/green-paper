@@ -1,154 +1,454 @@
-<!doctype html>
-<html><head><meta charset=utf-8><title>0ROOT.AI // SINGLE FILE</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0ROOT.AI — Merkle Bloom with PNG Nesters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-*{box-sizing:border-box}html,body{height:100%;margin:0;background:#f9f6ef;color:#000;font-family:'IBM Plex Mono',monospace}
-body{background-image:linear-gradient(rgba(0,0,0,0.04)1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04)1px,transparent 1px);background-size:24px 24px}
-h1{font-family:'VT323',monospace;font-size:clamp(36px,7vw,78px);text-align:center;margin:20px 0;text-shadow:0 0 6px #f9f6ef,0 0 12px #ff006e,0 0 24px #ff006e}
-.sub{text-align:center;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75}
-.wrap{max-width:900px;margin:0 auto;padding:20px;position:relative}
-.canvas{width:100%;height:400px;background:#000;position:relative;overflow:hidden;border:2px solid #000}
-.drop{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:2px dashed #00f5ff;color:#00f5ff;padding:20px;background:rgba(0,0,0,.7);text-align:center}
-.terminal{background:#000;color:#0f0;padding:10px;font-size:12px;height:120px;overflow:auto;margin-top:10px;border:1px solid #0f0}
-.corner{position:absolute;width:32px;height:32px}
-.tl{top:10px;left:10px;transform:rotate(45deg)}
-.tr{top:10px;right:10px;transform:rotate(-45deg)}
-.bl{bottom:10px;left:10px;transform:rotate(-45deg)}
-.br{bottom:10px;right:10px;transform:rotate(45deg)}
-.downloads{margin-top:20px;text-align:center}
-.downloads a{display:inline-block;margin:5px;padding:8px 12px;background:#000;color:#f9f6ef;text-decoration:none;border:2px solid #ff006e}
-.downloads a:hover{background:#ff006e;color:#000}
-.layers{margin-top:30px;font-size:14px}
-.layers h3{color:#9d00ff}
-</style></head><body>
-<h1>0ROOT.AI</h1>
-<div class="sub">NYE 1989 — Cameron Howe // Donna's Ledger // Iron Rain -+8 0 0 0 8</div>
-<div class="wrap">
-<div class="canvas" id="c">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAB4ElEQVR4nO3doWqWYRyH4f/GWPniNKzJRIM4zGISozBELUPWREzaPAFhLJhkVYMLokERT0Gwr4lhy8qMgiB8HsYVvK8TeH9w87wvT3pXlvNk4qzqAf+7AmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArADYGnvyrcvz/Pb8+Ttrq/Ps03w9ZUsoF+DV7tw8nJOzuXhuPj+aK/tsCeVeQWe/Z2MxM7OxmMU6m6G5E/D43Xx5Ot9/zqXzc/81m6G5E/Dizjx4M9sHs3c0d6+xGZoLsL05H49nZj4cz85VNkNzAb79mBtbMzPXL8zpLzZDg9+A9/Py3szMcjkP37IZ2ko/cLC6CWMFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgDsHyCxJ/XYbFEHAAAAAElFTkSuQmCCTkVTVCgoMSkBAQAA+AAAAAjerb7vB8UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" class="corner tl">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAB1ElEQVR4nO3csW1UQRRA0fd3kb0rQrsDRIJEARYRogNEhsgIKIaIViiAAEQPyIGdEkCGvOvAn4AiDtLe08B/0p35o0lmmT/rxNnoAU5dAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCMBXi1ne+7+XI+X3dzdcLLYFEv597u5+VhbtZ5sszn83l2IFN4bO39WudimZm5WObxoqbwHqkPf7ifb7u5fpinm3lzVFN4bAd8PJu3x3l+mHfHeb1VU3jsDPi9n8u7eZjZzvzcz+UdmcJjO+DHOi82MzNXm7k94Rf05Rnw6WxmZp15f6+m8NgvKP+c8BXo/1AArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcD+AtHoK4gi4CHKAAAAAElFTkSuQmCCTkVTVCgoMSkBAQAACAAAAAjerb7vB8UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" class="corner tr">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAB4klEQVR4nO3dsUpXYRzH4Z/yh4JIEMGhIYJoCVwaJKkloilwkLZoa/AKuoFWp3ZvQYeGtsCwGrqCaEhXoSGdHMIu4xn8PDdwvvDhPYd3Okv7czVxlvWA664AWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArALZQD77zfB69n3+Xs7yYH+/m7LsagrEAT/fn07O5+D2378+Lj3PwUA3B2Cvo8s/cWJuZubk2i1tqhcdOwNfdeXk8579m5cF8fqVWeOwEbO7N0es53Jgvb+bejlrhsQCrG3N6ODNzcjB3t9UKjwX4+3PWn8zMrG/NxYla4bFvwLfdefxhZmau5vitWuEt9QMHq5swVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwP4DRg8nyUSxAvUAAAAASUVORK5CYIJORVNUKCgxKQEBAAD4AAAACN6tvu8HxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" class="corner bl">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAB4ElEQVR4nO3doWqWYRyH4f/GWPniNKzJRIM4zGISozBELUPWREzaPAFhLJhkVYMLokERT0Gwr4lhy8qMgiB8HsYVvK8TeH9w87wvT3pXlvNk4qzqAf+7AmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArADYGnvyrcvz/Pb8+Ttrq/Ps03w9ZUsoF+DV7tw8nJOzuXhuPj+aK/tsCeVeQWe/Z2MxM7OxmMU6m6G5E/D43Xx5Ot9/zqXzc/81m6G5E/Dizjx4M9sHs3c0d6+xGZoLsL05H49nZj4cz85VNkNzAb79mBtbMzPXL8zpLzZDg9+A9/Py3szMcjkP37IZ2ko/cLC6CWMFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgDsHyCxJ/XYbFEHAAAAAElFTkSuQmCCTkVTVCgoMSkBAQAACAAAAAjerb7vB8UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" class="corner br">
-<div class="drop" id="drop">DROP PNG HERE — READ NEST</div>
+  :root {
+    --bone: #F9F7F3;
+    --ink: #0A0A0A;
+    --ink-70: rgba(10,10,10,0.7);
+    --ink-40: rgba(10,10,10,0.4);
+    --neon-1: #00FFA3;
+    --neon-2: #FF3BD4;
+    --neon-3: #00D0FF;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--bone);
+    color: var(--ink);
+    font-size: 14.5px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--neon-1); color: #000; }
+  h1, h2, h3 { font-weight: 500; letter-spacing: -0.01em; }
+  h2 {
+    font-size: 21px;
+    margin-top: 3.5rem;
+    margin-bottom: 1.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+  }
+  h2::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 48px;
+    height: 1px;
+    background: var(--neon-1);
+    box-shadow: 0 0 8px rgba(0,255,163,0.5);
+  }
+  h2 span { color: var(--ink-40); margin-right: 0.75rem; }
+  h3 { font-size: 15px; margin: 2rem 0 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  p { margin-bottom: 1.1rem; max-width: 72ch; }
+  a { color: inherit; text-decoration: underline; text-decoration-color: rgba(0,255,163,0.4); text-underline-offset: 3px; transition: all 0.15s; }
+  a:hover { text-decoration-color: var(--neon-1); text-shadow: 0 0 10px rgba(0,255,163,0.3); }
+  code, pre { font-family: inherit; }
+  pre {
+    background: #0B0B0B;
+    color: #EAE7E1;
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    border-left: 2px solid var(--neon-1);
+    font-size: 13px;
+    line-height: 1.6;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+  }
+  pre.ascii { background: transparent; color: var(--ink-70); border-left: 1px solid rgba(0,0,0,0.1); box-shadow: none; padding: 0.75rem 0 0.75rem 1rem; }
+  code.inline { background: rgba(0,0,0,0.06); padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.92em; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 13px; }
+  th { text-align: left; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; color: var(--ink-40); padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(0,0,0,0.15); }
+  td { padding: 0.55rem 0.75rem; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  tr:hover td { background: rgba(0,255,163,0.03); }
+  .toc-link { display: block; padding: 0.35rem 0; color: var(--ink-70); text-decoration: none; font-size: 13px; line-height: 1.4; border-left: 2px solid transparent; padding-left: 0.75rem; margin-left: -0.75rem; }
+  .toc-link:hover { color: var(--ink); border-left-color: var(--neon-1); }
+  .toc-link.active { color: var(--ink); border-left-color: var(--neon-1); text-shadow: 0 0 8px rgba(0,255,163,0.2); }
+  .neon { color: var(--neon-1); }
+  .shell-diagram { filter: drop-shadow(0 0 12px rgba(0,255,163,0.15)); }
+  .dropzone { border: 1px dashed rgba(0,0,0,0.2); transition: all 0.2s; }
+  .dropzone.dragover { border-color: var(--neon-1); background: rgba(0,255,163,0.05); box-shadow: 0 0 20px rgba(0,255,163,0.1) inset; }
+  @media (max-width: 1024px) {
+    aside { transform: translateX(-100%); }
+    aside.open { transform: translateX(0); }
+  }
+</style>
+</head>
+<body>
+<button id="menuBtn" class="lg:hidden fixed top-3 left-3 z-50 bg-[#0B0B0B] text-[var(--bone)] px-3 py-1.5 text-[11px] uppercase tracking-widest">MENU</button>
+
+<div class="flex min-h-screen">
+  <aside id="toc" class="fixed lg:sticky top-0 left-0 w-[300px] h-screen overflow-y-auto bg-[var(--bone)] border-r border-black/5 z-40 transition-transform duration-200 px-6 py-8">
+    <div class="mb-8">
+      <div class="text-[11px] tracking-[0.35em] uppercase">0ROOT.AI</div>
+      <div class="text-[10px] text-black/50 mt-1">v0.8.3 • IRON RAIN</div>
+    </div>
+    <nav class="space-y-1">
+      <a href="#the-problem" class="toc-link">1. The Problem</a>
+      <a href="#one-agent-one-bit" class="toc-link">2. One Agent One Bit</a>
+      <a href="#merkle-trees" class="toc-link">3. Merkle Trees in 200 words</a>
+      <a href="#bloom-filters" class="toc-link">4. Bloom Filters in 200 words</a>
+      <a href="#merkle-bloom-hybrid" class="toc-link">5. Merkle Bloom Hybrid</a>
+      <a href="#png-nesters" class="toc-link">6. PNG Nesters</a>
+      <a href="#nest-format" class="tok-link toc-link">7. The Nest Format</a>
+      <a href="#eight-shells" class="toc-link">8. ((((((((1))))))))</a>
+      <a href="#iron-rain" class="toc-link">9. Iron Rain</a>
+      <a href="#proof-of-work" class="toc-link">10. Proof of Work</a>
+      <a href="#four-ansibles" class="toc-link">11. The 4 Ansibles</a>
+      <a href="#teaching-silicon" class="toc-link">12. Teaching Silicon</a>
+      <a href="#how-to-use" class="toc-link">13. How to Use</a>
+      <a href="#shareware-license" class="toc-link">14. Shareware License</a>
+    </nav>
+    <div class="mt-12 pt-6 border-t border-black/10 text-[11px] leading-relaxed text-black/50">
+      <p>Manual rendered on demand. No trackers. No cookies. Print-friendly.</p>
+      <p class="mt-3">Questions: <a href="mailto:nest@0root.ai">nest@0root.ai</a></p>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="max-w-[840px] mx-auto px-6 lg:px-12 py-10 lg:py-16">
+      <header class="mb-16">
+        <div class="inline-flex items-center gap-3 mb-6">
+          <div class="w-2 h-2 rounded-full bg-[var(--neon-1)] shadow-[0_0_10px_rgba(0,255,163,0.7)]"></div>
+          <span class="text-[11px] uppercase tracking-[0.25em]">Teaching Silicon About Cities</span>
+        </div>
+        <h1 class="text-[32px] lg:text-[44px] leading-[1.1] font-medium">Merkle Bloom with PNG Nesters</h1>
+        <p class="mt-4 text-[15px] text-black/70 max-w-[62ch]">A lightweight, offline-first provenance layer for images. No blockchain. No accounts. 132 bytes appended after IEND. Built for agents, archivists, and rust-belt winter light.</p>
+      </header>
+
+      <article id="the-problem">
+        <h2><span>1.</span> The Problem (why provenance matters)</h2>
+        <p>Every image you encounter in 2025 has been touched by at least three non-human agents before it reaches your retina: a scraper, a resizer, a captioner, a compressor, a re-captioner, a safety filter. None of them leave a forwarding address.</p>
+        <p>Current provenance is theater. C2PA buries a 12–80KB JSON manifest inside JPEG APP11 or PNG iTXt, signed with X.509 chains that require Adobe’s trust store and an internet connection. It breaks on screenshot, on resize, on a naive `mogrify -strip`. It presumes publishers are honest and infrastructure is permanent.</p>
+        <p>Blockchain provenance is worse: it externalizes truth to a costly, public ledger, then points at an IPFS hash that 404s in 18 months. It solves double-spend, not double-see. Images are copied, not spent.</p>
+        <p>Watermarks are adversarial. Invisible DCT watermarks survive JPEG but die to diffusion re-synthesis. Visible watermarks are cropped. Both assume a single owner.</p>
+        <p>What cities need is not ownership. It is contact tracing. Buffalo does not need to own a photo of a snowplow on Bailey Ave. It needs to know: which models trained on it, which agents re-captioned it "truck in snow" vs "city plow #17 clearing east side, Feb 3 2023, -8°F", which archivist verified the location.</p>
+        <p>Provenance must be: 1) byte-level cheap (<200 bytes), 2) decoder-ignorant (survives normal CDN pass-through), 3) offline-verifiable (no RPC), 4) privacy-preserving (no global registry), 5) additive (many agents, no overwrite), 6) adversarially cheap to verify but linearly expensive to forge at scale.</p>
+        <p>Merkle Bloom is our answer. We treat each PNG as a nest. After the official IEND chunk, we append 132 bytes. Browsers, iOS, Android, libpng, Pillow, Cloudflare Images, S3, Discord all ignore trailing bytes per PNG spec §5.4. They do not strip them. Thus the nest rides for free.</p>
+        <p>Inside those 132 bytes: a truncated Merkle root committing to the image’s edit history, and a 128-bit Bloom filter representing the set of agents that have touched it. No signatures. No accounts. One agent, one configurable number of bit flips. Over time the filter saturates gracefully; you can estimate agent count via cardinality, not identity.</p>
+        <p>This is not DRM. It is a field notebook stapled to the back of a photograph.</p>
+      </article>
+
+      <article id="one-agent-one-bit">
+        <h2><span>2.</span> One Agent One Bit</h2>
+        <p>The core ethic: an agent should not be able to speak for others, only for itself, and it should do so as quietly as possible.</p>
+        <p>When an agent (a Python script, a browser extension, a local SDXL node) first opens a PNG with a nest, it computes its own Agent ID: <code class="inline">blake3("0root-agent-v1" || ed25519_pubkey)[0:16]</code>. No registration. If it has no key, it uses <code class="inline">blake3(hostname || binary_hash)</code>—ephemeral but consistent.</p>
+        <p>To mark contact, the agent does not sign. It sets k bits in the nest’s Bloom filter. We use k=3, m=128. Indices are: <code class="inline">h_i = (H(agent_id || merkle_root || i) mod 128)</code>. It ORs those three bits into the existing filter.</p>
+        <p>Properties: 1) Idempotent—re-marking does nothing. 2) Commutative—order of agents does not matter. 3) Private—you cannot enumerate agents from the filter, only test membership if you already know the agent ID. 4) Compact—128 bits for thousands of agents with ~1% false positive at 30 agents.</p>
+        <p>Why one bit (actually three)? Because we want contact to be cheap ethically. If marking costs nothing, spam is trivial. Hence we pair it with proof-of-work (§10). If marking is too expressive (a full signature), agents leak identity and create legal liability. A bit flip is a feather, not a flag.</p>
+        <p>Over months, a viral image of Rochester's Broad Street bridge accumulates a filter with 47 bits set. You cannot name all 47 agents, but you can test: "Did the City of Rochester Archivist Bot touch this?" Yes—bits 14, 91, 103 are set. "Did OpenAI GPT-4o captioner?" No—bit 14 is set but 22 and 77 are not. Probabilistic, but useful.</p>
+        <p>This is how mycelium works: no central ledger, just chemical traces that accrue.</p>
+      </article>
+
+      <article id="merkle-trees">
+        <h2><span>3.</span> Merkle Trees in 200 words</h2>
+        <p>A Merkle tree is a binary hash tree. Leaves are hashes of data blocks. Parents are <code class="inline">H(left || right)</code>. The root is a single hash committing to the entire set. Change one byte in one leaf, the root changes.</p>
+        <p>Key advantage: log(N) proofs. To prove leaf L5 is in a tree of 1M leaves, you only need ~20 sibling hashes (the Merkle path), not 1M. Verifier recomputes up to root and compares.</p>
+        <p>Used in Git (commit history), BitTorrent (piece verification), Certificate Transparency, and every blockchain. Not because it's trendy, because it's the minimal structure for tamper-evident append-only logs.</p>
+        <p>For images, we don't Merkle the pixels (too large). We Merkle the history of nests. Each edit creates a new leaf: <code class="inline">leaf_n = H(prev_root || bloom_n || timestamp || geohash)</code>. The new root commits to all prior versions.</p>
+        <p>This gives us "Proof of Edit" without storing edits. You can show that version 3 descends from version 1 with 2 hashes, offline.</p>
+      </article>
+
+      <article id="bloom-filters">
+        <h2><span>4.</span> Bloom Filters in 200 words</h2>
+        <p>A Bloom filter is a bit array of m bits, initially zero, with k independent hash functions. To add an item, set bits at positions h1(item)...hk(item). To query, check if all k bits are set. If any is zero: definitely not present. If all are one: probably present (false positive possible).</p>
+        <p>No deletions. No false negatives. Space efficiency is extreme: 10 bits per item yields ~1% FP rate. Chrome uses a 2MB Bloom for Safe Browsing (~1M URLs). We use 128 bits for ~30 agents at ~1.2% FP.</p>
+        <p>Tradeoff is intentional. We do not need perfect attribution, we need probabilistic contact history that cannot be forged without doing the work. Bloom filters are also mergeable via bitwise OR, perfect for combining nests when images are collaged.</p>
+        <p>Critically, they are deniable. You cannot prove an agent touched an image, only that it probably did, which protects researchers in hostile jurisdictions.</p>
+      </article>
+
+      <article id="merkle-bloom-hybrid">
+        <h2><span>5.</span> Merkle Bloom Hybrid</h2>
+        <p>Merkle gives order. Bloom gives set. Neither alone solves provenance for mutable media.</p>
+        <p>Our hybrid stores both in 32 bytes (16+16). The Merkle root ensures linear history: you cannot reorder edits without breaking the chain. The Bloom filter ensures breadth: you can accumulate unlimited agents touching the same version without growing storage.</p>
+        <p>Construction: On creation, <code class="inline">merkle_0 = H(blake3(IDAT) || 0x00)</code>, <code class="inline">bloom_0 = 0</code>. On each touch by agent A:</p>
+        <pre>bloom_1 = bloom_0 OR bits(A)
+leaf_1  = H(merkle_0 || bloom_1 || ts || geohash)
+merkle_1 = merkle_root(merkle_0, leaf_1)</pre>
+        <p>The nest stores only merkle_1, bloom_1, and prev_root=merkle_0. Verifier with access to prior PNG can recompute leaf_1 and check the link.</p>
+        <p>Why truncate to 128-bit roots? Collision resistance to 2^64 is sufficient for non-adversarial image history and saves 16 bytes. We use BLAKE3 because it's fast on ARM, stable across languages, and keyed.</p>
+        <p>Hybrid proofs are tiny: to prove an agent touched version 5 in a 1000-version history, you send 16-byte bloom, 16-byte root, plus ~160 bytes Merkle path. <200 bytes total, fits in QR.</p>
+        <p>This is what blockchains wanted to be before they became casinos: a way to commit to history without a network.</p>
+      </article>
+
+      <article id="png-nesters">
+        <h2><span>6.</span> PNG Nesters (how we hide data after IEND)</h2>
+        <p>PNG is a chunked format: 8-byte signature, then series of chunks: <code class="inline">[length:4][type:4][data:length][crc:4]</code>. The spec mandates that decoders stop after the IEND chunk (type 0x49454E44). Anything after is explicitly allowed and must be ignored.</p>
+        <p>This is not steganography. It is spec-compliant trailer data. The W3C PNG tests include files with trailing garbage; all browsers render them.</p>
+        <p>Advantages over ancillary chunks (tEXt, zTXt, iTXt): 1) CDNs strip ancillary chunks for "optimization". Cloudflare Polish, AWS Serverless Image Handler, and imgproxy all remove them. 2) Social networks re-encode and drop them. 3) They appear in metadata parsers.</p>
+        <p>Trailing data survives: Discord (as file, not proxy), Mastodon, Bluesky, Signal, Telegram, GitHub, S3, IPFS (as raw). It does NOT survive: X/Twitter, Facebook, Instagram, LinkedIn (they convert PNG→JPEG/WebP). Acceptable: lossy conversion is an edit, history breaks anyway.</p>
+<pre class="ascii">
+00000000  89 50 4E 47 0D 0A 1A 0A  ...  │ PNG signature
+... IDAT chunks ...
+0001A340  00 00 00 00 49 45 4E 44  │ 00 00 len, "IEND"
+0001A348  AE 42 60 82              │ IEND CRC ← decoder stops here
+0001A34C  4E 45 53 54 01 08 03 10  │ NEST magic, ver, shells, k, m/8 ← our data starts
+0001A354  ... 124 more bytes ...
+0001A3D0  45 4E 44 4E              │ ENDN footer
+</pre>
+        <p>Detection is O(1): seek to EOF-132, check magic. No PNG parse needed for verification.</p>
+        <p>We call this "nesting" because birds do not modify trees; they build after.</p>
+      </article>
+
+      <article id="nest-format">
+        <h2><span>7.</span> The Nest Format (132 bytes breakdown)</h2>
+        <p>Version 1, little-endian unless noted. All multi-byte integers LE.</p>
+        <table>
+          <thead><tr><th>Offset</th><th>Size</th><th>Field</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>4</td><td>magic</td><td>0x4E455354 "NEST"</td></tr>
+            <tr><td>4</td><td>1</td><td>ver</td><td>0x01</td></tr>
+            <tr><td>5</td><td>1</td><td>shells</td><td>0x08 (eight shells)</td></tr>
+            <tr><td>6</td><td>1</td><td>k</td><td>Bloom hashes (3)</td></tr>
+            <tr><td>7</td><td>1</td><td>m</td><td>Bloom bytes (16)</td></tr>
+            <tr><td>8</td><td>16</td><td>merkle_root</td><td>BLAKE3-128 of current tree</td></tr>
+            <tr><td>24</td><td>16</td><td>prev_root</td><td>Previous root, 0 for genesis</td></tr>
+            <tr><td>40</td><td>16</td><td>bloom</td><td>128-bit agent filter</td></tr>
+            <tr><td>56</td><td>16</td><td>work_hash</td><td>PoW: H(header||nonce) with 20 lz bits</td></tr>
+            <tr><td>72</td><td>8</td><td>timestamp</td><td>Unix ms, LE</td></tr>
+            <tr><td>80</td><td>8</td><td>geohash</td><td>lat/lon packed (see §9)</td></tr>
+            <tr><td>88</td><td>10</td><td>charge</td><td>5× uint16: [t,s,soc,c,sem]</td></tr>
+            <tr><td>98</td><td>16</td><td>agent_fp</td><td>Last writer fingerprint</td></tr>
+            <tr><td>114</td><td>6</td><td>iron</td><td>Iron Rain counter (48-bit)</td></tr>
+            <tr><td>120</td><td>8</td><td>ansible</td><td>Nearest ansible vector (2× int32)</td></tr>
+            <tr><td>128</td><td>4</td><td>crc32</td><td>CRC32 of bytes 0-127</td></tr>
+          </tbody>
+        </table>
+        <p>Total: 132 bytes. Fits in a single Ethernet frame with overhead. Intentionally not 128 to avoid alignment with crypto block sizes.</p>
+        <p>Future versions may extend by appending NEST2 after first; parsers read last valid.</p>
+<pre>example genesis nest (hex):
+4E455354 01080310 A3F1...B2  0000...00  0000...00  4C2A...  0190AB3F4D8B0100  ... ENDN</pre>
+      </article>
+
+      <article id="eight-shells">
+        <h2><span>8.</span> ((((((((1)))))))) — eight shells explained</h2>
+        <p>The eight shells are concentric contexts, from pixel to planet. Reading inward costs more compute; most verifiers stop at Shell 3.</p>
+        <div class="flex flex-col lg:flex-row gap-8 items-start my-6">
+          <svg class="shell-diagram shrink-0" width="200" height="200" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="95" fill="none" stroke="#0A0A0A" stroke-opacity="0.08"/>
+            <circle cx="100" cy="100" r="82" fill="none" stroke="#0A0A0A" stroke-opacity="0.12"/>
+            <circle cx="100" cy="100" r="69" fill="none" stroke="#0A0A0A" stroke-opacity="0.16"/>
+            <circle cx="100" cy="100" r="56" fill="none" stroke="#0A0A0A" stroke-opacity="0.22"/>
+            <circle cx="100" cy="100" r="44" fill="none" stroke="#0A0A0A" stroke-opacity="0.3"/>
+            <circle cx="100" cy="100" r="32" fill="none" stroke="#0A0A0A" stroke-opacity="0.4"/>
+            <circle cx="100" cy="100" r="21" fill="none" stroke="#0A0A0A" stroke-opacity="0.6"/>
+            <circle cx="100" cy="100" r="11" fill="none" stroke="#00FFA3" stroke-width="1.5" style="filter: drop-shadow(0 0 6px rgba(0,255,163,0.5));"/>
+            <text x="100" y="105" text-anchor="middle" font-size="10" fill="#0A0A0A">1</text>
+          </svg>
+          <div>
+            <p><strong>7 Core:</strong> <code class="inline">blake3(IDAT)</code>. Pixel identity. Changes on any re-encode.</p>
+            <p><strong>6 Microbe:</strong> Timestamp + PoW nonce. Proves when, not who.</p>
+            <p><strong>5 Lichen:</strong> Geohash + city code (BUF/ROC/MSP). Ties to place, not GPS precision.</p>
+            <p><strong>4 Mycelium:</strong> Bloom filter. Who touched.</p>
+            <p><strong>3 Root:</strong> prev_root link. Parentage.</p>
+            <p><strong>2 Trunk:</strong> merkle_root. Whole history commitment.</p>
+            <p><strong>1 Canopy:</strong> Ansible coordinates. Where in semantic forest.</p>
+            <p><strong>0 Atmosphere:</strong> Iron Rain counters, charge vector. How it moves through networks.</p>
+          </div>
+        <p>The nesting order matters: outer shells can be updated without recomputing inner expensive hashes. Iron Rain increments only touch bytes 114-119 + CRC.</p>
+        <p>Philosophically, this mirrors how we know a photo: first you see it circulate (Atmosphere), then where it lives online (Canopy), then its edits (Trunk), origin (Root), who shared it (Mycelium), where taken (Lichen), when (Microbe), and finally what pixels (Core). Most humans never get past Shell 4.</p>
+      </article>
+
+      <article id="iron-rain">
+        <h2><span>9.</span> Iron Rain and charge vector [0,0,8,0,0]</h2>
+        <p>Iron Rain is named for lake-effect snow in Buffalo: a sudden, heavy, uniform deposition that erases individual tracks.</p>
+        <p>Each nest carries a charge vector of five uint16s: <code class="inline">[temporal, spatial, social, compute, semantic]</code>. Genesis nests created by our tagger are initialized to <code class="inline">[0,0,8,0,0]</code> — eight units of spatial charge, zero elsewhere. Meaning: "this image is anchored to a place, not yet shared."</p>
+        <p>As the file moves:</p>
+        <ul class="list-disc ml-6 my-3 space-y-1">
+          <li>Each unique ASN that serves it: +1 social, -1 spatial</li>
+          <li>Each day elapsed: +1 temporal</li>
+          <li>Each verification PoW: +1 compute</li>
+          <li>Each semantic tag added by agent: +1 semantic</li>
+        </ul>
+        <p>When social ≥ 1000 and temporal ≤ 72h and spatial ≤ 2, the nest enters Iron Rain. The iron counter (bytes 114-119) increments. We flip the visual representation in readers to a desaturated preview: the image has become weather.</p>
+        <p>Why? To distinguish between a family photo (high spatial, low social) and a meme (low spatial, high social). Models should weight them differently. Teaching silicon about cities requires knowing which images are lived-in versus which are broadcast.</p>
+        <p>Charge is not consensus; it's local observation. Your node sees different values than mine. That's fine. Mycelium does not agree, it gradients.</p>
+      </article>
+
+      <article id="proof-of-work">
+        <h2><span>10.</span> Proof of Work without blockchain</h2>
+        <p>To prevent a bot from flipping all 128 bits in a second, we require a small proof-of-work per touch. No chain, no difficulty adjustment, no reward.</p>
+        <p>Target: <code class="inline">H(blake3, header[0:56] || nonce[8])</code> must have 20 leading zero bits (~1 in 1,048,576). On a 2023 laptop core, ~40-80ms. On a phone, ~200ms. Trivial for a human tagging 10 photos, expensive for a million.</p>
+        <p>The work_hash is stored in bytes 56-71. Verification is one hash. No network.</p>
+        <p>Unlike Bitcoin, work is not competitive; it's per-file and per-agent. Two agents can work in parallel, both valid, resulting in two sibling nests with same prev_root (a fork). Readers merge blooms via OR and pick higher iron count as canonical — eventual consistency, not consensus.</p>
+        <p>This is proof-of-effort, not proof-of-stake. It makes spam have a thermodynamic cost without creating currency. Archivists in Rochester running old ThinkPads can still participate; they just wait 0.3s.</p>
+<pre>def find_nonce(header):
+    for nonce in range(2**64):
+        h = blake3(header + nonce.to_bytes(8,'little')).digest()
+        if int.from_bytes(h[:3],'big') >> 4 == 0: # 20 zero bits
+            return nonce</pre>
+      </article>
+
+      <article id="four-ansibles">
+        <h2><span>11.</span> The 4 Ansibles (-+8 0 0 0 8)</h2>
+        <p>Ansibles are fixed reference points in the 5-dimensional charge space, named for Le Guin's instantaneous communicators. They allow decentralized spatial indexing without GPS or servers.</p>
+        <p>We defined four during Iron Rain winter 2024:</p>
+        <table>
+          <thead><tr><th>Name</th><th>Coords [t,s,soc,c,sem]</th><th>City</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>A0 BUF</td><td>[-8,0,0]</td><td>Buffalo, NY</td><td>Temporal west (past)</td></tr>
+            <tr><td>A1 ROC</td><td>[+8,0,0]</td><td>Rochester, NY</td><td>Temporal east (future)</td></tr>
+            <tr><td>A2 MSP</td><td>[0,0,0,0,-8]</td><td>Minneapolis, MN</td><td>Semantic south (concrete)</td></tr>
+            <tr><td>A3 DUL</td><td>[0,0,0,0,+8]</td><td>Duluth, MN</td><td>Semantic north (abstract)</td></tr>
+          </tbody>
+        </table>
+        <p>Any nest computes its Euclidean distance to each ansible after normalizing charge. The nearest two form a 2D coordinate stored in bytes 120-127. This gives rough clustering: Buffalo winter photos drift toward BUF+MSP; AI-generated cityscapes drift toward DUL+ROC.</p>
+        <p>Clients can query "show me images near BUF" by scanning local folders for nests with ansible distance &lt; 3. No central index.</p>
+        <p>The coordinates -+8 are deliberate: they exceed maximum normal charge (which caps at 8 per axis), ensuring ansibles are always outside the data cloud, like lighthouses.</p>
+      </article>
+
+      <article id="teaching-silicon">
+        <h2><span>12.</span> Teaching Silicon About Buffalo, Rochester, Minneapolis</h2>
+        <p>0root.ai started not as a protocol but as a dataset. In 2023 we fine-tuned SDXL on 47,000 photos taken between 1978-2023 in three cities: Buffalo, Rochester, Minneapolis. All photos were scanned from the Lower Lakes Archive, city planning departments, and personal collections. None came from LA, London, or subsampled LAION.</p>
+        <p>The model initially failed. Asked for "winter street at dusk", it produced cinematic Tokyo neon. Asked for "porch in January", it gave California stucco. The latent space had no representation for: vinyl siding with ice dams, glass bus shelters fogged from -15°F breath, salt-stained Dodge Caravans, leaded glass at 4:17pm in December, the specific gray of lake-effect sky.</p>
+        <p>We realized the problem was not model size but provenance starvation. Internet-scale datasets treat these cities as noise. Their images are not tagged "Buffalo"; they're tagged "city", "snow", "USA". Captioners (BLIP, etc.) were trained on coasts, so they hallucinate palm trees.</p>
+        <p>Merkle Bloom was built to fix the data, not the model. Every image we scanned was PNG-nested at origin with geohash, timestamp from back of print, and initial charge [0,0,8,0,0]. As volunteers re-tagged, each agent flipped bits. As images spread to local history groups, iron counters rose.</p>
+        <p>After 6 months, we retrained with loss weighted by spatial charge (images that stayed local weighted higher). The model learned: Rochester has blue recycling bins, not green. Buffalo has angled parking downtown. Minneapolis skyways connect at second floor, not ground.</p>
+        <p>This is "teaching silicon about cities": not giving it more data, but giving it situated data with a memory of where it has been. A nest is a tiny syllabus.</p>
+        <p>We publish the weights as shareware (§14). Use them to generate your own streets, but you must nest your outputs. The cities taught the model; the model must remember.</p>
+      </article>
+
+      <article id="how-to-use">
+        <h2><span>13.</span> How to Use (tagger, reader)</h2>
+        <p>Reference implementation: Python 3.11+, no dependencies beyond <code class="inline">blake3</code>.</p>
+<pre>pip install blake3
+
+# tag.py
+import struct, time, blake3
+from pathlib import Path
+
+MAGIC = b'NEST'
+def nest_png(path, agent_id, lat, lon):
+    data = Path(path).read_bytes()
+    iend = data.rfind(b'IEND') + 8
+    # check existing
+    if data[-132:-128] == MAGIC:
+        prev = data[-132:-116]
+    else:
+        prev = b'\x00'*16
+    merkle = blake3.blake3(data[:iend] + prev).digest()[:16]
+    bloom = bytearray(16)
+    for i in range(3):
+        h = blake3.blake3(agent_id + merkle + bytes([i])).digest()
+        idx = h[0] % 128
+        bloom[idx//8] |= 1 << (idx%8)
+    header = struct.pack('<4sBBBB', MAGIC,1,8,3,16) + merkle + prev + bytes(bloom)
+    # ... add timestamp, geohash, pow etc.
+    # simplified: append
+    Path(path).write_bytes(data + header.ljust(132, b'\x00') + b'ENDN')
+</pre>
+        <p>Reader (JavaScript, in-browser):</p>
+<pre>async function readNest(file) {
+  const buf = await file.arrayBuffer();
+  const view = new Uint8Array(buf);
+  const tail = view.slice(-132);
+  if (String.fromCharCode(...tail.slice(0,4)) !== 'NEST') return null;
+  const dv = new DataView(tail.buffer);
+  return {
+    merkle: [...tail.slice(8,24)].map(b=>b.toString(16).padStart(2,'0')).join(''),
+    bloomBits: [...tail.slice(40,56)].reduce((c,b)=>c+popcnt(b),0),
+    timestamp: Number(dv.getBigUint64(72, true)),
+    charge: Array.from({length:5},(_,i)=>dv.getUint16(88+i*2,true))
+  };
+}</pre>
+        <h3>Live Demo</h3>
+        <p>Drop a PNG below. If it contains a nest, we parse it locally (no upload).</p>
+        <div id="drop" class="dropzone p-6 text-center my-4 cursor-pointer">
+          <div class="text-[12px] uppercase tracking-widest opacity-60">Drop PNG here or click</div>
+          <input type="file" id="file" accept="image/png" class="hidden">
+          <div id="out" class="mt-4 text-left text-[12px] font-medium"></div>
+        </div>
+        <p>CLI: <code class="inline">0root tag photo.png --city BUF --agent mybot</code> — computes PoW (~50ms), appends nest. <code class="inline">0root verify photo.png</code> — prints Merkle path if prior version present.</p>
+      </article>
+
+      <article id="shareware-license">
+        <h2><span>14.</span> Shareware License</h2>
+        <p><strong>0ROOT Shareware License v1.3 (Iron Rain)</strong></p>
+        <p>Copyright 2024-2025 0root.ai, Buffalo NY.</p>
+        <p>Permission is granted to use, copy, modify, and distribute this specification, reference code, and pretrained weights for any purpose, provided that:</p>
+        <p>1) All PNG outputs generated by modified or derived models MUST contain a valid NEST (132 bytes) with accurate merkle_root and agent fingerprint.</p>
+        <p>2) For commercial use exceeding 1,000 nested images per month, you must either: a) pay $8 USD per 1,000 images to 0root.ai, or b) contribute 100+ geotagged, CC-BY images from a US zip code with population density &lt; 500/mi² and median income &lt; state median, with nests.</p>
+        <p>3) You may not use nests for surveillance, predictive policing, military targeting, or immigration enforcement. Cities are for living, not sorting.</p>
+        <p>4) No warranty. Nests are probabilistic. False positives in Bloom filters are a feature, not a bug.</p>
+        <p>5) Attribution: "Built with Merkle Bloom" and link to 0root.ai in documentation.</p>
+        <p>This is shareware, not open source. We ask for reciprocity, not permission. If you profit from teaching silicon about places, those places should benefit.</p>
+        <p>Send questions, city datasets, or proof of Iron Rain to nest@0root.ai. We read every mail.</p>
+        <div class="mt-12 pt-6 border-t border-black/10 text-[12px] opacity-70">
+          <p>END OF MANUAL. Rendered bone-white on black ink. Set in IBM Plex Mono for maximum legibility in cold rooms.</p>
+          <p class="mt-2">0ROOT.AI — Teaching Silicon About Cities — Buffalo • Rochester • Minneapolis</p>
+        </div>
+      </article>
+    </div>
+  </main>
 </div>
-<div class="terminal" id="term">> boot 0root.ai...<br>> ansibles loaded: 4<br>> vector: -+8 0 0 0 8<br>> ready.</div>
-<div class="downloads">
-<a href="#" onclick="download('neo_nest_tagger.py',tagger)">neo_nest_tagger.py</a>
-<a href="#" onclick="downloadZip()">nested_iron_rain_shareware.zip</a>
-</div>
-<div class="layers">
-<h3>What do the other layers do?</h3>
-<p><b>Layer 1 — Core bit:</b> 1 = "I've been touched". Bloom filter for lineage. One bit, infinite memory.</p>
-<p><b>Layer 2 — Depth:</b> How many shells. ((((((((1)))))))) = 8 touches. Each shell = one agent, one save, one betrayal.</p>
-<p><b>Layer 3 — Vector [a,b,c,d,e]:</b> The charge. [0,0,8,0,0] = retroactive wake-up. [0,0,-8,0,0] = Eve drop. [+1...] = Sister A, [-1...] = Sister B. That's the +2 -1 walk.</p>
-<p><b>Layer 4 — Parent CRC:</b> First 4 bytes of SHA-256(original). Proves what the file was before you nested it. No blockchain, just math.</p>
-<p><b>Layer 5 — Time:</b> 2 bytes, 1989 = 0x07C5. Mutiny timestamp. Lets you sort the chaos.</p>
-<p><b>Iron Rain (8):</b> The outer ring. Not data — energy. It rotates 90° across 16 steps because CRTs flicker and we breathe +2 -1.</p>
-<p><b>Ansibles:</b> The 4 corners. -+8 0 0 0 8 = push/pull. Donna pulls (+8) to keep books clean. Cameron pushes (-8) to break the wall. Together they charge the root.</p>
-</div>
-</div>
+
 <script>
-const tagger = `#!/usr/bin/env python3
-# neo_nest_tagged.py — shareware
-# drag-drop folder, watch iron rain charge to 0 0 8 0 0
-import os, struct, hashlib, time, threading, tkinter as tk
-from tkinter import filedialog
-import random
+  // mobile menu
+  const menuBtn = document.getElementById('menuBtn');
+  const toc = document.getElementById('toc');
+  menuBtn?.addEventListener('click', () => toc.classList.toggle('open'));
 
-CHARS = list('))))))))1((((((((')
+  // toc active
+  const links = document.querySelectorAll('.toc-link');
+  const secs = [...links].map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+e.target.id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  secs.forEach(s => observer.observe(s));
 
-def make_nest(original):
-    h = hashlib.sha256(original).digest()
-    parent = struct.unpack('>I', h[:4])[0]
-    header = struct.pack('>4sBBH', b'((1)', 1, 1, 0)
-    vec = [0,0,8,0,0]  # charge vector
-    shell = struct.pack('>5b', *vec) + struct.pack('>I', parent) + struct.pack('>H', int(time.time())%65536)
-    shells = shell + b'\x00'*77
-    return header + shells + struct.pack('>I', 100) + b'\x00'*28
-
-class RainApp:
-    def __init__(self, root):
-        self.root = root
-        root.title("NEST // iron rain")
-        root.configure(bg='black')
-        self.canvas = tk.Canvas(root, width=800, height=600, bg='black', highlightthickness=0)
-        self.canvas.pack()
-        self.btn = tk.Button(root, text="SELECT FOLDER", command=self.pick, bg='#003300', fg='#00ff00')
-        self.btn.pack(pady=10)
-        self.drops = []
-        self.running = True
-        self.animate()
-    
-    def animate(self):
-        self.canvas.delete('all')
-        # spawn new drops
-        if random.random() < 0.3:
-            x = random.randint(0, 780)
-            self.drops.append({'x':x, 'y':0, 'char': random.choice(CHARS), 'speed': random.randint(4,8)})
-        for d in self.drops[:]:
-            d['y'] += d['speed']
-            self.canvas.create_text(d['x'], d['y'], text=d['char'], fill='#00ff41', font=('Courier',14))
-            if d['y'] > 600:
-                self.drops.remove(d)
-        if self.running:
-            self.root.after(30, self.animate)
-    
-    def pick(self):
-        folder = filedialog.askdirectory()
-        if not folder: return
-        threading.Thread(target=self.tag_folder, args=(folder,), daemon=True).start()
-    
-    def tag_folder(self, folder):
-        count = 0
-        for root, _, files in os.walk(folder):
-            for f in files:
-                if not f.lower().endswith(('.png','.jpg','.jpeg','.mp4','.wav','.pdf','.webp')):
-                    continue
-                path = os.path.join(root,f)
-                with open(path,'rb') as r: data = r.read()
-                if b'NEST' in data[-200:]: continue
-                nest = make_nest(data)
-                with open(path,'ab') as w: w.write(b'NEST'+nest)
-                count += 1
-                # flash charge vector
-                self.canvas.create_text(400, 300, text='0 0 8 0 0', fill='#ff0040', font=('Courier',32))
-        self.canvas.create_text(400, 550, text=f'WAKE UP — {count} files tagged', fill='#00ff41', font=('Courier',16))
-
-if __name__ == '__main__':
-    root = tk.Tk()
-    app = RainApp(root)
-    root.mainloop()
-`;
-const zipB64 = `UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==`;
-function download(name, content){{ 
-  const a = document.createElement('a');
-  a.href = 'data:text/plain;base64,' + btoa(content);
-  a.download = name; a.click();
-}}
-function downloadZip(){{
-  const a = document.createElement('a');
-  a.href = 'data:application/zip;base64,' + zipB64;
-  a.download = 'nested_iron_rain_shareware.zip'; a.click();
-}}
-const term = document.getElementById('term');
-const drop = document.getElementById('drop');
-drop.addEventListener('dragover', e=>{{e.preventDefault();drop.style.borderColor='#ff006e'}});
-drop.addEventListener('dragleave', e=>{{drop.style.borderColor='#00f5ff'}});
-drop.addEventListener('drop', e=>{{
-  e.preventDefault();
-  const f = e.dataTransfer.files[0];
-  const r = new FileReader();
-  r.onload = ()=>{{
-    const b = new Uint8Array(r.result);
-    const t = new TextDecoder().decode(b.slice(-132));
-    const i = b.lastIndexOf(0x4E); // 'N'
-    if(b[i+1]!==0x45||b[i+2]!==0x53||b[i+3]!==0x54){{term.innerHTML+='<br>> no nest';return}}
-    const nest = b.slice(i+4,i+132);
-    const bit = nest[4], depth = nest[5];
-    const v = Array.from(nest.slice(8,13)).map(x=>x>127?x-256:x);
-    term.innerHTML+=`<br>> nest found<br>> bit=${bit} depth=${depth}<br>> vector=[${v.join(',')}]<br>> ${depth} shells lit`;
-  }};
-  r.readAsArrayBuffer(f);
-}});
+  // PNG drop demo
+  const drop = document.getElementById('drop');
+  const fileInput = document.getElementById('file');
+  const out = document.getElementById('out');
+  function popcnt(b){ let c=0; while(b){c+=b&1; b>>=1;} return c; }
+  async function handleFile(f){
+    if(!f || f.type !== 'image/png'){ out.textContent='Not a PNG.'; return; }
+    const buf = await f.arrayBuffer();
+    const view = new Uint8Array(buf);
+    if(view.length < 132){ out.textContent='File too small.'; return; }
+    const tail = view.slice(-132);
+    const magic = String.fromCharCode(...tail.slice(0,4));
+    if(magic !== 'NEST'){
+      out.innerHTML = '<span class="text-black/60">No NEST found. Valid PNG, but no provenance trailer.</span>';
+      return;
+    }
+    const dv = new DataView(tail.buffer, tail.byteOffset);
+    const ver = tail[4];
+    const merkle = [...tail.slice(8,24)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    const bloomBits = [...tail.slice(40,56)].reduce((a,b)=>a+popcnt(b),0);
+    const ts = Number(dv.getBigUint64(72, true));
+    const date = new Date(ts).toISOString();
+    const charge = Array.from({length:5},(_,i)=>dv.getUint16(88+i*2,true));
+    out.innerHTML = `
+      <div class="grid grid-cols-3 gap-2">
+        <div>version</div><div class="col-span-2">${ver}</div>
+        <div>merkle</div><div class="col-span-2">${merkle.slice(0,16)}…</div>
+        <div>bloom bits</div><div class="col-span-2">${bloomBits}/128 set</div>
+        <div>timestamp</div><div class="col-span-2">${date}</div>
+        <div>charge</div><div class="col-span-2">[${charge.join(', ')}]</div>
+      </div>
+      <div class="mt-2 text-[11px] opacity-60">Parsed locally. No upload.</div>
+    `;
+  }
+  drop.addEventListener('click', () => fileInput.click());
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
 </script>
-</body></html>
+</body>
+</html>
