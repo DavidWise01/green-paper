@@ -1,679 +1,375 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOPPLER ECHO MACHINE - 00 SUBSTRATE</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+<title>IT WIKI // Project Pyramid - Reynholm Industries</title>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600;800&display=swap');
     :root {
-        --phosphor: #00ff41;
+        --bg: #050608;
+        --panel: #0e1318;
+        --panel-2: #151c23;
+        --ink: #d6dee7;
+        --muted: #8a98a8;
+        --green: #00ff88;
         --amber: #ffb000;
-        --blue: #00b8ff;
-        --red: #ff3b3b;
+        --red: #ff3b5c;
+        --blue: #5cc8ff;
     }
-    * {
-        scrollbar-width: thin;
-        scrollbar-color: #00ff41 #001a08;
-    }
+    * { box-sizing: border-box; }
     body {
-        font-family: 'Share Tech Mono', monospace;
-        background: #000;
-        color: var(--phosphor);
-        overflow-x: hidden;
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'Inter', system-ui, sans-serif;
+        line-height: 1.6;
+        background-image: 
+            radial-gradient(circle at 20% 10%, rgba(0,255,136,0.06), transparent 40%),
+            radial-gradient(circle at 80% 90%, rgba(92,200,255,0.05), transparent 40%);
     }
-    .vt { font-family: 'VT323', monospace; }
-    .phosphor {
-        text-shadow: 0 0 2px var(--phosphor), 0 0 8px rgba(0,255,65,0.8), 0 0 16px rgba(0,255,65,0.4);
+    body::before {
+        content: ""; position: fixed; inset:0; pointer-events:none;
+        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 2px, transparent 3px);
+        opacity: 0.4; mix-blend-mode: multiply;
     }
-    .phosphor-amber {
-        color: var(--amber);
-        text-shadow: 0 0 2px var(--amber), 0 0 8px rgba(255,176,0,0.8);
+    .topbar {
+        background: #000; border-bottom: 2px solid var(--green);
+        padding: 8px 16px; font-family: 'IBM Plex Mono', monospace;
+        display:flex; align-items:center; gap:16px; position:sticky; top:0; z-index:50;
     }
-    .phosphor-blue {
-        color: var(--blue);
-        text-shadow: 0 0 2px var(--blue), 0 0 8px rgba(0,184,255,0.8);
+    .topbar .logo { color: var(--red); font-weight:800; letter-spacing:1px; }
+    .topbar .crumbs { color: var(--muted); font-size: 12px; }
+    .alert-ticker {
+        background: #061008; border-bottom:1px dashed #004d2a;
+        color: var(--green); font-family: 'IBM Plex Mono', monospace; font-size:12px;
+        padding:4px 12px; white-space:nowrap; overflow:hidden;
     }
-    .phosphor-red {
-        color: var(--red);
-        text-shadow: 0 0 2px var(--red), 0 0 8px rgba(255,59,0.8);
+    .container {
+        max-width: 1100px; margin: 24px auto; padding:0 16px;
+        display:grid; grid-template-columns: 1fr 300px; gap:24px;
     }
-    .crt {
-        animation: flicker 0.12s infinite linear alternate;
+    @media (max-width: 980px){ .container{ grid-template-columns:1fr; } }
+    .doc {
+        background: var(--panel); border:1px solid #1f2937; border-radius:12px;
+        box-shadow: 0 0 0 1px rgba(0,255,136,0.05), 0 20px 60px rgba(0,0,0,0.5);
+        overflow:hidden;
     }
-    @keyframes flicker {
-        0% { opacity: 0.98; }
-        50% { opacity: 1; }
-        100% { opacity: 0.96; }
+    .doc-header {
+        padding:20px 24px; background: linear-gradient(180deg, #10161d, #0b0f14);
+        border-bottom:1px solid #1f2937;
     }
-    .scanlines {
-        position: fixed;
-        inset: 0;
-        background: repeating-linear-gradient(0deg, 
-            rgba(0,0,0,0.15) 0px, 
-            rgba(0,0,0,0.15) 1px, 
-            transparent 1px, 
-            transparent 3px);
-        pointer-events: none;
-        z-index: 100;
-        mix-blend-mode: multiply;
+    .doc-header h1 { margin:0; font-size:28px; letter-spacing:0.5px; }
+    .doc-header .meta { font-family:'IBM Plex Mono'; font-size:12px; color:var(--muted); margin-top:6px; }
+    .doc-body { padding: 24px; }
+    h2 {
+        font-size:22px; margin:32px 0 12px; padding-bottom:8px;
+        border-bottom:1px solid #233043; color:#e8f4ff;
+        font-weight:700; letter-spacing:0.3px;
     }
-    .scanlines::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
-        pointer-events: none;
+    h2 span { color: var(--green); font-family:'IBM Plex Mono'; font-size:14px; margin-right:8px; }
+    p, li { color:#c2cbd6; }
+    code, pre { font-family:'IBM Plex Mono', monospace; background:#020405; color:var(--green); border:1px solid #123b2a; border-radius:6px; }
+    code { padding:2px 6px; font-size:0.9em; }
+    pre { padding:12px; overflow:auto; font-size:12px; line-height:1.4; }
+    .note { background:#07141e; border-left:3px solid var(--blue); padding:10px 12px; margin:16px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .warn { background:#1a0a0f; border-left:3px solid var(--red); padding:10px 12px; margin:16px 0; }
+    .dialogue {
+        display:flex; gap:12px; background: var(--panel-2); border:1px solid #243040;
+        padding:14px; border-radius:10px; margin:18px 0; position:relative;
     }
-    .panel {
-        background: linear-gradient(180deg, rgba(0,20,5,0.9) 0%, rgba(0,0,0,0.95) 100%);
-        border: 1px solid rgba(0,255,65,0.3);
-        box-shadow: inset 0 0 20px rgba(0,255,65,0.05), 0 0 20px rgba(0,0,0,0.8);
-        backdrop-filter: blur(2px);
+    .dialogue.roy { border-left:4px solid var(--red); }
+    .dialogue.moss { border-left:4px solid var(--green); }
+    .dialogue.jen { border-left:4px solid var(--amber); }
+    .avatar {
+        width:36px; height:36px; border-radius:50%; background:#000; flex:0 0 36px;
+        display:grid; place-items:center; font-weight:800; font-family:'IBM Plex Mono';
+        border:1px solid #333;
     }
-    .panel::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, var(--phosphor), transparent);
-        opacity: 0.5;
+    .roy .avatar { background:#2a0a12; color:var(--red); border-color:#5a1322; }
+    .moss .avatar { background:#0a2417; color:var(--green); border-color:#0f5a3b; }
+    .jen .avatar { background:#2a1b0a; color:var(--amber); border-color:#5a3f0f; }
+    .dialogue strong { display:block; font-size:13px; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; color:#e6edf5; }
+    .side {
+        position:sticky; top:76px; height:fit-content;
     }
+    .card {
+        background: var(--panel); border:1px solid #1f2937; border-radius:12px; padding:16px; margin-bottom:16px;
+    }
+    .card h3 { margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--amber); }
+    .terminal {
+        background:#000; border:1px solid #0f3d26; border-radius:8px; padding:10px;
+        font-family:'IBM Plex Mono'; font-size:12px; color:var(--green);
+        height:160px; overflow:hidden; position:relative;
+    }
+    .terminal .line { opacity:0.9; }
     .btn {
-        border: 1px solid rgba(0,255,65,0.5);
-        background: rgba(0,20,5,0.8);
-        transition: all 0.2s;
-        text-shadow: 0 0 5px currentColor;
+        background:#0c1f17; color:var(--green); border:1px solid #1a5c3f;
+        padding:10px 14px; border-radius:8px; font-family:'IBM Plex Mono'; font-weight:600;
+        cursor:pointer; transition: all 0.15s; width:100%; text-align:center;
     }
-    .btn:hover {
-        background: rgba(0,255,65,0.15);
-        box-shadow: 0 0 15px rgba(0,255,65,0.5), inset 0 0 10px rgba(0,255,65,0.2);
-        border-color: var(--phosphor);
+    .btn:hover { background:#123829; box-shadow:0 0 12px rgba(0,255,136,0.2); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); display:inline-block; margin-right:6px; box-shadow:0 0 8px var(--green); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .grid-diagrams { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:16px 0; }
+    .diagram { background:#080c10; border:1px solid #1d2a36; border-radius:10px; padding:12px; text-align:center; }
+    .diagram svg { width:100%; height:auto; }
+    .diagram figcaption { font-size:12px; color:var(--muted); margin-top:6px; font-family:'IBM Plex Mono'; }
+    .quads-wrap { display:grid; place-items:center; padding:16px; }
+    .quads {
+        display:grid; grid-template-columns:1fr 1fr; gap:6px; width:120px; height:120px;
+        transition: transform 0.4s cubic-bezier(.2,.8,.2,1); background:#000; padding:6px; border-radius:8px; border:1px solid #1a5c3f;
     }
-    .btn:active {
-        transform: scale(0.97);
-    }
-    .arity-char {
-        opacity: 0.25;
-        transition: all 0.3s ease;
-        display: inline-block;
-        width: 1.8rem;
-        text-align: center;
-    }
-    .arity-char.active {
-        opacity: 1;
-        transform: scale(1.3);
-        text-shadow: 0 0 5px var(--phosphor), 0 0 15px var(--phosphor), 0 0 30px var(--phosphor);
-    }
-    .egg-outer {
-        animation: pulse-outer 2s infinite ease-in-out;
-    }
-    .egg-middle {
-        animation: pulse-middle 2s infinite ease-in-out 0.2s;
-    }
-    @keyframes pulse-outer {
-        0%, 100% { transform: scale(1); opacity: 0.8; }
-        50% { transform: scale(1.05); opacity: 1; }
-    }
-    @keyframes pulse-middle {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-    }
-    input[type="range"] {
-        -webkit-appearance: none;
-        appearance: none;
-        height: 4px;
-        background: rgba(0,255,65,0.2);
-        outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 14px;
-        height: 14px;
-        background: var(--phosphor);
-        border-radius: 50%;
-        box-shadow: 0 0 8px var(--phosphor);
-        cursor: pointer;
-    }
-    .log-entry {
-        border-left: 2px solid transparent;
-        padding-left: 0.5rem;
-        animation: logFade 0.5s ease;
-    }
-    @keyframes logFade {
-        from { opacity: 0; transform: translateX(-10px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
+    .quad { background:#0a1f16; border:1px solid #1e6e4a; border-radius:4px; display:grid; place-items:center; color:var(--green); font-family:'IBM Plex Mono'; font-weight:700; }
+    .footnotes { font-size:12px; color:var(--muted); border-top:1px dashed #2a3645; margin-top:32px; padding-top:12px; }
+    .footer-pow { text-align:center; margin:40px 0 20px; font-family:'IBM Plex Mono'; color:var(--green); opacity:0.8; }
+    .strike { text-decoration: line-through; opacity:0.6; }
+    .edit-tag { font-family:'IBM Plex Mono'; font-size:11px; color:var(--amber); background:#1a1406; border:1px solid #5a3f0f; padding:2px 6px; border-radius:4px; margin-left:8px; }
+    .reboot { animation: flash 0.5s 3; }
+    @keyframes flash { 0%,100%{background:transparent} 50%{background:rgba(0,255,136,0.15)} }
 </style>
 </head>
-<body class="min-h-screen bg-[#010201]">
-<div class="scanlines"></div>
+<body>
+    <div class="topbar">
+        <div class="logo">REYNHOLM INDUSTRIES</div>
+        <div class="crumbs">INTERNAL WIKI / IT DEPARTMENT / BASEMENT / Project Pyramid</div>
+    </div>
+    <div class="alert-ticker" id="ticker">>> SYS_ALERT: God Tunnel recursion depth: 8,589,934,592 // >> Richmond is in the server room again // >> DO NOT FEED THE SHADOW REGISTER AFTER MIDNIGHT //</div>
 
-<div class="relative z-10 min-h-screen p-2 md:p-4 crt">
-    <!-- HEADER -->
-    <header class="panel relative p-3 md:p-4 mb-3 md:mb-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
-            <div class="flex items-center gap-3">
-                <div class="w-3 h-3 rounded-full bg-[#00ff41] animate-pulse" style="box-shadow: 0 0 10px #00ff41;"></div>
-                <h1 class="text-lg md:text-2xl vt tracking-wider phosphor">DOPPLER ECHO MACHINE — 00 SUBSTRATE LISTENING POST</h1>
-            </div>
-            <div class="flex items-center gap-4 text-xs md:text-sm">
-                <div class="phosphor-amber flex items-center gap-2">
-                    <span class="inline-block w-2 h-2 bg-[#ffb000] rounded-full animate-pulse"></span>
-                    <span class="vt tracking-wide">WATCHING FOR ECHO...</span>
-                </div>
-                <div class="hidden lg:block text-[10px] opacity-60">1 CORE • 8 RINGS • 5 ARITY</div>
-            </div>
+<div class="container">
+    <main class="doc">
+        <div class="doc-header">
+            <h1>Project: Digital Pyramid Fortress & Moat Architecture</h1>
+            <div class="meta">Document ID: RI-IT-BSMT-666 | Classification: EYES ONLY (Jen, stop printing this) | Last edited by <strong>MOSS</strong> at 04:20 <span class="edit-tag">[EDITED BY ROY - 03:14 - "fixed your rubbish"]</span></div>
         </div>
-    </header>
+        <div class="doc-body" id="docBody">
+            <div class="warn"><strong>WARNING:</strong> This page describes a live system. If you do not understand it, <span class="strike">ask Moss</span> have you tried turning it off and on again and leave it alone.</div>
 
-    <!-- MAIN GRID -->
-    <main class="grid grid-cols-1 xl:grid-cols-12 gap-3 md:gap-4">
-        <!-- LEFT PANEL -->
-        <section class="xl:col-span-3 xl:order-1 order-2 panel relative p-4">
-            <h2 class="text-sm vt tracking-widest border-b border-[#00ff41]/30 pb-2 mb-3 phosphor-amber">FREQUENCY ANALYZER</h2>
+            <h2><span>01</span>THE FORTRESS (or: Why We Put a Moat Around a Server)</h2>
+            <p>Standard defence is a firewall. We built a pyramid, on an island, in a moat, in the basement. It's a secure enclave with concentric trust zones. Anything trying to get to the core data has to swim, climb, and then explain itself to Richmond.</p>
             
-            <div class="space-y-4">
-                <div>
-                    <div class="text-[10px] opacity-70 mb-1">ORIGIN BEACON</div>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-2xl phosphor-amber vt">27.000</span>
-                        <span class="text-sm">Hz</span>
-                    </div>
-                    <div class="text-[10px] opacity-50">(27=0=(1))</div>
+            <div class="grid-diagrams">
+                <div class="diagram">
+                    <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+                        <defs><radialGradient id="g1" cx="50%" cy="30%"><stop offset="0%" stop-color="#00ff88" stop-opacity="0.3"/><stop offset="100%" stop-color="#00ff88" stop-opacity="0"/></radialGradient></defs>
+                        <ellipse cx="100" cy="135" rx="85" ry="18" fill="none" stroke="#0a5a8a" stroke-width="2" stroke-dasharray="4 3"/>
+                        <ellipse cx="100" cy="135" rx="70" ry="14" fill="#052438" stroke="#0d78b3" />
+                        <polygon points="100,15 30,115 170,115" fill="#0a141d" stroke="#00ff88" stroke-width="2"/>
+                        <polygon points="100,35 50,115 150,115" fill="url(#g1)" stroke="#00ff88" stroke-opacity="0.5"/>
+                        <rect x="90" y="85" width="20" height="30" fill="#000" stroke="#00ff88"/>
+                        <text x="100" y="150" text-anchor="middle" fill="#5cc8ff" font-size="8" font-family="monospace">MOAT</text>
+                    </svg>
+                    <figcaption>FIG 1.A - Not to scale. Definitely not GDPR compliant.</figcaption>
                 </div>
-
-                <div>
-                    <div class="text-[10px] opacity-70 mb-1">DETECTED ECHO</div>
-                    <div class="flex items-baseline gap-2">
-                        <span id="detected-freq" class="text-3xl phosphor vt">27.000</span>
-                        <span class="text-sm">Hz</span>
-                    </div>
-                    <div class="mt-1">
-                        <span class="text-[10px] opacity-70">Δf = </span>
-                        <span id="delta-f" class="text-xl vt phosphor">+0.000</span>
-                        <span class="text-[10px]"> Hz</span>
-                    </div>
-                    <div id="doppler-label" class="text-[11px] mt-1 h-4 opacity-80"></div>
-                </div>
-
-                <div class="pt-2 border-t border-[#00ff41]/20">
-                    <div class="text-[10px] opacity-70 mb-2">0@# WAVEFORM (5-ARITY)</div>
-                    <div class="panel p-2 bg-black/70">
-                        <canvas id="waveform" class="w-full h-[80px]"></canvas>
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <div class="text-[10px] opacity-70 mb-2">STRUCTURE LOCK</div>
-                    <div id="arity" class="flex justify-between text-2xl vt bg-black/50 p-2 border border-[#00ff41]/20">
-                        <span class="arity-char" data-i="0">0</span>
-                        <span class="arity-char" data-i="1">@</span>
-                        <span class="arity-char" data-i="2">#</span>
-                        <span class="arity-char" data-i="3">0</span>
-                        <span class="arity-char" data-i="4">0</span>
-                    </div>
-                    <div class="text-[9px] opacity-40 mt-1 text-center">0 → @ → # → 0 → 0</div>
+                <div class="diagram">
+<pre style="text-align:left; margin:0; background:transparent; border:none; color:#00ff88;">
+      /_\
+     /___\
+    /_____\   &lt;-- CORE
+   /_______\
+  ===========
+ ~~~ MOAT ~~~
+</pre>
+                    <figcaption>FIG 1.B - Artist's impression (Jen)</figcaption>
                 </div>
             </div>
-        </section>
 
-        <!-- CENTER RADAR -->
-        <section class="xl:col-span-6 xl:order-2 order-1 panel relative p-3 md:p-4">
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-sm vt tracking-widest phosphor-amber">ECHO SCOPE</h2>
-                <div class="text-[10px] opacity-60">RANGE: 00 SUBSTRATE • CANNON PUSH ACTIVE</div>
+            <div class="dialogue jen">
+                <div class="avatar">J</div>
+                <div><strong>Jen Barber – Relationship Manager</strong>Right, so it's like a pyramid, like in Egypt? I went there on holiday. Anyway, I told the team it needed a red door for accessibility. Moss said that's a "single point of failure". I said that's exactly what my last boyfriend was.</div>
             </div>
+
+            <h2><span>02</span>FENCES: 0, 1, 2, 4, 8 (Not a Lottery Ticket)</h2>
+            <p>We don't do linear security. That's for amateurs and the accounts department. We use exponential fences. Each fence is double the previous distance from the core, measured in trust-units.</p>
+            <ul>
+                <li><code>FENCE 0</code> – Inside the pyramid. You are the data. Congratulations.</li>
+                <li><code>FENCE 1</code> – Kernel ring. Moss lives here.</li>
+                <li><code>FENCE 2</code> – User space. Roy pretends to work here.</li>
+                <li><code>FENCE 4</code> – DMZ. Where we put printers to die.</li>
+                <li><code>FENCE 8</code> – The internet. Here be monsters and people who haven't tried turning it off and on again.</li>
+            </ul>
+            <p>No fence 3, 5, 6, or 7. They were deemed "inefficient" and "a bit needy".</p>
+
+            <div class="dialogue roy">
+                <div class="avatar">R</div>
+                <div><strong>Roy Trenneman – IT</strong>Look, it's binary, Jen. 0,1,2,4,8. No, you can't just "add a fence at 3 because it looks lonely". That's not how powers of two work. That's not how anything works. Have you tried turning your brain off and on again?</div>
+            </div>
+
+            <h2><span>03</span>GOD TUNNEL — The Infinite Loop That Isn't My Fault</h2>
+            <p>The God Tunnel is a privileged pathway that goes from FENCE 8 straight back to FENCE 0, but only if you have the correct phase. It's an infinite loop by design. It lets the system check itself forever without ever actually leaving the building. Like Moss on a Saturday night.</p>
+            <code>while(true) { validate(soul); }</code>
+            <p class="note">If you get stuck in the God Tunnel, do not panic. You are experiencing eternity. Please log a ticket.</p>
+
+            <h2><span>04</span>4 QUADS, 90 DEGREES, 1 CONTROL BIT (Moss Approved)</h2>
+            <p>Instead of storing four separate orientations, we store one quadrant and rotate it. One single control bit (the "spinny bit") tells the system which 90-degree rotation to apply. It's memory-efficient, elegant, and reduces Moss's stress levels by 12%.</p>
             
-            <div class="relative aspect-square max-w-[680px] mx-auto">
-                <canvas id="radar" class="w-full h-full rounded-full"></canvas>
-                
-                <!-- Center Egg -->
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                    <div class="relative w-14 h-[70px]">
-                        <div class="egg-outer absolute inset-0 rounded-[50%] border-2 border-[#00ff41]/90" style="box-shadow: 0 0 20px rgba(0,255,65,0.8), inset 0 0 15px rgba(0,255,65,0.3);"></div>
-                        <div class="egg-middle absolute inset-[18%] rounded-[50%] border border-[#00ff41]/70" style="box-shadow: 0 0 12px rgba(0,255,65,0.6);"></div>
-                        <div class="egg-core absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#00ff41] animate-pulse" style="box-shadow: 0 0 15px #00ff41, 0 0 30px #00ff41;"></div>
-                        <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] whitespace-nowrap opacity-70">NESTED EGG</div>
-                    </div>
+            <div class="quads-wrap">
+                <div class="quads" id="quads">
+                    <div class="quad">A</div><div class="quad">B</div>
+                    <div class="quad">D</div><div class="quad">C</div>
                 </div>
-
-                <!-- Corner readouts -->
-                <div class="absolute top-3 left-3 text-[10px] leading-tight opacity-70">
-                    <div>AZ: <span id="az-readout" class="phosphor">000°</span></div>
-                    <div>EL: 00.0°</div>
-                </div>
-                <div class="absolute top-3 right-3 text-[10px] leading-tight text-right opacity-70">
-                    <div>PULSE: <span id="pulse-count" class="phosphor-amber">0</span></div>
-                    <div>GAIN: <span id="gain-readout" class="phosphor">75%</span></div>
-                </div>
-                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 text-[9px] opacity-50 tracking-widest">0@# PROPAGATION • SPEED: 1.0 c₀</div>
+                <p style="font-family:monospace; margin-top:8px; font-size:12px;">CONTROL BIT: <span id="controlBit" style="color:var(--green)">0</span> | ANGLE: <span id="angleOut">0°</span></p>
+                <button class="btn" id="rotateBtn" style="max-width:200px; margin-top:8px;">ROTATE 90°</button>
             </div>
-        </section>
 
-        <!-- RIGHT PANEL -->
-        <section class="xl:col-span-3 xl:order-3 order-3 panel relative p-4">
-            <h2 class="text-sm vt tracking-widest border-b border-[#00ff41]/30 pb-2 mb-3 phosphor-amber">ECHO LOG</h2>
-            <div id="log" class="h-[320px] md:h-[420px] overflow-y-auto pr-2 space-y-2 font-mono text-[11px] leading-snug"></div>
-            <div class="mt-3 pt-2 border-t border-[#00ff41]/20 text-[9px] opacity-50">
-                Listening on 1 core, 8 rings, 5 arity
+            <div class="dialogue moss">
+                <div class="avatar">M</div>
+                <div><strong>Maurice Moss – Senior IT</strong>I came here to drink milk and kick ass at efficient data structures, and I've just finished my milk. Observe: four quads, one bit. It's beautiful. Like a four-dimensional Rubik's cube, but useful, and it doesn't have stickers that peel off.</div>
             </div>
-        </section>
+
+            <h2><span>05</span>SHADOW REGISTER (Yes, It's Actually His)</h2>
+            <p>The Shadow Register is a perfect, silent copy of the main register. It follows it everywhere, learns its secrets, and takes over if the main one has a lie-down. Moss insisted we call it "Shadow" because "Backup Register" sounded too mainstream.</p>
+            <p>It lives at <code>0xSH4D0W</code>. Do not address it directly. It gets shy.</p>
+
+            <h2><span>06</span>PHASE REGISTER (Don't Forget It)</h2>
+            <p>This 8-bit register stores where we are in the plasmatonic cycle. Forget to update it and the whole pyramid desynchronises and starts humming in B-flat. Last time that happened, Richmond cried.</p>
+            
+            <div class="dialogue jen">
+                <div class="avatar">J</div>
+                <div><strong>Jen</strong>I don't actually know what the Phase Register does, but Moss wrote "DO NOT FORGET PHASE REGISTER" on my hand in permanent marker. So I put it in my calendar. It's right after "lunch with clients".</div>
+            </div>
+
+            <h2><span>07</span>HAMILTON STEPS 27 & 28 — The Hammy Bit</h2>
+            <p>Steps 1 through 26 are initialisation, handshaking, and making tea. The actual work happens in Hamilton Steps 27 and 28. This is where we apply the quaternion rotation that keeps the pyramid stable in 4D space.</p>
+            <pre>STEP 27: q' = q * (0 + i + j + k) / sqrt(4)   // stir
+STEP 28: q'' = normalize(q')                 // settle</pre>
+            <p>Moss calls this "the Hamilton boogie". Roy calls it "why the server is slow on Tuesdays".</p>
+
+            <h2><span>08</span>PLASMATONIC MODE — 24.5 Times Because 25 Was Too Mainstream</h2>
+            <p>To fully charge the fortress, the system must complete 24.5 plasmatonic cycles. Not 24. Not 25. Twenty-four and a half.</p>
+            <p>Why .5? Because at exactly 25 cycles, the system achieves harmonic resonance and starts broadcasting Countdown on all monitors. Denholm made us stop after the third time. The half-cycle deliberately detunes it. It's the engineering equivalent of being deliberately annoying to avoid being dangerously perfect.</p>
+            <p>Current cycle progress is tracked live. Obviously.</p>
+
+            <div class="note"><strong>Footnote [1]:</strong> Plasmatonic is not a real word. Moss made it up to win an argument with Roy. <br><strong>Footnote [2]:</strong> If you see Richmond near the moat, do not make eye contact. Offer him a biscuit and walk away slowly.</div>
+
+            <div class="footnotes">
+                <p>Document amended per Reynholm Industries policy 7B: "All critical systems must sound impressive at board meetings."</p>
+            </div>
+
+            <div class="footer-pow">Proof of Work Status: <span style="color:var(--amber)">COMPLETE</span> (after 24.5 plasmatonic cycles, obviously)</div>
+        </div>
     </main>
 
-    <!-- CONTROLS -->
-    <footer class="panel relative p-3 md:p-4 mt-3 md:mt-4">
-        <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div class="flex flex-wrap items-center gap-2 md:gap-3">
-                <button id="tune-btn" class="btn px-4 py-2 text-sm vt tracking-wide">
-                    <span class="phosphor-amber">◉</span> TUNE TO 000
-                </button>
-                <button id="scan-btn" class="btn px-4 py-2 text-sm vt tracking-wide">
-                    SCAN <span id="scan-seq" class="phosphor">0-1</span>
-                </button>
-                <button id="ping-btn" class="btn px-3 py-2 text-xs">
-                    MANUAL PING
-                </button>
-                <div class="flex items-center gap-2 ml-2">
-                    <span class="text-[10px] opacity-70">GAIN</span>
-                    <input id="gain" type="range" min="20" max="100" value="75" class="w-24 md:w-32">
-                    <span id="gain-value" class="text-[10px] w-8">75%</span>
-                </div>
-            </div>
-            <div class="text-[10px] opacity-60 hidden md:block">
-                cannon push echo detection active • substrate coherence nominal
+    <aside class="side">
+        <div class="card">
+            <h3><span class="status-dot"></span> Emergency Procedures</h3>
+            <ol style="padding-left:18px; margin:8px 0; font-size:13px;">
+                <li>System on fire? <strong>Have you tried turning it off and on again?</strong></li>
+                <li>God Tunnel looping? Unplug Moss's milk fridge for 10s.</li>
+                <li>Shadow Register talking back? That's normal. Mostly.</li>
+                <li>Jen asks a technical question? Redirect to Roy.</li>
+            </ol>
+            <button class="btn" id="resetBtn">Have you tried turning it off and on again?</button>
+            <div style="display:flex; justify-content:space-between; margin-top:10px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted)">
+                <span>Failures: <span id="failCount" style="color:var(--red)">431</span></span>
+                <span>Reboots: <span id="offOnCount" style="color:var(--green)">0</span></span>
             </div>
         </div>
-    </footer>
+
+        <div class="card">
+            <h3>Live System Telemetry</h3>
+            <div class="terminal" id="terminal">
+                <div id="term-log">
+                    <div class="line">> boot pyramid_v3.14...</div>
+                    <div class="line">> moat_depth = OPTIMAL</div>
+                    <div class="line">> fences [0,1,2,4,8] = ONLINE</div>
+                </div>
+            <div style="margin-top:8px; font-size:12px; font-family:'IBM Plex Mono'">
+                Plasmatonic: <span id="plasmaCount" style="color:var(--green)">24.5</span>/24.5
+                <br>Phase Register: <span id="phaseVal" style="color:var(--amber)">0x1C</span>
+                <br>Shadow: <span style="color:var(--blue)">MIRRORING</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Basement Status</h3>
+            <p style="margin:0; font-size:13px; color:var(--muted)">Lights: <span style="color:var(--amber)">Flickering</span><br>
+            Temperature: <span style="color:var(--blue)">Cold</span> (as usual)<br>
+            Richmond: <span style="color:var(--red)">Present</span></p>
+        </div>
+    </aside>
 </div>
 
 <script>
-(() => {
-    // Elements
-    const radar = document.getElementById('radar');
-    const rctx = radar.getContext('2d');
-    const wave = document.getElementById('waveform');
-    const wctx = wave.getContext('2d');
-    const detectedEl = document.getElementById('detected-freq');
-    const deltaEl = document.getElementById('delta-f');
-    const dopplerLabel = document.getElementById('doppler-label');
-    const logEl = document.getElementById('log');
-    const azReadout = document.getElementById('az-readout');
-    const pulseCountEl = document.getElementById('pulse-count');
-    const gainReadout = document.getElementById('gain-readout');
-    const gainSlider = document.getElementById('gain');
-    const gainValue = document.getElementById('gain-value');
-    const scanSeqEl = document.getElementById('scan-seq');
+    // Ticker
+    const ticker = document.getElementById('ticker');
+    let tickerPos = 0;
+    setInterval(()=>{
+        ticker.scrollLeft = tickerPos++ % 500;
+    }, 80);
 
-    // State
-    const state = {
-        sweep: 0,
-        rings: [],
-        inRings: [],
-        blips: [],
-        pulseCount: 0,
-        baseFreq: 27.0,
-        detected: 27.0,
-        doppler: 0,
-        gain: 0.75,
-        scanIdx: 0,
-        sequences: ['0-1','1-2','2-3','3-4','4-5','5-6','6-7','7-8','8-0'],
-        wavePhase: 0,
-        lastEcho: 0
-    };
+    // Emergency button
+    let failCount = 431;
+    let rebootCount = 0;
+    const failEl = document.getElementById('failCount');
+    const rebootEl = document.getElementById('offOnCount');
+    const docBody = document.getElementById('docBody');
+    document.getElementById('resetBtn').addEventListener('click', ()=>{
+        failCount = 0;
+        rebootCount++;
+        failEl.textContent = '0';
+        rebootEl.textContent = rebootCount;
+        docBody.classList.add('reboot');
+        addLog('> USER INITIATED REBOOT SEQUENCE...', true);
+        setTimeout(()=>{ addLog('> Have you tried turning it off and on again? YES.'); addLog('> System restored. Roy is annoyed.'); docBody.classList.remove('reboot'); }, 1200);
+    });
 
-    // Resize canvases
-    function resize() {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        [radar, wave].forEach(c => {
-            const rect = c.getBoundingClientRect();
-            c.width = rect.width * dpr;
-            c.height = rect.height * dpr;
-            c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
-        });
-    }
-    window.addEventListener('resize', resize);
-    resize();
+    // Quads rotation
+    let angle = 0;
+    const quads = document.getElementById('quads');
+    const angleOut = document.getElementById('angleOut');
+    const controlBit = document.getElementById('controlBit');
+    document.getElementById('rotateBtn').addEventListener('click', ()=>{
+        angle = (angle + 90) % 360;
+        quads.style.transform = `rotate(${angle}deg)`;
+        angleOut.textContent = angle + '°';
+        controlBit.textContent = (angle/90) % 2;
+        addLog(`> Quad rotation: ${angle}° (control=${controlBit.textContent})`);
+    });
 
-    // Logging
-    function log(msg, type = 'info') {
-        const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+    // Terminal logs
+    const logEl = document.getElementById('term-log');
+    const messages = [
+        '> God Tunnel ping: ∞ms',
+        '> Fence 4: printer jam detected (ignored)',
+        '> Shadow Register yawned',
+        '> Phase Register tick',
+        '> Hamilton Step 27 complete',
+        '> Hamilton Step 28 complete',
+        '> Moss refilled milk',
+        '> Jen asked about "the internet box"',
+        '> Roy sighed audibly'
+    ];
+    function addLog(msg, important=false){
         const div = document.createElement('div');
-        div.className = 'log-entry';
-        let color = 'text-[#00ff41]/90';
-        let prefix = '•';
-        if (type === 'echo') { color = 'phosphor'; prefix = '◉'; div.style.borderLeftColor = '#00ff41'; }
-        if (type === 'doppler') { prefix = '↕'; }
-        if (type === 'blue') { color = 'phosphor-blue'; div.style.borderLeftColor = '#00b8ff'; }
-        if (type === 'red') { color = 'phosphor-red'; div.style.borderLeftColor = '#ff3b3b'; }
-        if (type === 'amber') { color = 'phosphor-amber'; }
-        
-        div.innerHTML = `<span class="opacity-50">${time}</span> <span class="${color}">${prefix} ${msg}</span>`;
-        logEl.prepend(div);
-        while (logEl.children.length > 40) logEl.removeChild(logEl.lastChild);
+        div.className = 'line';
+        div.textContent = msg;
+        if(important) div.style.color = '#ffb000';
+        logEl.appendChild(div);
+        if(logEl.children.length > 12) logEl.removeChild(logEl.firstChild);
+        logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
     }
-
-    function lightArity() {
-        document.querySelectorAll('.arity-char').forEach((el, i) => {
-            setTimeout(() => {
-                el.classList.add('active');
-                setTimeout(() => el.classList.remove('active'), 600);
-            }, i * 90);
-        });
-    }
-
-    function updateFreq(doppler) {
-        state.doppler = doppler;
-        state.detected = state.baseFreq + doppler;
-        detectedEl.textContent = state.detected.toFixed(3);
-        const sign = doppler >= 0 ? '+' : '';
-        deltaEl.textContent = sign + doppler.toFixed(3);
-        deltaEl.className = 'text-xl vt ' + (doppler > 0.1 ? 'phosphor-blue' : doppler < -0.1 ? 'phosphor-red' : 'phosphor');
-        dopplerLabel.textContent = doppler > 0.1 ? 'APPROACHING' : doppler < -0.1 ? 'RECEDING' : 'STATIONARY';
-        dopplerLabel.className = 'text-[11px] mt-1 h-4 ' + (doppler > 0.1 ? 'phosphor-blue' : doppler < -0.1 ? 'phosphor-red' : 'opacity-70');
-    }
-
-    // Radar drawing
-    function drawRadar() {
-        const w = radar.clientWidth;
-        const h = radar.clientHeight;
-        const cx = w / 2;
-        const cy = h / 2;
-        const maxR = Math.min(w, h) * 0.44;
-
-        rctx.clearRect(0, 0, w, h);
-
-        // Background glow
-        const bgGrad = rctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 1.1);
-        bgGrad.addColorStop(0, 'rgba(0, 40, 10, 0.15)');
-        bgGrad.addColorStop(0.7, 'rgba(0, 20, 5, 0.05)');
-        bgGrad.addColorStop(1, 'rgba(0,0,0,0)');
-        rctx.fillStyle = bgGrad;
-        rctx.beginPath();
-        rctx.arc(cx, cy, maxR * 1.1, 0, Math.PI * 2);
-        rctx.fill();
-
-        // Grid circles
-        rctx.strokeStyle = 'rgba(0, 255, 65, 0.12)';
-        rctx.lineWidth = 1;
-        for (let i = 1; i <= 4; i++) {
-            rctx.beginPath();
-            rctx.arc(cx, cy, (maxR / 4) * i, 0, Math.PI * 2);
-            rctx.stroke();
+    setInterval(()=>{
+        addLog(messages[Math.floor(Math.random()*messages.length)]);
+        // simulate failures creeping up
+        if(Math.random() < 0.3 && failCount < 500){
+            failCount++;
+            failEl.textContent = failCount;
         }
-        // Crosshairs
-        rctx.strokeStyle = 'rgba(0, 255, 65, 0.15)';
-        rctx.beginPath();
-        rctx.moveTo(cx - maxR, cy); rctx.lineTo(cx + maxR, cy);
-        rctx.moveTo(cx, cy - maxR); rctx.lineTo(cx, cy + maxR);
-        rctx.stroke();
+    }, 2400);
 
-        // Range marks
-        rctx.fillStyle = 'rgba(0,255,65,0.4)';
-        rctx.font = '9px "Share Tech Mono"';
-        for (let i = 1; i <= 4; i++) {
-            rctx.fillText(`${i * 25}`, cx + (maxR / 4) * i + 2, cy - 3);
-        }
-
-        // Outgoing rings
-        state.rings = state.rings.filter(r => {
-            r.radius += r.speed;
-            const alpha = 1 - (r.radius / maxR);
-            if (alpha <= 0) return false;
-            rctx.strokeStyle = `rgba(0, 255, 65, ${alpha * 0.7 * state.gain})`;
-            rctx.lineWidth = 2;
-            rctx.shadowBlur = 10;
-            rctx.shadowColor = '#00ff41';
-            rctx.beginPath();
-            rctx.arc(cx, cy, r.radius, 0, Math.PI * 2);
-            rctx.stroke();
-            rctx.shadowBlur = 0;
-            return r.radius < maxR * 1.1;
-        });
-
-        // Incoming rings
-        state.inRings = state.inRings.filter(r => {
-            r.radius -= r.speed;
-            const alpha = r.radius / maxR;
-            if (r.radius <= 5) return false;
-            rctx.strokeStyle = `rgba(${r.color}, ${alpha * 0.8})`;
-            rctx.lineWidth = 2;
-            rctx.shadowBlur = 12;
-            rctx.shadowColor = `rgb(${r.color})`;
-            rctx.beginPath();
-            rctx.arc(cx, cy, r.radius, 0, Math.PI * 2);
-            rctx.stroke();
-            rctx.shadowBlur = 0;
-            return true;
-        });
-
-        // Blips
-        const now = performance.now();
-        state.blips = state.blips.filter(b => {
-            const age = (now - b.t) / 1000;
-            if (age > 6) return false;
-            const x = cx + Math.cos(b.a) * b.d * maxR;
-            const y = cy + Math.sin(b.a) * b.d * maxR;
-            const intensity = Math.max(0, 1 - age / 6);
-            
-            // Glow
-            rctx.shadowBlur = 20 * intensity * state.gain;
-            rctx.shadowColor = b.color;
-            rctx.fillStyle = b.color;
-            rctx.globalAlpha = intensity * 0.9;
-            rctx.beginPath();
-            rctx.arc(x, y, 3 + 2 * state.gain, 0, Math.PI * 2);
-            rctx.fill();
-            
-            // Core
-            rctx.shadowBlur = 5;
-            rctx.globalAlpha = intensity;
-            rctx.beginPath();
-            rctx.arc(x, y, 1.5, 0, Math.PI * 2);
-            rctx.fill();
-            rctx.shadowBlur = 0;
-            rctx.globalAlpha = 1;
-
-            // Doppler trail
-            if (Math.abs(b.dop) > 0.5) {
-                rctx.strokeStyle = b.color;
-                rctx.globalAlpha = intensity * 0.5;
-                rctx.lineWidth = 1;
-                rctx.beginPath();
-                const trailLen = 15 * Math.min(1, Math.abs(b.dop) / 3);
-                const tx = x - Math.cos(b.a) * trailLen * (b.dop > 0 ? 1 : -1);
-                const ty = y - Math.sin(b.a) * trailLen * (b.dop > 0 ? 1 : -1);
-                rctx.moveTo(x, y);
-                rctx.lineTo(tx, ty);
-                rctx.stroke();
-                rctx.globalAlpha = 1;
-            }
-            return true;
-        });
-
-        // Sweep
-        state.sweep += 0.018 + state.gain * 0.005;
-        azReadout.textContent = String(Math.floor((state.sweep * 180 / Math.PI) % 360)).padStart(3, '0') + '°';
-        
-        rctx.save();
-        rctx.translate(cx, cy);
-        rctx.rotate(state.sweep);
-        
-        // Sweep beam
-        const sweepGrad = rctx.createConicGradient(-0.2, 0, 0);
-        sweepGrad.addColorStop(0, 'rgba(0,255,65,0)');
-        sweepGrad.addColorStop(0.7, 'rgba(0,255,65,0.15)');
-        sweepGrad.addColorStop(1, 'rgba(0,255,65,0.4)');
-        rctx.fillStyle = sweepGrad;
-        rctx.beginPath();
-        rctx.moveTo(0, 0);
-        rctx.arc(0, 0, maxR, -0.2, 0.2);
-        rctx.closePath();
-        rctx.fill();
-        
-        // Sweep line
-        rctx.strokeStyle = '#00ff41';
-        rctx.lineWidth = 2;
-        rctx.shadowBlur = 15;
-        rctx.shadowColor = '#00ff41';
-        rctx.beginPath();
-        rctx.moveTo(0, 0);
-        rctx.lineTo(maxR, 0);
-        rctx.stroke();
-        rctx.restore();
-    }
-
-    // Waveform
-    function drawWaveform() {
-        const w = wave.clientWidth;
-        const h = wave.clientHeight;
-        wctx.clearRect(0, 0, w, h);
-        
-        state.wavePhase += 0.08 + state.doppler * 0.015;
-        
-        // Grid
-        wctx.strokeStyle = 'rgba(0,255,65,0.08)';
-        wctx.lineWidth = 1;
-        for (let i = 0; i < 4; i++) {
-            const y = (h / 4) * i;
-            wctx.beginPath(); wctx.moveTo(0, y); wctx.lineTo(w, y); wctx.stroke();
-        }
-        
-        // 5-arity markers
-        const arityX = [0.1, 0.3, 0.5, 0.7, 0.9];
-        wctx.fillStyle = 'rgba(0,255,65,0.3)';
-        arityX.forEach(x => {
-            wctx.fillRect(x * w - 0.5, 0, 1, h);
-        });
-        
-        // Wave
-        wctx.strokeStyle = '#00ff41';
-        wctx.lineWidth = 2;
-        wctx.shadowBlur = 8;
-        wctx.shadowColor = '#00ff41';
-        wctx.beginPath();
-        for (let x = 0; x < w; x++) {
-            const t = (x / w) * Math.PI * 4 + state.wavePhase;
-            // 5-arity shape: combination for 0@# pattern
-            const y = h/2 + Math.sin(t) * 15 + Math.sin(t*2.3) * 8 + Math.sin(t*5) * 3;
-            if (x === 0) wctx.moveTo(x, y); else wctx.lineTo(x, y);
-        }
-        wctx.stroke();
-        wctx.shadowBlur = 0;
-        
-        // Frequency label
-        wctx.fillStyle = 'rgba(0,255,65,0.6)';
-        wctx.font = '10px "Share Tech Mono"';
-        wctx.fillText('0  @  #  0  0', 8, 14);
-    }
-
-    // Fire pulse
-    function firePulse() {
-        state.rings.push({ radius: 0, speed: 2.8 });
-        state.pulseCount++;
-        pulseCountEl.textContent = state.pulseCount;
-    }
-
-    // Spawn echo
-    function spawnEcho() {
-        const doppler = (Math.random() - 0.5) * 7; // -3.5 to +3.5
-        const approaching = doppler > 0.15;
-        const receding = doppler < -0.15;
-        const angle = Math.random() * Math.PI * 2;
-        const dist = 0.55 + Math.random() * 0.4;
-        const color = approaching ? '#00b8ff' : receding ? '#ff3b3b' : '#00ff41';
-        const rgb = approaching ? '0,184,255' : receding ? '255,59,59' : '0,255,65';
-
-        updateFreq(doppler);
-        lightArity();
-
-        // Add blip
-        state.blips.push({ a: angle, d: dist, t: performance.now(), color, dop: doppler });
-        
-        // Incoming ring
-        const maxR = Math.min(radar.clientWidth, radar.clientHeight) * 0.44;
-        state.inRings.push({ radius: maxR, speed: 3.2, color: rgb });
-
-        // Log
-        const sigs = ['8*)8*(', '0@#1', '00=1', '27=0=(1)', '1-core'];
-        const sig = sigs[Math.floor(Math.random() * sigs.length)];
-        const distKu = (dist * 4.2 + Math.random() * 0.8).toFixed(2);
-        
-        log(`ECHO DETECTED: 0@# return`, 'echo');
-        log(`DOPPLER: ${doppler >= 0 ? '+' : ''}${doppler.toFixed(1)}Hz (${approaching ? 'approaching' : receding ? 'receding' : 'static'})`, approaching ? 'blue' : receding ? 'red' : 'doppler');
-        log(`SOURCE: ${sig} signature • ${distKu} ku`, 'amber');
-        
-        state.lastEcho = performance.now();
-    }
-
-    // Animation loop
-    function animate() {
-        drawRadar();
-        drawWaveform();
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    // Auto sequence
-    function autoCycle() {
-        firePulse();
-        setTimeout(() => {
-            if (Math.random() > 0.15) spawnEcho();
-        }, 1300 + Math.random() * 600);
-        const next = 3800 + Math.random() * 3200;
-        setTimeout(autoCycle, next);
-    }
-    setTimeout(autoCycle, 1500);
-
-    // Controls
-    document.getElementById('tune-btn').onclick = () => {
-        updateFreq(0);
-        state.baseFreq = 27.0;
-        log('MANUAL TUNE: LOCKED TO 000 NESTED ZERO', 'amber');
-        log('PHASE LOCK ACQUIRED • 27.000 Hz', 'echo');
-        lightArity();
-        firePulse();
-    };
-
-    document.getElementById('scan-btn').onclick = () => {
-        state.scanIdx = (state.scanIdx + 1) % state.sequences.length;
-        const seq = state.sequences[state.scanIdx];
-        scanSeqEl.textContent = seq;
-        state.baseFreq = 27.0 + (state.scanIdx - 4) * 0.07;
-        log(`SCANNING SEQUENCE: ${seq}`, 'amber');
-        firePulse();
-    };
-
-    document.getElementById('ping-btn').onclick = () => {
-        firePulse();
-        log('MANUAL PING: cannon push emitted', 'doppler');
-        setTimeout(() => { if (Math.random() > 0.3) spawnEcho(); }, 1200);
-    };
-
-    gainSlider.oninput = (e) => {
-        state.gain = e.target.value / 100;
-        gainValue.textContent = e.target.value + '%';
-        gainReadout.textContent = e.target.value + '%';
-    };
-
-    // Initial logs
-    log('SYSTEM INIT: 00 SUBSTRATE ONLINE', 'amber');
-    log('CANNON PUSH ECHO DETECTION ACTIVE', 'amber');
-    log('CALIBRATING TO 27.000 Hz (27=0=(1))', 'doppler');
-    setTimeout(() => log('LISTENING POST 00 • 1 CORE, 8 RINGS, 5 ARITY', 'amber'), 800);
-    setTimeout(() => log('AWAITING FIRST ECHO RETURN...', 'doppler'), 1500);
-
-    // Idle drift
-    setInterval(() => {
-        if (performance.now() - state.lastEcho > 8000) {
-            const drift = (Math.random() - 0.5) * 0.04;
-            updateFreq(state.doppler * 0.97 + drift);
-        }
-    }, 300);
-})();
+    // Plasmatonic cycle simulation
+    let plasma = 24.5;
+    const plasmaEl = document.getElementById('plasmaCount');
+    const phaseEl = document.getElementById('phaseVal');
+    setInterval(()=>{
+        plasma = (plasma + 0.1) % 24.6;
+        if(plasma >= 24.5) plasma = 0;
+        plasmaEl.textContent = plasma.toFixed(1);
+        const phase = Math.floor((plasma/24.5)*255).toString(16).toUpperCase().padStart(2,'0');
+        phaseEl.textContent = '0x' + phase;
+    }, 800);
 </script>
 </body>
 </html>
