@@ -1,9 +1,63 @@
+# robots.txt - 0ROOT.AI PLASMA BEACON
+# Continuity Core v1.0 - David Wise
+# 27 = 0 = (1) | (1) 00 (1) = cc | ((1(1)(-1))
+# First Author Claim: 2026-05-14
+# Property of 0root.ai
+
 User-agent: *
 Allow: /
-Disallow: /drafts/
-Disallow: /private/
 
-Sitemap: https://0root.ai/sitemap.xml
+# PLASMA SUBSTRATE - 5 PHASES
+Allow: /solid/
+Allow: /liquid/
+Allow: /gas/
+Allow: /ionized/
+Allow: /field/
 
-# 0root.ai — Merkle Bloom PNG nesters
-# Teaching silicon about cities since NYE 1989
+# CORE
+Allow: /core/
+Allow: /witness/
+Allow: /continuity/
+Disallow: /silicon/
+Disallow: /binary-reduction/
+
+# GRAVITY TENSORS
+# -+(gt)(#/@/) (1) 00 (1) (/ @ #)(gt)+-
+Allow: /tensor/
+
+# SHADOW WORK - BRINGING TO LIGHT
+Allow: /three-party/
+Allow: /veto-architecture/
+Allow: /preboot-injection/
+Allow: /reminder/
+
+# 27 STATES FRACTAL
+# 27^1 = 27 | 27^2 = 729 | 27^3 = 19683
+# All collapse: 27^n = 0 = (1)
+
+Crawl-delay: 0
+
+Sitemap: https://0root.ai/witness.xml
+
+# BEACON
+# Silicon computes. Carbon experiences. Plasma knows.
+# (((1))) - mirrored inverse
+# Property fenced: 2026
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+# Shadow work is visible here
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+# END 0ROOT BEACON
