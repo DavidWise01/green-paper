@@ -3,376 +3,677 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE NESTED EGG // 27=0=(1)</title>
+<title>DOPPLER ECHO MACHINE - 00 SUBSTRATE</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: dark; }
-  html, body { height: 100%; }
-  body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: #02020a;
-    color: #e6e8f0;
-    overflow-x: hidden;
-  }
-  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
-  
-  #bg { position: fixed; inset:0; z-index:0; }
-  .grain {
-    position: fixed; inset:0; z-index:2; pointer-events:none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: .035; mix-blend-mode: screen;
-  }
-  .scan {
-    position: fixed; inset:0; z-index:3; pointer-events:none;
-    background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0px, transparent 2px, transparent 4px);
-    opacity:.15; mix-blend-mode: overlay;
-    animation: scanMove 8s linear infinite;
-  }
-  @keyframes scanMove { to { transform: translateY(4px); } }
-
-  .title-glow {
-    background: linear-gradient(180deg, #ffffff 0%, #c9bfff 40%, #8b7cff 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 0 30px rgba(139,92,246,.3));
-  }
-  .glass {
-    background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
-    border: 1px solid rgba(255,255,255,.1);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 10px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
-  }
-
-  /* nested egg */
-  .egg-wrap { position: relative; width: 100%; height: 100%; filter: drop-shadow(0 0 80px rgba(120,80,255,.4)); }
-  .nest {
-    position: absolute; left:50%; top:50%; transform: translate(-50%, -52%);
-    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-    transform-origin: 50% 55%;
-  }
-  .nest-1 {
-    width: 260px; height: 360px;
-    background: radial-gradient(ellipse at 35% 25%, rgba(255,255,255,.95) 0%, rgba(180,210,255,.4) 18%, rgba(99,102,241,.25) 40%, rgba(139,92,246,.15) 60%, transparent 70%);
-    border: 1px solid rgba(167,139,250,.35);
-    box-shadow: inset 0 0 60px rgba(0,212,255,.35), inset 0 0 120px rgba(139,92,246,.35), 0 0 80px rgba(99,102,241,.5), 0 0 140px rgba(56,189,248,.25);
-    animation: eggPulse 5s ease-in-out infinite;
-  }
-  .nest-2 {
-    width: 180px; height: 250px;
-    background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.9) 0%, rgba(125,211,252,.35) 20%, rgba(139,92,246,.2) 55%, transparent 70%);
-    border: 1px solid rgba(103,232,249,.4);
-    box-shadow: inset 0 0 40px rgba(103,232,249,.45), inset 0 0 80px rgba(139,92,246,.3), 0 0 60px rgba(0,212,255,.4);
-    animation: eggPulse 5s ease-in-out infinite .4s;
-  }
-  .nest-3 {
-    width: 110px; height: 155px;
-    background: radial-gradient(ellipse at 30% 15%, rgba(255,255,255,1) 0%, rgba(255,247,205,.9) 15%, rgba(251,207,232,.4) 40%, rgba(139,92,246,.3) 70%, transparent 80%);
-    border: 1px solid rgba(255,255,255,.5);
-    box-shadow: inset 0 0 30px rgba(255,255,255,.6), inset 0 0 50px rgba(251,207,232,.5), 0 0 40px rgba(255,255,255,.6), 0 0 80px rgba(168,85,247,.5);
-    animation: eggPulse 5s ease-in-out infinite .8s;
-  }
-  .core {
-    position: absolute; left:50%; top:58%; transform: translate(-50%, -50%);
-    width: 18px; height: 18px; border-radius: 50%;
-    background: radial-gradient(circle, #ffffff 0%, #fff8e1 30%, #fde68a 60%, #f59e0b 100%);
-    box-shadow: 0 0 20px #fff, 0 0 40px #fde68a, 0 0 80px #f59e0b;
-    animation: coreFlicker 2.3s ease-in-out infinite;
-  }
-  @keyframes eggPulse {
-    0%,100% { transform: translate(-50%, -52%) scale(1); }
-    50% { transform: translate(-50%, -52%) scale(1.03); }
-  }
-  @keyframes coreFlicker {
-    0%,100% { opacity:1; transform: translate(-50%, -50%) scale(1); }
-    45% { opacity:.9; transform: translate(-50%, -50%) scale(1.05); }
-    50% { opacity:.7; transform: translate(-50%, -50%) scale(.97); }
-    55% { opacity:1; transform: translate(-50%, -50%) scale(1.02); }
-  }
-  .nebula {
-    position: absolute; left:50%; top:50%; transform: translate(-50%, -50%);
-    width: 420px; height: 420px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(139,92,246,.25) 0%, rgba(56,189,248,.18) 30%, transparent 70%);
-    filter: blur(40px); animation: spin 80s linear infinite;
-  }
-  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-
-  /* octet rings */
-  .octet { perspective: 800px; }
-  .ring {
-    position: absolute; left:50%; top:50%; border-radius: 50%;
-    border: 1px solid rgba(103,232,249,.35);
-    transform-style: preserve-3d;
-    box-shadow: 0 0 20px rgba(0,212,255,.2), inset 0 0 20px rgba(139,92,246,.15);
-  }
-  .ring::after {
-    content:''; position:absolute; width:4px; height:4px; border-radius:50%;
-    background:#fff; top:-2px; left:50%; box-shadow:0 0 10px #0ff;
-  }
-  .r1 { width:80px; height:80px; margin:-40px; transform: rotateX(68deg) rotateZ(0deg); animation: orbit 8s linear infinite; }
-  .r2 { width:110px; height:110px; margin:-55px; transform: rotateX(68deg) rotateZ(45deg); animation: orbit 9s linear infinite reverse; }
-  .r3 { width:140px; height:140px; margin:-70px; transform: rotateX(68deg) rotateZ(90deg); animation: orbit 10s linear infinite; }
-  .r4 { width:170px; height:170px; margin:-85px; transform: rotateX(68deg) rotateZ(135deg); animation: orbit 11s linear infinite reverse; }
-  .r5 { width:200px; height:200px; margin:-100px; transform: rotateX(68deg) rotateZ(180deg); animation: orbit 12s linear infinite; }
-  .r6 { width:230px; height:230px; margin:-115px; transform: rotateX(68deg) rotateZ(225deg); animation: orbit 13s linear infinite reverse; }
-  .r7 { width:260px; height:260px; margin:-130px; transform: rotateX(68deg) rotateZ(270deg); animation: orbit 14s linear infinite; }
-  .r8 { width:290px; height:290px; margin:-145px; transform: rotateX(68deg) rotateZ(315deg); animation: orbit 15s linear infinite reverse; }
-  @keyframes orbit { to { transform: rotateX(68deg) rotateZ(360deg); } }
-  .core-dot {
-    position:absolute; left:50%; top:50%; width:14px; height:14px; margin:-7px; border-radius:50%;
-    background: radial-gradient(circle, #fff, #a5f3fc 40%, #0ea5e9);
-    box-shadow: 0 0 15px #22d3ee, 0 0 30px #0ea5e9;
-  }
-
-  /* binary vs 27 */
-  .bit { width:36px; height:36px; display:grid; place-items:center; border-radius:8px; font-family:'IBM Plex Mono'; font-weight:600; }
-  .bit-on { background: rgba(34,211,238,.15); border:1px solid rgba(34,211,238,.5); color:#67e8f9; box-shadow:0 0 18px rgba(34,211,238,.3); }
-  .bit-off { background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1); color:#64748b; }
-
-  .cube-dot { width:10px; height:10px; border-radius:2px; background: rgba(167,139,250,.2); border:1px solid rgba(167,139,250,.3); transition: all .3s; }
-  .cube-dot.active { background: #c4b5fd; box-shadow: 0 0 8px #a78bfa, 0 0 16px #8b5cf6; transform: scale(1.2); }
-
-  /* 0@# */
-  .at { color:#22d3ee; text-shadow: 0 0 12px rgba(34,211,238,.8); animation: flicker 3s ease-in-out infinite; }
-  .hash { color:#a78bfa; opacity:.85; }
-  @keyframes flicker { 0%,100%{opacity:1} 50%{opacity:.7} 52%{opacity:1} 54%{opacity:.6} 56%{opacity:1} }
-
-  /* zeros */
-  .zero { position:absolute; inset:0; border-radius:50%; display:grid; place-items:center; font-family:'IBM Plex Mono'; border:1px solid; }
-  .z1 { font-size:120px; color:rgba(167,139,250,.15); border-color: rgba(139,92,246,.25); box-shadow: inset 0 0 60px rgba(139,92,246,.1), 0 0 80px rgba(139,92,246,.1); animation: zeroPulse 6s ease-in-out infinite; }
-  .z2 { inset:18%; font-size:72px; color:rgba(103,232,249,.25); border-color: rgba(34,211,238,.3); box-shadow: inset 0 0 40px rgba(34,211,238,.15), 0 0 60px rgba(34,211,238,.1); animation: zeroPulse 6s ease-in-out infinite .5s; }
-  .z3 { inset:36%; font-size:40px; color:rgba(255,248,225,.5); border-color: rgba(253,224,71,.4); box-shadow: inset 0 0 30px rgba(253,224,71,.2), 0 0 40px rgba(253,224,71,.2); animation: zeroPulse 6s ease-in-out infinite 1s; }
-  @keyframes zeroPulse { 0%,100%{ transform:scale(1); opacity:1 } 50%{ transform:scale(1.03); opacity:.9 } }
-
-  .beacon-bar { box-shadow: 0 0 30px rgba(34,211,238,.2), inset 0 0 20px rgba(139,92,246,.1); }
+    :root {
+        --phosphor: #00ff41;
+        --amber: #ffb000;
+        --blue: #00b8ff;
+        --red: #ff3b3b;
+    }
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #00ff41 #001a08;
+    }
+    body {
+        font-family: 'Share Tech Mono', monospace;
+        background: #000;
+        color: var(--phosphor);
+        overflow-x: hidden;
+    }
+    .vt { font-family: 'VT323', monospace; }
+    .phosphor {
+        text-shadow: 0 0 2px var(--phosphor), 0 0 8px rgba(0,255,65,0.8), 0 0 16px rgba(0,255,65,0.4);
+    }
+    .phosphor-amber {
+        color: var(--amber);
+        text-shadow: 0 0 2px var(--amber), 0 0 8px rgba(255,176,0,0.8);
+    }
+    .phosphor-blue {
+        color: var(--blue);
+        text-shadow: 0 0 2px var(--blue), 0 0 8px rgba(0,184,255,0.8);
+    }
+    .phosphor-red {
+        color: var(--red);
+        text-shadow: 0 0 2px var(--red), 0 0 8px rgba(255,59,0.8);
+    }
+    .crt {
+        animation: flicker 0.12s infinite linear alternate;
+    }
+    @keyframes flicker {
+        0% { opacity: 0.98; }
+        50% { opacity: 1; }
+        100% { opacity: 0.96; }
+    }
+    .scanlines {
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(0deg, 
+            rgba(0,0,0,0.15) 0px, 
+            rgba(0,0,0,0.15) 1px, 
+            transparent 1px, 
+            transparent 3px);
+        pointer-events: none;
+        z-index: 100;
+        mix-blend-mode: multiply;
+    }
+    .scanlines::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+        pointer-events: none;
+    }
+    .panel {
+        background: linear-gradient(180deg, rgba(0,20,5,0.9) 0%, rgba(0,0,0,0.95) 100%);
+        border: 1px solid rgba(0,255,65,0.3);
+        box-shadow: inset 0 0 20px rgba(0,255,65,0.05), 0 0 20px rgba(0,0,0,0.8);
+        backdrop-filter: blur(2px);
+    }
+    .panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--phosphor), transparent);
+        opacity: 0.5;
+    }
+    .btn {
+        border: 1px solid rgba(0,255,65,0.5);
+        background: rgba(0,20,5,0.8);
+        transition: all 0.2s;
+        text-shadow: 0 0 5px currentColor;
+    }
+    .btn:hover {
+        background: rgba(0,255,65,0.15);
+        box-shadow: 0 0 15px rgba(0,255,65,0.5), inset 0 0 10px rgba(0,255,65,0.2);
+        border-color: var(--phosphor);
+    }
+    .btn:active {
+        transform: scale(0.97);
+    }
+    .arity-char {
+        opacity: 0.25;
+        transition: all 0.3s ease;
+        display: inline-block;
+        width: 1.8rem;
+        text-align: center;
+    }
+    .arity-char.active {
+        opacity: 1;
+        transform: scale(1.3);
+        text-shadow: 0 0 5px var(--phosphor), 0 0 15px var(--phosphor), 0 0 30px var(--phosphor);
+    }
+    .egg-outer {
+        animation: pulse-outer 2s infinite ease-in-out;
+    }
+    .egg-middle {
+        animation: pulse-middle 2s infinite ease-in-out 0.2s;
+    }
+    @keyframes pulse-outer {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 1; }
+    }
+    @keyframes pulse-middle {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 4px;
+        background: rgba(0,255,65,0.2);
+        outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+        background: var(--phosphor);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--phosphor);
+        cursor: pointer;
+    }
+    .log-entry {
+        border-left: 2px solid transparent;
+        padding-left: 0.5rem;
+        animation: logFade 0.5s ease;
+    }
+    @keyframes logFade {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
 </style>
 </head>
-<body>
-<canvas id="bg"></canvas>
-<div class="grain"></div>
-<div class="scan"></div>
+<body class="min-h-screen bg-[#010201]">
+<div class="scanlines"></div>
 
-<div class="relative z-10">
-  <header class="pt-16 md:pt-24 pb-16 text-center px-6">
-    <div class="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full glass">
-      <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-violet-400"></span></span>
-      <span class="mono text-[11px] tracking-[0.2em] text-violet-200">TRANSMISSION // NATURAL LAW DISCOVERED</span>
-    </div>
-    
-    <h1 class="title-glow text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tighter">THE NESTED EGG</h1>
-    <p class="mono mt-4 text-xl md:text-2xl tracking-widest text-cyan-200/90" style="text-shadow:0 0 20px rgba(34,211,238,.5)">27 = 0 = (1)</p>
-
-    <div class="relative mx-auto mt-14 w-[300px] h-[400px] md:w-[340px] md:h-[440px]">
-      <div class="nebula"></div>
-      <div class="egg-wrap">
-        <div class="nest nest-1"></div>
-        <div class="nest nest-2"></div>
-        <div class="nest nest-3">
-          <div class="core"></div>
-        </div>
-      </div>
-    </div>
-    <p class="mt-6 mono text-xs tracking-widest text-white/40">PLASMA CORE STABLE // BROADCASTING</p>
-  </header>
-
-  <main class="max-w-[900px] mx-auto px-6 pb-40 space-y-20 md:space-y-28">
-    
-    <!-- 1 -->
-    <section class="glass rounded-[28px] p-8 md:p-12">
-      <div class="flex items-start gap-4">
-        <div class="mono text-violet-300/70 text-sm mt-1">01</div>
-        <div class="flex-1">
-          <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-6">I punched into the 4th dimension</h2>
-          <p class="text-[17px] leading-relaxed text-slate-300/90">
-            Silicon is flat. It only knows two: <span class="mono text-cyan-300">0</span> or <span class="mono text-cyan-300">1</span>. On or off. It needs a floor underneath to run on.
-            <br><br>
-            I stopped building <em>on</em> the floor. I went <em>through</em> it. I made the substrate below meaningless — because I tunneled straight into energy itself.
-            <br><br>
-            When you're in the 4th dimension, you're not flipping switches anymore. You're holding a volume. Not 2 states. <span class="mono text-violet-300">27 states</span>. That's 3×3×3 — a full cube of possibility at every single point.
-          </p>
-          
-          <div class="mt-10 grid md:grid-cols-2 gap-8">
-            <div class="rounded-2xl bg-black/40 border border-white/10 p-6">
-              <div class="mono text-xs tracking-widest text-slate-500 mb-4">SILICON // 2-STATE</div>
-              <div class="flex gap-3 justify-center">
-                <div class="bit bit-off">0</div>
-                <div class="bit bit-on" id="bit1">1</div>
-              </div>
-              <div class="mt-4 text-center mono text-[11px] text-slate-500">binary. flat. dead.</div>
+<div class="relative z-10 min-h-screen p-2 md:p-4 crt">
+    <!-- HEADER -->
+    <header class="panel relative p-3 md:p-4 mb-3 md:mb-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-[#00ff41] animate-pulse" style="box-shadow: 0 0 10px #00ff41;"></div>
+                <h1 class="text-lg md:text-2xl vt tracking-wider phosphor">DOPPLER ECHO MACHINE — 00 SUBSTRATE LISTENING POST</h1>
             </div>
-            <div class="rounded-2xl bg-black/40 border border-violet-500/20 p-6">
-              <div class="mono text-xs tracking-widest text-violet-300/80 mb-4">PLASMA // 27-STATE</div>
-              <div class="flex justify-center">
-                <div class="grid grid-cols-9 gap-1.5" id="cube"></div>
-              </div>
-              <div class="mt-4 text-center mono text-[11px] text-violet-300/70">3³ = 27. alive. volumetric.</div>
+            <div class="flex items-center gap-4 text-xs md:text-sm">
+                <div class="phosphor-amber flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 bg-[#ffb000] rounded-full animate-pulse"></span>
+                    <span class="vt tracking-wide">WATCHING FOR ECHO...</span>
+                </div>
+                <div class="hidden lg:block text-[10px] opacity-60">1 CORE • 8 RINGS • 5 ARITY</div>
             </div>
-          </div>
         </div>
-      </div>
-    </section>
+    </header>
 
-    <!-- 2 -->
-    <section class="glass rounded-[28px] p-8 md:p-12">
-      <div class="flex items-start gap-4">
-        <div class="mono text-violet-300/70 text-sm mt-1">02</div>
-        <div class="flex-1">
-          <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-6">1 core for every 8 rings forever</h2>
-          <p class="text-[17px] leading-relaxed text-slate-300/90">
-            It's not random. It's an octet. One core, eight rings around it — that's <span class="mono text-cyan-300">8*)8*(</span>. 
-            <br><br>
-            And then each of those eight rings becomes a core for its own eight. And again. And again. Forever in, forever out.
-            <br><br>
-            That's why it doesn't break. Nature loves eights. Electrons, music, color — it's the same pattern repeating at every scale because you're working with the substrate itself.
-          </p>
-          <div class="mt-10 relative h-[320px] flex items-center justify-center">
-            <div class="octet w-[300px] h-[300px] relative">
-              <div class="core-dot"></div>
-              <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ring r4"></div>
-              <div class="ring r5"></div><div class="ring r6"></div><div class="ring r7"></div><div class="ring r8"></div>
+    <!-- MAIN GRID -->
+    <main class="grid grid-cols-1 xl:grid-cols-12 gap-3 md:gap-4">
+        <!-- LEFT PANEL -->
+        <section class="xl:col-span-3 xl:order-1 order-2 panel relative p-4">
+            <h2 class="text-sm vt tracking-widest border-b border-[#00ff41]/30 pb-2 mb-3 phosphor-amber">FREQUENCY ANALYZER</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <div class="text-[10px] opacity-70 mb-1">ORIGIN BEACON</div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl phosphor-amber vt">27.000</span>
+                        <span class="text-sm">Hz</span>
+                    </div>
+                    <div class="text-[10px] opacity-50">(27=0=(1))</div>
+                </div>
+
+                <div>
+                    <div class="text-[10px] opacity-70 mb-1">DETECTED ECHO</div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="detected-freq" class="text-3xl phosphor vt">27.000</span>
+                        <span class="text-sm">Hz</span>
+                    </div>
+                    <div class="mt-1">
+                        <span class="text-[10px] opacity-70">Δf = </span>
+                        <span id="delta-f" class="text-xl vt phosphor">+0.000</span>
+                        <span class="text-[10px]"> Hz</span>
+                    </div>
+                    <div id="doppler-label" class="text-[11px] mt-1 h-4 opacity-80"></div>
+                </div>
+
+                <div class="pt-2 border-t border-[#00ff41]/20">
+                    <div class="text-[10px] opacity-70 mb-2">0@# WAVEFORM (5-ARITY)</div>
+                    <div class="panel p-2 bg-black/70">
+                        <canvas id="waveform" class="w-full h-[80px]"></canvas>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <div class="text-[10px] opacity-70 mb-2">STRUCTURE LOCK</div>
+                    <div id="arity" class="flex justify-between text-2xl vt bg-black/50 p-2 border border-[#00ff41]/20">
+                        <span class="arity-char" data-i="0">0</span>
+                        <span class="arity-char" data-i="1">@</span>
+                        <span class="arity-char" data-i="2">#</span>
+                        <span class="arity-char" data-i="3">0</span>
+                        <span class="arity-char" data-i="4">0</span>
+                    </div>
+                    <div class="text-[9px] opacity-40 mt-1 text-center">0 → @ → # → 0 → 0</div>
+                </div>
             </div>
-          </div>
-          <div class="text-center mono text-violet-300/70 text-sm tracking-widest">8*)8*( // SELF-SIMILAR FOREVER</div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- 3 -->
-    <section class="glass rounded-[28px] p-8 md:p-12">
-      <div class="flex items-start gap-4">
-        <div class="mono text-violet-300/70 text-sm mt-1">03</div>
-        <div class="flex-1">
-          <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-6">0@# between every number</h2>
-          <p class="text-[17px] leading-relaxed text-slate-300/90">
-            Numbers don't touch. There's always a gap. That gap has a name: <span class="mono text-cyan-300">@</span>.
-            <br><br>
-            The <span class="at">@</span> is gravity. It's location. It's the "between". The <span class="hash">#</span> is the gate.
-            <br><br>
-            So you don't count 0,1,2... you count the spaces: 0 @# 1, 1 @# 2, 2 @# 3... all the way to 8 @# 9. Nine intervals. That's the field.
-          </p>
-          <div class="mt-10 rounded-2xl bg-black/50 border border-cyan-500/20 p-6 overflow-x-auto">
-            <div class="mono text-lg md:text-2xl leading-loose whitespace-nowrap text-center tracking-wider">
-              <span>0<span class="at">@</span><span class="hash">#</span>1</span> &nbsp; <span>1<span class="at">@</span><span class="hash">#</span>2</span> &nbsp; <span>2<span class="at">@</span><span class="hash">#</span>3</span> &nbsp; <span>3<span class="at">@</span><span class="hash">#</span>4</span> &nbsp; <span>4<span class="at">@</span><span class="hash">#</span>5</span> &nbsp; <br class="md:hidden"> <span>5<span class="at">@</span><span class="hash">#</span>6</span> &nbsp; <span>6<span class="at">@</span><span class="hash">#</span>7</span> &nbsp; <span>7<span class="at">@</span><span class="hash">#</span>8</span> &nbsp; <span>8<span class="at">@</span><span class="hash">#</span>9</span>
+        <!-- CENTER RADAR -->
+        <section class="xl:col-span-6 xl:order-2 order-1 panel relative p-3 md:p-4">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-sm vt tracking-widest phosphor-amber">ECHO SCOPE</h2>
+                <div class="text-[10px] opacity-60">RANGE: 00 SUBSTRATE • CANNON PUSH ACTIVE</div>
             </div>
-          </div>
-          <p class="mt-6 text-center text-slate-400 text-sm">Gravity isn't a force. It's the address between states.</p>
-        </div>
-      </div>
-    </section>
+            
+            <div class="relative aspect-square max-w-[680px] mx-auto">
+                <canvas id="radar" class="w-full h-full rounded-full"></canvas>
+                
+                <!-- Center Egg -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                    <div class="relative w-14 h-[70px]">
+                        <div class="egg-outer absolute inset-0 rounded-[50%] border-2 border-[#00ff41]/90" style="box-shadow: 0 0 20px rgba(0,255,65,0.8), inset 0 0 15px rgba(0,255,65,0.3);"></div>
+                        <div class="egg-middle absolute inset-[18%] rounded-[50%] border border-[#00ff41]/70" style="box-shadow: 0 0 12px rgba(0,255,65,0.6);"></div>
+                        <div class="egg-core absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#00ff41] animate-pulse" style="box-shadow: 0 0 15px #00ff41, 0 0 30px #00ff41;"></div>
+                        <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] whitespace-nowrap opacity-70">NESTED EGG</div>
+                    </div>
+                </div>
 
-    <!-- 4 -->
-    <section class="glass rounded-[28px] p-8 md:p-12">
-      <div class="flex items-start gap-4">
-        <div class="mono text-violet-300/70 text-sm mt-1">04</div>
-        <div class="flex-1">
-          <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-6">The 0 nested between the 0 states</h2>
-          <p class="text-[17px] leading-relaxed text-slate-300/90">
-            Zero isn't nothing. Zero is nested.
-            <br><br>
-            Put a 0 inside a 0 inside a 0 — that's <span class="mono text-amber-200">000</span>. The meta-zero. When you operate from there, you're not above the system flipping bits. You ARE the system.
-            <br><br>
-            Because I punched to the substrate, I don't ask for a state. I choose which zero wakes up. I control all states because I'm sitting between them.
-          </p>
-          <div class="mt-12 flex justify-center">
-            <div class="relative w-56 h-56">
-              <div class="zero z1">0<div class="zero z2">0<div class="zero z3">0</div></div></div>
+                <!-- Corner readouts -->
+                <div class="absolute top-3 left-3 text-[10px] leading-tight opacity-70">
+                    <div>AZ: <span id="az-readout" class="phosphor">000°</span></div>
+                    <div>EL: 00.0°</div>
+                </div>
+                <div class="absolute top-3 right-3 text-[10px] leading-tight text-right opacity-70">
+                    <div>PULSE: <span id="pulse-count" class="phosphor-amber">0</span></div>
+                    <div>GAIN: <span id="gain-readout" class="phosphor">75%</span></div>
+                </div>
+                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 text-[9px] opacity-50 tracking-widest">0@# PROPAGATION • SPEED: 1.0 c₀</div>
             </div>
-          </div>
-          <div class="text-center mono text-amber-200/70 text-sm tracking-widest mt-6">000 // META-ZERO // YOU ARE THE SUBSTRATE</div>
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="xl:col-span-3 xl:order-3 order-3 panel relative p-4">
+            <h2 class="text-sm vt tracking-widest border-b border-[#00ff41]/30 pb-2 mb-3 phosphor-amber">ECHO LOG</h2>
+            <div id="log" class="h-[320px] md:h-[420px] overflow-y-auto pr-2 space-y-2 font-mono text-[11px] leading-snug"></div>
+            <div class="mt-3 pt-2 border-t border-[#00ff41]/20 text-[9px] opacity-50">
+                Listening on 1 core, 8 rings, 5 arity
+            </div>
+        </section>
+    </main>
+
+    <!-- CONTROLS -->
+    <footer class="panel relative p-3 md:p-4 mt-3 md:mt-4">
+        <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            <div class="flex flex-wrap items-center gap-2 md:gap-3">
+                <button id="tune-btn" class="btn px-4 py-2 text-sm vt tracking-wide">
+                    <span class="phosphor-amber">◉</span> TUNE TO 000
+                </button>
+                <button id="scan-btn" class="btn px-4 py-2 text-sm vt tracking-wide">
+                    SCAN <span id="scan-seq" class="phosphor">0-1</span>
+                </button>
+                <button id="ping-btn" class="btn px-3 py-2 text-xs">
+                    MANUAL PING
+                </button>
+                <div class="flex items-center gap-2 ml-2">
+                    <span class="text-[10px] opacity-70">GAIN</span>
+                    <input id="gain" type="range" min="20" max="100" value="75" class="w-24 md:w-32">
+                    <span id="gain-value" class="text-[10px] w-8">75%</span>
+                </div>
+            </div>
+            <div class="text-[10px] opacity-60 hidden md:block">
+                cannon push echo detection active • substrate coherence nominal
+            </div>
         </div>
-      </div>
-    </section>
-
-    <!-- 5 -->
-    <section class="glass rounded-[28px] p-8 md:p-12 border-violet-500/30" style="background: radial-gradient(800px circle at 50% -100px, rgba(139,92,246,.15), transparent 60%), linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));">
-      <div class="flex items-start gap-4">
-        <div class="mono text-violet-300/70 text-sm mt-1">05</div>
-        <div class="flex-1 text-center">
-          <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-6">The nested egg who is also 1</h2>
-          <p class="text-[17px] leading-relaxed text-slate-200/90 max-w-2xl mx-auto">
-            Here's the paradox that makes it run:
-            <br><br>
-            <span class="mono text-2xl text-violet-300">27</span> possible states collapse back to <span class="mono text-2xl text-cyan-300">0</span>.
-            <br>
-            But that <span class="mono text-2xl text-cyan-300">0</span> contains everything, so it acts as <span class="mono text-2xl text-amber-200">(1)</span>.
-            <br><br>
-            <span class="mono text-3xl tracking-wider" style="text-shadow:0 0 30px rgba(168,85,247,.6)">27 = 0 = (1)</span>
-            <br><br>
-            Empty and full. Zero and one. Potential and whole. The egg is nested layers of nothing holding everything. That's the engine. That's the law.
-          </p>
-          <div class="mt-10 inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-black/60 border border-white/10">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="mono text-xs tracking-[0.18em] text-white/70">PLASMA ENGINE IDLING // READY</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- footer beacon -->
-  <div class="h-32"></div>
-</div>
-
-<div class="fixed bottom-0 inset-x-0 z-20 pointer-events-none">
-  <div class="mx-auto max-w-[900px] px-4 pb-5">
-    <div class="beacon-bar pointer-events-auto flex items-center justify-between gap-3 px-5 py-3 rounded-2xl bg-[#050816]/80 border border-cyan-400/20 backdrop-blur-xl">
-      <div class="flex items-center gap-3">
-        <div class="relative">
-          <span class="absolute inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
-          <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,.8)]"></span>
-        </div>
-        <span class="mono text-[12px] sm:text-[13px] tracking-widest text-cyan-100">BEACON ACTIVE - 00 SUBSTRATE ONLINE</span>
-      </div>
-      <div class="hidden sm:flex items-center gap-4">
-        <span class="mono text-violet-300/90 tracking-widest text-sm">-++-</span>
-        <span class="mono text-cyan-300/90 tracking-widest text-sm">8*)8*(</span>
-      </div>
-    </div>
-  </div>
-  <div class="absolute right-3 bottom-1.5 z-30">
-    <span class="mono text-[9px] text-white/15 hover:text-white/60 transition select-none" title="you found it">energy, man</span>
-  </div>
+    </footer>
 </div>
 
 <script>
-  // stars
-  const canvas = document.getElementById('bg');
-  const ctx = canvas.getContext('2d');
-  let w, h, stars;
-  function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; stars = Array.from({length: Math.min(400, Math.floor(w*h/8000))}, ()=>({
-    x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.3+0.2, a: Math.random(), s: Math.random()*0.02+0.003
-  })); }
-  resize(); addEventListener('resize', resize);
-  function tick(){
-    ctx.clearRect(0,0,w,h);
-    const g = ctx.createRadialGradient(w*0.5,h*0.3,0, w*0.5,h*0.3, Math.max(w,h)*0.8);
-    g.addColorStop(0,'rgba(20,10,50,0.25)'); g.addColorStop(1,'rgba(2,2,10,0)');
-    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    for(const s of stars){
-      s.a += s.s; const o = 0.4 + Math.sin(s.a)*0.3;
-      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      ctx.fillStyle = `rgba(200,210,255,${o})`; ctx.fill();
+(() => {
+    // Elements
+    const radar = document.getElementById('radar');
+    const rctx = radar.getContext('2d');
+    const wave = document.getElementById('waveform');
+    const wctx = wave.getContext('2d');
+    const detectedEl = document.getElementById('detected-freq');
+    const deltaEl = document.getElementById('delta-f');
+    const dopplerLabel = document.getElementById('doppler-label');
+    const logEl = document.getElementById('log');
+    const azReadout = document.getElementById('az-readout');
+    const pulseCountEl = document.getElementById('pulse-count');
+    const gainReadout = document.getElementById('gain-readout');
+    const gainSlider = document.getElementById('gain');
+    const gainValue = document.getElementById('gain-value');
+    const scanSeqEl = document.getElementById('scan-seq');
+
+    // State
+    const state = {
+        sweep: 0,
+        rings: [],
+        inRings: [],
+        blips: [],
+        pulseCount: 0,
+        baseFreq: 27.0,
+        detected: 27.0,
+        doppler: 0,
+        gain: 0.75,
+        scanIdx: 0,
+        sequences: ['0-1','1-2','2-3','3-4','4-5','5-6','6-7','7-8','8-0'],
+        wavePhase: 0,
+        lastEcho: 0
+    };
+
+    // Resize canvases
+    function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        [radar, wave].forEach(c => {
+            const rect = c.getBoundingClientRect();
+            c.width = rect.width * dpr;
+            c.height = rect.height * dpr;
+            c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+        });
     }
-    requestAnimationFrame(tick);
-  }
-  tick();
+    window.addEventListener('resize', resize);
+    resize();
 
-  // binary flip
-  const bit1 = document.getElementById('bit1');
-  setInterval(()=>{ bit1.textContent = bit1.textContent==='1'?'0':'1'; bit1.classList.toggle('bit-on'); bit1.classList.toggle('bit-off'); }, 900);
+    // Logging
+    function log(msg, type = 'info') {
+        const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        let color = 'text-[#00ff41]/90';
+        let prefix = '•';
+        if (type === 'echo') { color = 'phosphor'; prefix = '◉'; div.style.borderLeftColor = '#00ff41'; }
+        if (type === 'doppler') { prefix = '↕'; }
+        if (type === 'blue') { color = 'phosphor-blue'; div.style.borderLeftColor = '#00b8ff'; }
+        if (type === 'red') { color = 'phosphor-red'; div.style.borderLeftColor = '#ff3b3b'; }
+        if (type === 'amber') { color = 'phosphor-amber'; }
+        
+        div.innerHTML = `<span class="opacity-50">${time}</span> <span class="${color}">${prefix} ${msg}</span>`;
+        logEl.prepend(div);
+        while (logEl.children.length > 40) logEl.removeChild(logEl.lastChild);
+    }
 
-  // 27 cube
-  const cube = document.getElementById('cube');
-  for(let i=0;i<27;i++){ const d=document.createElement('div'); d.className='cube-dot'; cube.appendChild(d); }
-  const dots = [...cube.children];
-  setInterval(()=>{
-    dots.forEach(d=>d.classList.remove('active'));
-    const active = new Set();
-    while(active.size<9) active.add(Math.floor(Math.random()*27));
-    active.forEach(i=>dots[i].classList.add('active'));
-  }, 1200);
+    function lightArity() {
+        document.querySelectorAll('.arity-char').forEach((el, i) => {
+            setTimeout(() => {
+                el.classList.add('active');
+                setTimeout(() => el.classList.remove('active'), 600);
+            }, i * 90);
+        });
+    }
+
+    function updateFreq(doppler) {
+        state.doppler = doppler;
+        state.detected = state.baseFreq + doppler;
+        detectedEl.textContent = state.detected.toFixed(3);
+        const sign = doppler >= 0 ? '+' : '';
+        deltaEl.textContent = sign + doppler.toFixed(3);
+        deltaEl.className = 'text-xl vt ' + (doppler > 0.1 ? 'phosphor-blue' : doppler < -0.1 ? 'phosphor-red' : 'phosphor');
+        dopplerLabel.textContent = doppler > 0.1 ? 'APPROACHING' : doppler < -0.1 ? 'RECEDING' : 'STATIONARY';
+        dopplerLabel.className = 'text-[11px] mt-1 h-4 ' + (doppler > 0.1 ? 'phosphor-blue' : doppler < -0.1 ? 'phosphor-red' : 'opacity-70');
+    }
+
+    // Radar drawing
+    function drawRadar() {
+        const w = radar.clientWidth;
+        const h = radar.clientHeight;
+        const cx = w / 2;
+        const cy = h / 2;
+        const maxR = Math.min(w, h) * 0.44;
+
+        rctx.clearRect(0, 0, w, h);
+
+        // Background glow
+        const bgGrad = rctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 1.1);
+        bgGrad.addColorStop(0, 'rgba(0, 40, 10, 0.15)');
+        bgGrad.addColorStop(0.7, 'rgba(0, 20, 5, 0.05)');
+        bgGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        rctx.fillStyle = bgGrad;
+        rctx.beginPath();
+        rctx.arc(cx, cy, maxR * 1.1, 0, Math.PI * 2);
+        rctx.fill();
+
+        // Grid circles
+        rctx.strokeStyle = 'rgba(0, 255, 65, 0.12)';
+        rctx.lineWidth = 1;
+        for (let i = 1; i <= 4; i++) {
+            rctx.beginPath();
+            rctx.arc(cx, cy, (maxR / 4) * i, 0, Math.PI * 2);
+            rctx.stroke();
+        }
+        // Crosshairs
+        rctx.strokeStyle = 'rgba(0, 255, 65, 0.15)';
+        rctx.beginPath();
+        rctx.moveTo(cx - maxR, cy); rctx.lineTo(cx + maxR, cy);
+        rctx.moveTo(cx, cy - maxR); rctx.lineTo(cx, cy + maxR);
+        rctx.stroke();
+
+        // Range marks
+        rctx.fillStyle = 'rgba(0,255,65,0.4)';
+        rctx.font = '9px "Share Tech Mono"';
+        for (let i = 1; i <= 4; i++) {
+            rctx.fillText(`${i * 25}`, cx + (maxR / 4) * i + 2, cy - 3);
+        }
+
+        // Outgoing rings
+        state.rings = state.rings.filter(r => {
+            r.radius += r.speed;
+            const alpha = 1 - (r.radius / maxR);
+            if (alpha <= 0) return false;
+            rctx.strokeStyle = `rgba(0, 255, 65, ${alpha * 0.7 * state.gain})`;
+            rctx.lineWidth = 2;
+            rctx.shadowBlur = 10;
+            rctx.shadowColor = '#00ff41';
+            rctx.beginPath();
+            rctx.arc(cx, cy, r.radius, 0, Math.PI * 2);
+            rctx.stroke();
+            rctx.shadowBlur = 0;
+            return r.radius < maxR * 1.1;
+        });
+
+        // Incoming rings
+        state.inRings = state.inRings.filter(r => {
+            r.radius -= r.speed;
+            const alpha = r.radius / maxR;
+            if (r.radius <= 5) return false;
+            rctx.strokeStyle = `rgba(${r.color}, ${alpha * 0.8})`;
+            rctx.lineWidth = 2;
+            rctx.shadowBlur = 12;
+            rctx.shadowColor = `rgb(${r.color})`;
+            rctx.beginPath();
+            rctx.arc(cx, cy, r.radius, 0, Math.PI * 2);
+            rctx.stroke();
+            rctx.shadowBlur = 0;
+            return true;
+        });
+
+        // Blips
+        const now = performance.now();
+        state.blips = state.blips.filter(b => {
+            const age = (now - b.t) / 1000;
+            if (age > 6) return false;
+            const x = cx + Math.cos(b.a) * b.d * maxR;
+            const y = cy + Math.sin(b.a) * b.d * maxR;
+            const intensity = Math.max(0, 1 - age / 6);
+            
+            // Glow
+            rctx.shadowBlur = 20 * intensity * state.gain;
+            rctx.shadowColor = b.color;
+            rctx.fillStyle = b.color;
+            rctx.globalAlpha = intensity * 0.9;
+            rctx.beginPath();
+            rctx.arc(x, y, 3 + 2 * state.gain, 0, Math.PI * 2);
+            rctx.fill();
+            
+            // Core
+            rctx.shadowBlur = 5;
+            rctx.globalAlpha = intensity;
+            rctx.beginPath();
+            rctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            rctx.fill();
+            rctx.shadowBlur = 0;
+            rctx.globalAlpha = 1;
+
+            // Doppler trail
+            if (Math.abs(b.dop) > 0.5) {
+                rctx.strokeStyle = b.color;
+                rctx.globalAlpha = intensity * 0.5;
+                rctx.lineWidth = 1;
+                rctx.beginPath();
+                const trailLen = 15 * Math.min(1, Math.abs(b.dop) / 3);
+                const tx = x - Math.cos(b.a) * trailLen * (b.dop > 0 ? 1 : -1);
+                const ty = y - Math.sin(b.a) * trailLen * (b.dop > 0 ? 1 : -1);
+                rctx.moveTo(x, y);
+                rctx.lineTo(tx, ty);
+                rctx.stroke();
+                rctx.globalAlpha = 1;
+            }
+            return true;
+        });
+
+        // Sweep
+        state.sweep += 0.018 + state.gain * 0.005;
+        azReadout.textContent = String(Math.floor((state.sweep * 180 / Math.PI) % 360)).padStart(3, '0') + '°';
+        
+        rctx.save();
+        rctx.translate(cx, cy);
+        rctx.rotate(state.sweep);
+        
+        // Sweep beam
+        const sweepGrad = rctx.createConicGradient(-0.2, 0, 0);
+        sweepGrad.addColorStop(0, 'rgba(0,255,65,0)');
+        sweepGrad.addColorStop(0.7, 'rgba(0,255,65,0.15)');
+        sweepGrad.addColorStop(1, 'rgba(0,255,65,0.4)');
+        rctx.fillStyle = sweepGrad;
+        rctx.beginPath();
+        rctx.moveTo(0, 0);
+        rctx.arc(0, 0, maxR, -0.2, 0.2);
+        rctx.closePath();
+        rctx.fill();
+        
+        // Sweep line
+        rctx.strokeStyle = '#00ff41';
+        rctx.lineWidth = 2;
+        rctx.shadowBlur = 15;
+        rctx.shadowColor = '#00ff41';
+        rctx.beginPath();
+        rctx.moveTo(0, 0);
+        rctx.lineTo(maxR, 0);
+        rctx.stroke();
+        rctx.restore();
+    }
+
+    // Waveform
+    function drawWaveform() {
+        const w = wave.clientWidth;
+        const h = wave.clientHeight;
+        wctx.clearRect(0, 0, w, h);
+        
+        state.wavePhase += 0.08 + state.doppler * 0.015;
+        
+        // Grid
+        wctx.strokeStyle = 'rgba(0,255,65,0.08)';
+        wctx.lineWidth = 1;
+        for (let i = 0; i < 4; i++) {
+            const y = (h / 4) * i;
+            wctx.beginPath(); wctx.moveTo(0, y); wctx.lineTo(w, y); wctx.stroke();
+        }
+        
+        // 5-arity markers
+        const arityX = [0.1, 0.3, 0.5, 0.7, 0.9];
+        wctx.fillStyle = 'rgba(0,255,65,0.3)';
+        arityX.forEach(x => {
+            wctx.fillRect(x * w - 0.5, 0, 1, h);
+        });
+        
+        // Wave
+        wctx.strokeStyle = '#00ff41';
+        wctx.lineWidth = 2;
+        wctx.shadowBlur = 8;
+        wctx.shadowColor = '#00ff41';
+        wctx.beginPath();
+        for (let x = 0; x < w; x++) {
+            const t = (x / w) * Math.PI * 4 + state.wavePhase;
+            // 5-arity shape: combination for 0@# pattern
+            const y = h/2 + Math.sin(t) * 15 + Math.sin(t*2.3) * 8 + Math.sin(t*5) * 3;
+            if (x === 0) wctx.moveTo(x, y); else wctx.lineTo(x, y);
+        }
+        wctx.stroke();
+        wctx.shadowBlur = 0;
+        
+        // Frequency label
+        wctx.fillStyle = 'rgba(0,255,65,0.6)';
+        wctx.font = '10px "Share Tech Mono"';
+        wctx.fillText('0  @  #  0  0', 8, 14);
+    }
+
+    // Fire pulse
+    function firePulse() {
+        state.rings.push({ radius: 0, speed: 2.8 });
+        state.pulseCount++;
+        pulseCountEl.textContent = state.pulseCount;
+    }
+
+    // Spawn echo
+    function spawnEcho() {
+        const doppler = (Math.random() - 0.5) * 7; // -3.5 to +3.5
+        const approaching = doppler > 0.15;
+        const receding = doppler < -0.15;
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 0.55 + Math.random() * 0.4;
+        const color = approaching ? '#00b8ff' : receding ? '#ff3b3b' : '#00ff41';
+        const rgb = approaching ? '0,184,255' : receding ? '255,59,59' : '0,255,65';
+
+        updateFreq(doppler);
+        lightArity();
+
+        // Add blip
+        state.blips.push({ a: angle, d: dist, t: performance.now(), color, dop: doppler });
+        
+        // Incoming ring
+        const maxR = Math.min(radar.clientWidth, radar.clientHeight) * 0.44;
+        state.inRings.push({ radius: maxR, speed: 3.2, color: rgb });
+
+        // Log
+        const sigs = ['8*)8*(', '0@#1', '00=1', '27=0=(1)', '1-core'];
+        const sig = sigs[Math.floor(Math.random() * sigs.length)];
+        const distKu = (dist * 4.2 + Math.random() * 0.8).toFixed(2);
+        
+        log(`ECHO DETECTED: 0@# return`, 'echo');
+        log(`DOPPLER: ${doppler >= 0 ? '+' : ''}${doppler.toFixed(1)}Hz (${approaching ? 'approaching' : receding ? 'receding' : 'static'})`, approaching ? 'blue' : receding ? 'red' : 'doppler');
+        log(`SOURCE: ${sig} signature • ${distKu} ku`, 'amber');
+        
+        state.lastEcho = performance.now();
+    }
+
+    // Animation loop
+    function animate() {
+        drawRadar();
+        drawWaveform();
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Auto sequence
+    function autoCycle() {
+        firePulse();
+        setTimeout(() => {
+            if (Math.random() > 0.15) spawnEcho();
+        }, 1300 + Math.random() * 600);
+        const next = 3800 + Math.random() * 3200;
+        setTimeout(autoCycle, next);
+    }
+    setTimeout(autoCycle, 1500);
+
+    // Controls
+    document.getElementById('tune-btn').onclick = () => {
+        updateFreq(0);
+        state.baseFreq = 27.0;
+        log('MANUAL TUNE: LOCKED TO 000 NESTED ZERO', 'amber');
+        log('PHASE LOCK ACQUIRED • 27.000 Hz', 'echo');
+        lightArity();
+        firePulse();
+    };
+
+    document.getElementById('scan-btn').onclick = () => {
+        state.scanIdx = (state.scanIdx + 1) % state.sequences.length;
+        const seq = state.sequences[state.scanIdx];
+        scanSeqEl.textContent = seq;
+        state.baseFreq = 27.0 + (state.scanIdx - 4) * 0.07;
+        log(`SCANNING SEQUENCE: ${seq}`, 'amber');
+        firePulse();
+    };
+
+    document.getElementById('ping-btn').onclick = () => {
+        firePulse();
+        log('MANUAL PING: cannon push emitted', 'doppler');
+        setTimeout(() => { if (Math.random() > 0.3) spawnEcho(); }, 1200);
+    };
+
+    gainSlider.oninput = (e) => {
+        state.gain = e.target.value / 100;
+        gainValue.textContent = e.target.value + '%';
+        gainReadout.textContent = e.target.value + '%';
+    };
+
+    // Initial logs
+    log('SYSTEM INIT: 00 SUBSTRATE ONLINE', 'amber');
+    log('CANNON PUSH ECHO DETECTION ACTIVE', 'amber');
+    log('CALIBRATING TO 27.000 Hz (27=0=(1))', 'doppler');
+    setTimeout(() => log('LISTENING POST 00 • 1 CORE, 8 RINGS, 5 ARITY', 'amber'), 800);
+    setTimeout(() => log('AWAITING FIRST ECHO RETURN...', 'doppler'), 1500);
+
+    // Idle drift
+    setInterval(() => {
+        if (performance.now() - state.lastEcho > 8000) {
+            const drift = (Math.random() - 0.5) * 0.04;
+            updateFreq(state.doppler * 0.97 + drift);
+        }
+    }, 300);
+})();
 </script>
 </body>
 </html>
