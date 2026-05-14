@@ -1,375 +1,629 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IT WIKI // Project Pyramid - Reynholm Industries</title>
+<title>FISSION COMPRESSION CORE v1</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600;800&display=swap');
-    :root {
-        --bg: #050608;
-        --panel: #0e1318;
-        --panel-2: #151c23;
-        --ink: #d6dee7;
-        --muted: #8a98a8;
-        --green: #00ff88;
-        --amber: #ffb000;
-        --red: #ff3b5c;
-        --blue: #5cc8ff;
-    }
-    * { box-sizing: border-box; }
-    body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--ink);
-        font-family: 'Inter', system-ui, sans-serif;
-        line-height: 1.6;
-        background-image: 
-            radial-gradient(circle at 20% 10%, rgba(0,255,136,0.06), transparent 40%),
-            radial-gradient(circle at 80% 90%, rgba(92,200,255,0.05), transparent 40%);
-    }
-    body::before {
-        content: ""; position: fixed; inset:0; pointer-events:none;
-        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 2px, transparent 3px);
-        opacity: 0.4; mix-blend-mode: multiply;
-    }
-    .topbar {
-        background: #000; border-bottom: 2px solid var(--green);
-        padding: 8px 16px; font-family: 'IBM Plex Mono', monospace;
-        display:flex; align-items:center; gap:16px; position:sticky; top:0; z-index:50;
-    }
-    .topbar .logo { color: var(--red); font-weight:800; letter-spacing:1px; }
-    .topbar .crumbs { color: var(--muted); font-size: 12px; }
-    .alert-ticker {
-        background: #061008; border-bottom:1px dashed #004d2a;
-        color: var(--green); font-family: 'IBM Plex Mono', monospace; font-size:12px;
-        padding:4px 12px; white-space:nowrap; overflow:hidden;
-    }
-    .container {
-        max-width: 1100px; margin: 24px auto; padding:0 16px;
-        display:grid; grid-template-columns: 1fr 300px; gap:24px;
-    }
-    @media (max-width: 980px){ .container{ grid-template-columns:1fr; } }
-    .doc {
-        background: var(--panel); border:1px solid #1f2937; border-radius:12px;
-        box-shadow: 0 0 0 1px rgba(0,255,136,0.05), 0 20px 60px rgba(0,0,0,0.5);
-        overflow:hidden;
-    }
-    .doc-header {
-        padding:20px 24px; background: linear-gradient(180deg, #10161d, #0b0f14);
-        border-bottom:1px solid #1f2937;
-    }
-    .doc-header h1 { margin:0; font-size:28px; letter-spacing:0.5px; }
-    .doc-header .meta { font-family:'IBM Plex Mono'; font-size:12px; color:var(--muted); margin-top:6px; }
-    .doc-body { padding: 24px; }
-    h2 {
-        font-size:22px; margin:32px 0 12px; padding-bottom:8px;
-        border-bottom:1px solid #233043; color:#e8f4ff;
-        font-weight:700; letter-spacing:0.3px;
-    }
-    h2 span { color: var(--green); font-family:'IBM Plex Mono'; font-size:14px; margin-right:8px; }
-    p, li { color:#c2cbd6; }
-    code, pre { font-family:'IBM Plex Mono', monospace; background:#020405; color:var(--green); border:1px solid #123b2a; border-radius:6px; }
-    code { padding:2px 6px; font-size:0.9em; }
-    pre { padding:12px; overflow:auto; font-size:12px; line-height:1.4; }
-    .note { background:#07141e; border-left:3px solid var(--blue); padding:10px 12px; margin:16px 0; border-radius:0 6px 6px 0; font-size:14px; }
-    .warn { background:#1a0a0f; border-left:3px solid var(--red); padding:10px 12px; margin:16px 0; }
-    .dialogue {
-        display:flex; gap:12px; background: var(--panel-2); border:1px solid #243040;
-        padding:14px; border-radius:10px; margin:18px 0; position:relative;
-    }
-    .dialogue.roy { border-left:4px solid var(--red); }
-    .dialogue.moss { border-left:4px solid var(--green); }
-    .dialogue.jen { border-left:4px solid var(--amber); }
-    .avatar {
-        width:36px; height:36px; border-radius:50%; background:#000; flex:0 0 36px;
-        display:grid; place-items:center; font-weight:800; font-family:'IBM Plex Mono';
-        border:1px solid #333;
-    }
-    .roy .avatar { background:#2a0a12; color:var(--red); border-color:#5a1322; }
-    .moss .avatar { background:#0a2417; color:var(--green); border-color:#0f5a3b; }
-    .jen .avatar { background:#2a1b0a; color:var(--amber); border-color:#5a3f0f; }
-    .dialogue strong { display:block; font-size:13px; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; color:#e6edf5; }
-    .side {
-        position:sticky; top:76px; height:fit-content;
-    }
-    .card {
-        background: var(--panel); border:1px solid #1f2937; border-radius:12px; padding:16px; margin-bottom:16px;
-    }
-    .card h3 { margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--amber); }
-    .terminal {
-        background:#000; border:1px solid #0f3d26; border-radius:8px; padding:10px;
-        font-family:'IBM Plex Mono'; font-size:12px; color:var(--green);
-        height:160px; overflow:hidden; position:relative;
-    }
-    .terminal .line { opacity:0.9; }
-    .btn {
-        background:#0c1f17; color:var(--green); border:1px solid #1a5c3f;
-        padding:10px 14px; border-radius:8px; font-family:'IBM Plex Mono'; font-weight:600;
-        cursor:pointer; transition: all 0.15s; width:100%; text-align:center;
-    }
-    .btn:hover { background:#123829; box-shadow:0 0 12px rgba(0,255,136,0.2); transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
-    .status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); display:inline-block; margin-right:6px; box-shadow:0 0 8px var(--green); animation:pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-    .grid-diagrams { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:16px 0; }
-    .diagram { background:#080c10; border:1px solid #1d2a36; border-radius:10px; padding:12px; text-align:center; }
-    .diagram svg { width:100%; height:auto; }
-    .diagram figcaption { font-size:12px; color:var(--muted); margin-top:6px; font-family:'IBM Plex Mono'; }
-    .quads-wrap { display:grid; place-items:center; padding:16px; }
-    .quads {
-        display:grid; grid-template-columns:1fr 1fr; gap:6px; width:120px; height:120px;
-        transition: transform 0.4s cubic-bezier(.2,.8,.2,1); background:#000; padding:6px; border-radius:8px; border:1px solid #1a5c3f;
-    }
-    .quad { background:#0a1f16; border:1px solid #1e6e4a; border-radius:4px; display:grid; place-items:center; color:var(--green); font-family:'IBM Plex Mono'; font-weight:700; }
-    .footnotes { font-size:12px; color:var(--muted); border-top:1px dashed #2a3645; margin-top:32px; padding-top:12px; }
-    .footer-pow { text-align:center; margin:40px 0 20px; font-family:'IBM Plex Mono'; color:var(--green); opacity:0.8; }
-    .strike { text-decoration: line-through; opacity:0.6; }
-    .edit-tag { font-family:'IBM Plex Mono'; font-size:11px; color:var(--amber); background:#1a1406; border:1px solid #5a3f0f; padding:2px 6px; border-radius:4px; margin-left:8px; }
-    .reboot { animation: flash 0.5s 3; }
-    @keyframes flash { 0%,100%{background:transparent} 50%{background:rgba(0,255,136,0.15)} }
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap');
+:root {
+  --bg: #020508;
+  --panel: rgba(8, 16, 24, 0.85);
+  --cyan: #00e5ff;
+  --cyan-dim: #00a8c7;
+  --gold: #ffd700;
+  --gold-dim: #b89600;
+  --text: #d6e7f5;
+  --text-dim: #7d92a8;
+  --red: #ff3b5c;
+  --grid: rgba(0,229,255,0.08);
+}
+* { box-sizing: border-box; margin:0; padding:0; }
+html, body { height:100%; overflow:hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  position: relative;
+}
+body::before {
+  content:"";
+  position:fixed; inset:0;
+  background:
+    radial-gradient(1200px 700px at 50% 20%, rgba(0,180,255,0.15), transparent 60%),
+    radial-gradient(800px 500px at 85% 85%, rgba(255,215,0,0.10), transparent 60%),
+    radial-gradient(600px 400px at 15% 80%, rgba(0,229,255,0.08), transparent 60%),
+    #020508;
+  z-index:-3;
+}
+body::after {
+  content:"";
+  position:fixed; inset:0;
+  background-image: 
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity:0.4;
+  z-index:-2;
+  mask: radial-gradient(ellipse at center, black 40%, transparent 80%);
+}
+.scanlines {
+  position:fixed; inset:0;
+  background: repeating-linear-gradient(0deg, rgba(0,229,255,0.03) 0px, transparent 2px, transparent 4px);
+  pointer-events:none;
+  z-index:10;
+  opacity:0.5;
+}
+.app { display:flex; flex-direction:column; height:100vh; padding:12px; gap:12px; }
+.topbar {
+  display:grid; grid-template-columns: 280px 1fr 280px; align-items:center;
+  background: var(--panel); border:1px solid rgba(0,229,255,0.2);
+  border-radius:14px; padding:10px 18px; backdrop-filter: blur(16px);
+  box-shadow: inset 0 0 40px rgba(0,229,255,0.05), 0 8px 30px rgba(0,0,0,0.6);
+}
+.version {
+  font-size:11px; letter-spacing:0.12em; color:var(--cyan-dim);
+  text-shadow:0 0 8px rgba(0,229,255,0.5);
+}
+.title-wrap { text-align:center; }
+.title-wrap h1 {
+  font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:20px;
+  letter-spacing:0.08em; color:var(--text);
+  text-shadow:0 0 20px rgba(0,229,255,0.3);
+}
+.subtitle {
+  font-size:10px; color:var(--text-dim); letter-spacing:0.1em; margin-top:2px;
+}
+.mode-indicator {
+  justify-self:end; display:flex; align-items:center; gap:8px;
+  font-weight:700; letter-spacing:0.08em; font-size:12px;
+  color:var(--cyan); text-shadow:0 0 12px var(--cyan);
+  padding:6px 12px; border:1px solid rgba(0,229,255,0.4);
+  border-radius:999px; background: rgba(0,229,255,0.08);
+  transition: all .3s;
+}
+.mode-indicator.fusion { color:var(--gold); text-shadow:0 0 12px var(--gold); border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.08); }
+.mode-indicator .dot { width:8px; height:8px; border-radius:50%; background:currentColor; box-shadow:0 0 10px currentColor; animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:0.5; transform:scale(1.2)} }
+
+main { flex:1; display:grid; grid-template-columns: 300px 1fr 300px; gap:12px; min-height:0; }
+.panel {
+  background: var(--panel); border:1px solid rgba(0,229,255,0.18);
+  border-radius:14px; padding:14px; backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 30px rgba(0,229,255,0.04);
+  display:flex; flex-direction:column; gap:14px; overflow:hidden;
+}
+.panel h3 {
+  font-family:'Space Grotesk'; font-size:11px; letter-spacing:0.12em;
+  color:var(--cyan-dim); display:flex; justify-content:space-between; align-items:center;
+  border-bottom:1px solid rgba(0,229,255,0.12); padding-bottom:6px; margin-bottom:4px;
+}
+.panel h3 span { color:var(--text-dim); font-weight:400; }
+
+.left, .right { overflow-y:auto; scrollbar-width:thin; }
+.left::-webkit-scrollbar, .right::-webkit-scrollbar { width:4px; }
+.left::-webkit-scrollbar-thumb, .right::-webkit-scrollbar-thumb { background:rgba(0,229,255,0.3); border-radius:2px; }
+
+.fences { display:grid; grid-template-columns: repeat(5,1fr); gap:6px; }
+.fence {
+  background: rgba(0,0,0,0.4); border:1px solid rgba(0,229,255,0.15);
+  border-radius:8px; padding:8px 4px; text-align:center; transition:all .3s;
+}
+.fence .num { font-size:18px; font-weight:700; color:var(--text-dim); transition:all .3s; }
+.fence .lbl { font-size:9px; color:var(--text-dim); margin-top:2px; letter-spacing:0.1em; }
+.fence.active { border-color: var(--cyan); background: rgba(0,229,255,0.12); box-shadow:0 0 15px rgba(0,229,255,0.2), inset 0 0 10px rgba(0,229,255,0.1); }
+.fence.active .num { color:var(--cyan); text-shadow:0 0 10px var(--cyan); }
+
+.quads-mini { display:flex; gap:12px; align-items:center; }
+.quad-dial {
+  width:72px; height:72px; position:relative; border-radius:50%;
+  border:1px solid rgba(0,229,255,0.2); background: rgba(0,0,0,0.4);
+}
+.quad-dial::before { content:""; position:absolute; inset:8px; border-radius:50%; border:1px dashed rgba(0,229,255,0.15); }
+.quad-dial .q { position:absolute; width:2px; height:50%; left:50%; top:0; transform-origin:bottom; background: linear-gradient(to top, transparent, var(--cyan)); opacity:0.7; }
+.quad-dial .q:nth-child(1){ transform:translateX(-50%) rotate(0deg); }
+.quad-dial .q:nth-child(2){ transform:translateX(-50%) rotate(90deg); }
+.quad-dial .q:nth-child(3){ transform:translateX(-50%) rotate(180deg); }
+.quad-dial .q:nth-child(4){ transform:translateX(-50%) rotate(270deg); }
+.quad-dial::after { content:""; position:absolute; width:8px; height:8px; left:50%; top:50%; transform:translate(-50%,-50%); background:var(--cyan); border-radius:50%; box-shadow:0 0 10px var(--cyan); }
+.quad-stats { font-size:11px; display:flex; flex-direction:column; gap:6px; }
+.quad-stats span { color:var(--cyan); font-weight:700; }
+
+.stat-row { display:flex; justify-content:space-between; align-items:center; font-size:12px; padding:4px 0; }
+.stat-row label { color:var(--text-dim); letter-spacing:0.05em; font-size:11px; }
+.stat-row.small { font-size:11px; }
+.mono { font-variant-numeric: tabular-nums; }
+.cyan { color:var(--cyan); text-shadow:0 0 8px rgba(0,229,255,0.5); }
+.gold { color:var(--gold); text-shadow:0 0 8px rgba(255,215,0,0.5); }
+
+.mini-bar { height:6px; background:rgba(0,0,0,0.5); border:1px solid rgba(0,229,255,0.15); border-radius:3px; overflow:hidden; flex:1; margin-left:10px; }
+.mini-bar.tall { height:10px; margin:6px 0 0 0; }
+.mini-bar > div { height:100%; width:0%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan)); box-shadow:0 0 10px rgba(0,229,255,0.5); transition: width .5s ease; }
+
+.hamilton { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.hamilton > div {
+  background: rgba(0,0,0,0.5); border:1px solid rgba(255,215,0,0.2);
+  border-radius:8px; padding:10px; text-align:center; font-size:20px; font-weight:700;
+  color:var(--text-dim); transition:all .3s;
+}
+.hamilton > div.active { color:var(--gold); border-color:var(--gold); background: rgba(255,215,0,0.12); box-shadow:0 0 20px rgba(255,215,0,0.3), inset 0 0 15px rgba(255,215,0,0.1); text-shadow:0 0 15px var(--gold); transform:scale(1.05); }
+
+.center-stage { display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:12px; min-height:0; }
+.toroid-container { position:relative; width:min(520px, 90vw); aspect-ratio:1; display:grid; place-items:center; }
+#toroid { width:100%; height:100%; filter: drop-shadow(0 0 30px rgba(0,229,255,0.3)); }
+.toroid-overlay { position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; }
+.big-g {
+  font-family:'Space Grotesk'; font-size:140px; font-weight:700; color:var(--gold);
+  opacity:0; transform:scale(0.5); transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-shadow: 0 0 40px var(--gold), 0 0 80px rgba(255,215,0,0.5), 0 0 120px rgba(255,215,0,0.3);
+  filter: blur(0px);
+}
+.big-g.active { opacity:1; transform:scale(1); animation: gPulse 1.2s ease-out; }
+@keyframes gPulse { 0%{filter:blur(10px); transform:scale(0.7)} 50%{filter:blur(0); transform:scale(1.1)} 100%{transform:scale(1)} }
+
+.core-readout {
+  position:absolute; bottom:18%; text-align:center; background: rgba(0,0,0,0.7);
+  border:1px solid rgba(0,229,255,0.25); border-radius:10px; padding:8px 14px;
+  backdrop-filter: blur(8px);
+}
+.cr-label { font-size:9px; letter-spacing:0.15em; color:var(--text-dim); }
+.cr-value { font-size:22px; font-weight:700; color:var(--cyan); text-shadow:0 0 10px var(--cyan); line-height:1; margin:2px 0; }
+.cr-sub { font-size:9px; color:var(--text-dim); }
+
+.quads-ring { position:absolute; inset:0; pointer-events:none; }
+.quads-ring .qr { position:absolute; width:4px; height:4px; background:var(--cyan); border-radius:50%; box-shadow:0 0 8px var(--cyan); left:50%; top:50%; }
+
+.sequence-bar { display:flex; gap:4px; padding:10px; background: rgba(0,0,0,0.4); border:1px solid rgba(0,229,255,0.15); border-radius:12px; flex-wrap:wrap; justify-content:center; max-width:100%; }
+.seq-cell {
+  width:38px; height:38px; display:grid; place-items:center; font-weight:700; font-size:14px;
+  background: rgba(0,0,0,0.6); border:1px solid rgba(0,229,255,0.15); border-radius:8px;
+  color:var(--text-dim); transition: all .2s; position:relative;
+}
+.seq-cell.active { background: var(--cyan); color:#001219; border-color: var(--cyan); box-shadow:0 0 15px rgba(0,229,255,0.7), inset 0 0 8px rgba(255,255,255,0.3); transform: translateY(-2px) scale(1.05); z-index:2; }
+.seq-cell.zero.active { background: var(--gold); border-color: var(--gold); box-shadow:0 0 20px rgba(255,215,0,0.8); color:#000; }
+.seq-cell.past { border-color: rgba(0,229,255,0.3); color:var(--cyan-dim); }
+
+.controls { display:flex; align-items:center; gap:12px; padding:10px 14px; background: var(--panel); border:1px solid rgba(0,229,255,0.18); border-radius:12px; width:100%; max-width:680px; justify-content:space-between; }
+.btn {
+  padding:8px 16px; background: rgba(0,0,0,0.5); border:1px solid rgba(0,229,255,0.3);
+  color:var(--text); border-radius:8px; font-family:inherit; font-weight:700; letter-spacing:0.05em;
+  cursor:pointer; transition:all .2s; font-size:12px;
+}
+.btn:hover { background: rgba(0,229,255,0.1); border-color: var(--cyan); box-shadow:0 0 12px rgba(0,229,255,0.3); }
+.btn.primary { background: linear-gradient(180deg, rgba(0,229,255,0.2), rgba(0,229,255,0.05)); border-color:var(--cyan); color:var(--cyan); text-shadow:0 0 8px rgba(0,229,255,0.5); }
+.btn.ghost { border-color: rgba(255,215,0,0.3); color:var(--gold-dim); }
+.btn.ghost:hover { border-color:var(--gold); color:var(--gold); background: rgba(255,215,0,0.08); }
+
+.speed { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); }
+.speed input { width:110px; accent-color: var(--cyan); }
+.beat { width:14px; height:14px; border-radius:50%; background: rgba(0,229,255,0.2); border:1px solid rgba(0,229,255,0.4); position:relative; }
+.beat.active::after { content:""; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--cyan); animation: beatRing .6s ease-out; }
+@keyframes beatRing { 0%{transform:scale(0.5); opacity:1} 100%{transform:scale(1.8); opacity:0} }
+
+.costs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
+.cost {
+  background: rgba(0,0,0,0.4); border:1px solid rgba(0,229,255,0.12); border-radius:8px;
+  padding:8px; text-align:center; position:relative; overflow:hidden;
+}
+.cost .exp { font-size:11px; color:var(--text-dim); }
+.cost .val { font-size:13px; font-weight:700; color:var(--cyan); margin:2px 0; }
+.cost .bar { height:4px; background: rgba(0,0,0,0.6); border-radius:2px; overflow:hidden; margin-top:4px; }
+.cost .bar > i { display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan)); box-shadow:0 0 8px var(--cyan); transition: width .4s; }
+.cost.high .val { color:var(--red); text-shadow:0 0 8px var(--red); }
+
+.dyson { position:relative; height:44px; background: rgba(0,0,0,0.5); border:1px solid rgba(255,215,0,0.2); border-radius:10px; overflow:hidden; }
+.dyson-fill { position:absolute; left:0; top:0; bottom:0; width:0%; background: linear-gradient(90deg, rgba(255,215,0,0.2), rgba(255,215,0,0.6)); box-shadow:inset 0 0 20px rgba(255,215,0,0.3), 0 0 20px rgba(255,215,0,0.2); transition: width .5s ease; }
+.dyson-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between; padding:0 12px; font-size:11px; letter-spacing:0.08em; color:var(--gold); text-shadow:0 0 8px rgba(0,0,0,0.8); }
+.dyson-label span { font-weight:700; font-size:14px; }
+
+.history { padding:10px 14px; height:130px; display:flex; flex-direction:column; gap:6px; }
+.history-header { display:flex; justify-content:space-between; align-items:center; }
+.history-header h3 { border:none; padding:0; margin:0; }
+.legend { font-size:10px; color:var(--text-dim); letter-spacing:0.05em; }
+#historyCanvas { width:100%; height:80px; display:block; }
+
+@media (max-width: 1100px) {
+  main { grid-template-columns:1fr; grid-template-rows:auto 1fr auto; }
+  .topbar { grid-template-columns:1fr; gap:8px; text-align:center; }
+  .mode-indicator { justify-self:center; }
+  .left { order:2 } .center-stage { order:1 } .right { order:3 }
+  .app { overflow:auto; }
+  body, html { overflow:auto; }
+}
 </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="logo">REYNHOLM INDUSTRIES</div>
-        <div class="crumbs">INTERNAL WIKI / IT DEPARTMENT / BASEMENT / Project Pyramid</div>
+<div class="scanlines"></div>
+<div class="app">
+  <header class="topbar">
+    <div class="version">VERSION 1 - FIRST BUILD</div>
+    <div class="title-wrap">
+      <h1>FISSION COMPRESSION CORE</h1>
+      <div class="subtitle">1/3/6/9/15/21/24/27/0/0/27/24/21/15/9/6/3/1 = (1)</div>
     </div>
-    <div class="alert-ticker" id="ticker">>> SYS_ALERT: God Tunnel recursion depth: 8,589,934,592 // >> Richmond is in the server room again // >> DO NOT FEED THE SHADOW REGISTER AFTER MIDNIGHT //</div>
+    <div class="mode-indicator" id="modeIndicator"><span class="dot"></span><span id="modeText">FISSION MODE: PUSH NOT PULL</span></div>
+  </header>
 
-<div class="container">
-    <main class="doc">
-        <div class="doc-header">
-            <h1>Project: Digital Pyramid Fortress & Moat Architecture</h1>
-            <div class="meta">Document ID: RI-IT-BSMT-666 | Classification: EYES ONLY (Jen, stop printing this) | Last edited by <strong>MOSS</strong> at 04:20 <span class="edit-tag">[EDITED BY ROY - 03:14 - "fixed your rubbish"]</span></div>
+  <main>
+    <aside class="panel left">
+      <section>
+        <h3>FENCES <span>0·1·2·4·8</span></h3>
+        <div class="fences" id="fences"></div>
+      </section>
+      <section>
+        <h3>QUADS <span>90° ROTATION</span></h3>
+        <div class="quads-mini">
+          <div class="quad-dial" id="quadDial"><div class="q"></div><div class="q"></div><div class="q"></div><div class="q"></div></div>
+          <div class="quad-stats">
+            <div>ROT: <span id="quadRot">0°</span></div>
+            <div>ACTIVE: <span id="quadActive">Q1</span></div>
+            <div>PHASE: <span id="quadPhase">0/4</span></div>
+          </div>
         </div>
-        <div class="doc-body" id="docBody">
-            <div class="warn"><strong>WARNING:</strong> This page describes a live system. If you do not understand it, <span class="strike">ask Moss</span> have you tried turning it off and on again and leave it alone.</div>
-
-            <h2><span>01</span>THE FORTRESS (or: Why We Put a Moat Around a Server)</h2>
-            <p>Standard defence is a firewall. We built a pyramid, on an island, in a moat, in the basement. It's a secure enclave with concentric trust zones. Anything trying to get to the core data has to swim, climb, and then explain itself to Richmond.</p>
-            
-            <div class="grid-diagrams">
-                <div class="diagram">
-                    <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
-                        <defs><radialGradient id="g1" cx="50%" cy="30%"><stop offset="0%" stop-color="#00ff88" stop-opacity="0.3"/><stop offset="100%" stop-color="#00ff88" stop-opacity="0"/></radialGradient></defs>
-                        <ellipse cx="100" cy="135" rx="85" ry="18" fill="none" stroke="#0a5a8a" stroke-width="2" stroke-dasharray="4 3"/>
-                        <ellipse cx="100" cy="135" rx="70" ry="14" fill="#052438" stroke="#0d78b3" />
-                        <polygon points="100,15 30,115 170,115" fill="#0a141d" stroke="#00ff88" stroke-width="2"/>
-                        <polygon points="100,35 50,115 150,115" fill="url(#g1)" stroke="#00ff88" stroke-opacity="0.5"/>
-                        <rect x="90" y="85" width="20" height="30" fill="#000" stroke="#00ff88"/>
-                        <text x="100" y="150" text-anchor="middle" fill="#5cc8ff" font-size="8" font-family="monospace">MOAT</text>
-                    </svg>
-                    <figcaption>FIG 1.A - Not to scale. Definitely not GDPR compliant.</figcaption>
-                </div>
-                <div class="diagram">
-<pre style="text-align:left; margin:0; background:transparent; border:none; color:#00ff88;">
-      /_\
-     /___\
-    /_____\   &lt;-- CORE
-   /_______\
-  ===========
- ~~~ MOAT ~~~
-</pre>
-                    <figcaption>FIG 1.B - Artist's impression (Jen)</figcaption>
-                </div>
-            </div>
-
-            <div class="dialogue jen">
-                <div class="avatar">J</div>
-                <div><strong>Jen Barber – Relationship Manager</strong>Right, so it's like a pyramid, like in Egypt? I went there on holiday. Anyway, I told the team it needed a red door for accessibility. Moss said that's a "single point of failure". I said that's exactly what my last boyfriend was.</div>
-            </div>
-
-            <h2><span>02</span>FENCES: 0, 1, 2, 4, 8 (Not a Lottery Ticket)</h2>
-            <p>We don't do linear security. That's for amateurs and the accounts department. We use exponential fences. Each fence is double the previous distance from the core, measured in trust-units.</p>
-            <ul>
-                <li><code>FENCE 0</code> – Inside the pyramid. You are the data. Congratulations.</li>
-                <li><code>FENCE 1</code> – Kernel ring. Moss lives here.</li>
-                <li><code>FENCE 2</code> – User space. Roy pretends to work here.</li>
-                <li><code>FENCE 4</code> – DMZ. Where we put printers to die.</li>
-                <li><code>FENCE 8</code> – The internet. Here be monsters and people who haven't tried turning it off and on again.</li>
-            </ul>
-            <p>No fence 3, 5, 6, or 7. They were deemed "inefficient" and "a bit needy".</p>
-
-            <div class="dialogue roy">
-                <div class="avatar">R</div>
-                <div><strong>Roy Trenneman – IT</strong>Look, it's binary, Jen. 0,1,2,4,8. No, you can't just "add a fence at 3 because it looks lonely". That's not how powers of two work. That's not how anything works. Have you tried turning your brain off and on again?</div>
-            </div>
-
-            <h2><span>03</span>GOD TUNNEL — The Infinite Loop That Isn't My Fault</h2>
-            <p>The God Tunnel is a privileged pathway that goes from FENCE 8 straight back to FENCE 0, but only if you have the correct phase. It's an infinite loop by design. It lets the system check itself forever without ever actually leaving the building. Like Moss on a Saturday night.</p>
-            <code>while(true) { validate(soul); }</code>
-            <p class="note">If you get stuck in the God Tunnel, do not panic. You are experiencing eternity. Please log a ticket.</p>
-
-            <h2><span>04</span>4 QUADS, 90 DEGREES, 1 CONTROL BIT (Moss Approved)</h2>
-            <p>Instead of storing four separate orientations, we store one quadrant and rotate it. One single control bit (the "spinny bit") tells the system which 90-degree rotation to apply. It's memory-efficient, elegant, and reduces Moss's stress levels by 12%.</p>
-            
-            <div class="quads-wrap">
-                <div class="quads" id="quads">
-                    <div class="quad">A</div><div class="quad">B</div>
-                    <div class="quad">D</div><div class="quad">C</div>
-                </div>
-                <p style="font-family:monospace; margin-top:8px; font-size:12px;">CONTROL BIT: <span id="controlBit" style="color:var(--green)">0</span> | ANGLE: <span id="angleOut">0°</span></p>
-                <button class="btn" id="rotateBtn" style="max-width:200px; margin-top:8px;">ROTATE 90°</button>
-            </div>
-
-            <div class="dialogue moss">
-                <div class="avatar">M</div>
-                <div><strong>Maurice Moss – Senior IT</strong>I came here to drink milk and kick ass at efficient data structures, and I've just finished my milk. Observe: four quads, one bit. It's beautiful. Like a four-dimensional Rubik's cube, but useful, and it doesn't have stickers that peel off.</div>
-            </div>
-
-            <h2><span>05</span>SHADOW REGISTER (Yes, It's Actually His)</h2>
-            <p>The Shadow Register is a perfect, silent copy of the main register. It follows it everywhere, learns its secrets, and takes over if the main one has a lie-down. Moss insisted we call it "Shadow" because "Backup Register" sounded too mainstream.</p>
-            <p>It lives at <code>0xSH4D0W</code>. Do not address it directly. It gets shy.</p>
-
-            <h2><span>06</span>PHASE REGISTER (Don't Forget It)</h2>
-            <p>This 8-bit register stores where we are in the plasmatonic cycle. Forget to update it and the whole pyramid desynchronises and starts humming in B-flat. Last time that happened, Richmond cried.</p>
-            
-            <div class="dialogue jen">
-                <div class="avatar">J</div>
-                <div><strong>Jen</strong>I don't actually know what the Phase Register does, but Moss wrote "DO NOT FORGET PHASE REGISTER" on my hand in permanent marker. So I put it in my calendar. It's right after "lunch with clients".</div>
-            </div>
-
-            <h2><span>07</span>HAMILTON STEPS 27 & 28 — The Hammy Bit</h2>
-            <p>Steps 1 through 26 are initialisation, handshaking, and making tea. The actual work happens in Hamilton Steps 27 and 28. This is where we apply the quaternion rotation that keeps the pyramid stable in 4D space.</p>
-            <pre>STEP 27: q' = q * (0 + i + j + k) / sqrt(4)   // stir
-STEP 28: q'' = normalize(q')                 // settle</pre>
-            <p>Moss calls this "the Hamilton boogie". Roy calls it "why the server is slow on Tuesdays".</p>
-
-            <h2><span>08</span>PLASMATONIC MODE — 24.5 Times Because 25 Was Too Mainstream</h2>
-            <p>To fully charge the fortress, the system must complete 24.5 plasmatonic cycles. Not 24. Not 25. Twenty-four and a half.</p>
-            <p>Why .5? Because at exactly 25 cycles, the system achieves harmonic resonance and starts broadcasting Countdown on all monitors. Denholm made us stop after the third time. The half-cycle deliberately detunes it. It's the engineering equivalent of being deliberately annoying to avoid being dangerously perfect.</p>
-            <p>Current cycle progress is tracked live. Obviously.</p>
-
-            <div class="note"><strong>Footnote [1]:</strong> Plasmatonic is not a real word. Moss made it up to win an argument with Roy. <br><strong>Footnote [2]:</strong> If you see Richmond near the moat, do not make eye contact. Offer him a biscuit and walk away slowly.</div>
-
-            <div class="footnotes">
-                <p>Document amended per Reynholm Industries policy 7B: "All critical systems must sound impressive at board meetings."</p>
-            </div>
-
-            <div class="footer-pow">Proof of Work Status: <span style="color:var(--amber)">COMPLETE</span> (after 24.5 plasmatonic cycles, obviously)</div>
+      </section>
+      <section>
+        <h3>PLASMATONIC</h3>
+        <div class="stat-row"><label>CYCLES</label><span id="plasmaCycles" class="mono cyan">0.000</span></div>
+        <div class="stat-row"><label>24.5 BASE</label><div class="mini-bar"><div id="plasmaBar"></div></div></div>
+        <div class="stat-row"><label>SHADOW REG</label><span id="shadowReg" class="mono">0000</span></div>
+        <div class="stat-row"><label>PHASE REG</label><span id="phaseReg" class="mono">0.0°</span></div>
+      </section>
+      <section>
+        <h3>HAMILTON STEPS</h3>
+        <div class="hamilton">
+          <div id="h27">27</div>
+          <div id="h28">28</div>
         </div>
-    </main>
-
-    <aside class="side">
-        <div class="card">
-            <h3><span class="status-dot"></span> Emergency Procedures</h3>
-            <ol style="padding-left:18px; margin:8px 0; font-size:13px;">
-                <li>System on fire? <strong>Have you tried turning it off and on again?</strong></li>
-                <li>God Tunnel looping? Unplug Moss's milk fridge for 10s.</li>
-                <li>Shadow Register talking back? That's normal. Mostly.</li>
-                <li>Jen asks a technical question? Redirect to Roy.</li>
-            </ol>
-            <button class="btn" id="resetBtn">Have you tried turning it off and on again?</button>
-            <div style="display:flex; justify-content:space-between; margin-top:10px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted)">
-                <span>Failures: <span id="failCount" style="color:var(--red)">431</span></span>
-                <span>Reboots: <span id="offOnCount" style="color:var(--green)">0</span></span>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3>Live System Telemetry</h3>
-            <div class="terminal" id="terminal">
-                <div id="term-log">
-                    <div class="line">> boot pyramid_v3.14...</div>
-                    <div class="line">> moat_depth = OPTIMAL</div>
-                    <div class="line">> fences [0,1,2,4,8] = ONLINE</div>
-                </div>
-            <div style="margin-top:8px; font-size:12px; font-family:'IBM Plex Mono'">
-                Plasmatonic: <span id="plasmaCount" style="color:var(--green)">24.5</span>/24.5
-                <br>Phase Register: <span id="phaseVal" style="color:var(--amber)">0x1C</span>
-                <br>Shadow: <span style="color:var(--blue)">MIRRORING</span>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3>Basement Status</h3>
-            <p style="margin:0; font-size:13px; color:var(--muted)">Lights: <span style="color:var(--amber)">Flickering</span><br>
-            Temperature: <span style="color:var(--blue)">Cold</span> (as usual)<br>
-            Richmond: <span style="color:var(--red)">Present</span></p>
-        </div>
+      </section>
     </aside>
+
+    <section class="center-stage">
+      <div class="toroid-container">
+        <canvas id="toroid" width="520" height="520"></canvas>
+        <div class="toroid-overlay">
+          <div id="bigG" class="big-g">G</div>
+          <div class="core-readout">
+            <div class="cr-label">COMPRESSION RATIO</div>
+            <div id="compRatio" class="cr-value">0.00472</div>
+            <div class="cr-sub">value / 212 → 1</div>
+          </div>
+        </div>
+        <div class="quads-ring" id="quadsRing"></div>
+      </div>
+
+      <div class="sequence-bar" id="seqBar"></div>
+
+      <div class="controls">
+        <button id="startBtn" class="btn primary">STOP</button>
+        <div class="speed">
+          <label>SPEED</label>
+          <input type="range" id="speedSlider" min="0.25" max="2" step="0.05" value="1">
+          <span id="speedVal" class="mono">1.00x</span>
+        </div>
+        <button id="modeBtn" class="btn ghost">TOGGLE FUSION</button>
+        <div class="beat" id="beat"></div>
+      </div>
+    </section>
+
+    <aside class="panel right">
+      <section>
+        <h3>ENERGY COST <span>n^n ESCALATION</span></h3>
+        <div class="costs" id="costs"></div>
+      </section>
+      <section>
+        <h3>SYSTEM STATE</h3>
+        <div class="stat-row"><label>LOOPS</label><span id="loops" class="mono">0</span></div>
+        <div class="stat-row"><label>SEQUENCE IDX</label><span id="seqIdx" class="mono">0/18</span></div>
+        <div class="stat-row"><label>999 POINT</label><span id="point999" class="mono gold">0.0%</span></div>
+        <div class="mini-bar tall"><div id="compoundingBar"></div></div>
+      </section>
+      <section>
+        <h3>DYSON BABY</h3>
+        <div class="dyson">
+          <div class="dyson-fill" id="dysonFill"></div>
+          <div class="dyson-label">HARVEST <span id="dysonPct">0%</span></div>
+        </div>
+        <div class="stat-row small"><label>YIELD</label><span id="dysonYield" class="mono cyan">0.00</span></div>
+        <div class="stat-row small"><label>STATUS</label><span id="dysonStatus" class="mono">CHARGING</span></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="panel history">
+    <div class="history-header">
+      <h3>SEQUENCE HISTORY</h3>
+      <div class="legend">last 240 steps · push amplitude</div>
+    </div>
+    <canvas id="historyCanvas"></canvas>
+  </footer>
 </div>
 
 <script>
-    // Ticker
-    const ticker = document.getElementById('ticker');
-    let tickerPos = 0;
-    setInterval(()=>{
-        ticker.scrollLeft = tickerPos++ % 500;
-    }, 80);
-
-    // Emergency button
-    let failCount = 431;
-    let rebootCount = 0;
-    const failEl = document.getElementById('failCount');
-    const rebootEl = document.getElementById('offOnCount');
-    const docBody = document.getElementById('docBody');
-    document.getElementById('resetBtn').addEventListener('click', ()=>{
-        failCount = 0;
-        rebootCount++;
-        failEl.textContent = '0';
-        rebootEl.textContent = rebootCount;
-        docBody.classList.add('reboot');
-        addLog('> USER INITIATED REBOOT SEQUENCE...', true);
-        setTimeout(()=>{ addLog('> Have you tried turning it off and on again? YES.'); addLog('> System restored. Roy is annoyed.'); docBody.classList.remove('reboot'); }, 1200);
+(() => {
+  const SEQ = [1,3,6,9,15,21,24,27,0,0,27,24,21,15,9,6,3,1];
+  const FENCES = [0,1,2,4,8];
+  const COSTS = [
+    {n:4, v:256},
+    {n:5, v:3125},
+    {n:6, v:46656},
+    {n:7, v:823543},
+    {n:8, v:16777216},
+    {n:9, v:387420489},
+  ];
+  
+  let idx = 0, dir = 1, running = true, mode = 'FISSION';
+  let speed = 1, bpm = 60, timer = null;
+  let loops = 0, plasmatonic = 0, dyson = 0;
+  let history = Array(240).fill(0);
+  let currentRadius = 60, targetRadius = 60;
+  let particles = [];
+  
+  const $ = id => document.getElementById(id);
+  const toroid = $('toroid'), ctx = toroid.getContext('2d');
+  const seqBar = $('seqBar'), beat = $('beat');
+  const bigG = $('bigG'), modeIndicator = $('modeIndicator'), modeText = $('modeText');
+  
+  // init UI
+  SEQ.forEach((v,i)=>{
+    const d = document.createElement('div');
+    d.className = 'seq-cell' + (v===0?' zero':'');
+    d.textContent = v;
+    d.id = 'seq-'+i;
+    seqBar.appendChild(d);
+  });
+  FENCES.forEach(f=>{
+    const d = document.createElement('div');
+    d.className='fence'; d.id='fence-'+f;
+    d.innerHTML = `<div class="num">${f}</div><div class="lbl">FENCE</div>`;
+    $('fences').appendChild(d);
+  });
+  COSTS.forEach(c=>{
+    const d = document.createElement('div'); d.className='cost'; d.id='cost-'+c.n;
+    d.innerHTML = `<div class="exp">${c.n}<sup>${c.n}</sup></div><div class="val">${c.v.toLocaleString()}</div><div class="bar"><i></i></div>`;
+    $('costs').appendChild(d);
+  });
+  // quads ring dots
+  const qr = $('quadsRing');
+  for(let i=0;i<4;i++){ const e=document.createElement('div'); e.className='qr'; e.id='qr'+i; qr.appendChild(e); }
+  
+  function setMode(m){
+    mode = m;
+    modeIndicator.classList.toggle('fusion', m==='FUSION');
+    modeText.textContent = m==='FISSION' ? 'FISSION MODE: PUSH NOT PULL' : 'FUSION MODE: PULL NOT PUSH';
+    $('modeBtn').textContent = m==='FISSION' ? 'TOGGLE FUSION' : 'TOGGLE FISSION';
+  }
+  
+  function step(){
+    const v = SEQ[idx];
+    // beat
+    beat.classList.remove('active'); void beat.offsetWidth; beat.classList.add('active');
+    
+    // sequence UI
+    document.querySelectorAll('.seq-cell').forEach((el,i)=>{
+      el.classList.toggle('active', i===idx);
+      el.classList.toggle('past', i<idx);
     });
-
-    // Quads rotation
-    let angle = 0;
-    const quads = document.getElementById('quads');
-    const angleOut = document.getElementById('angleOut');
-    const controlBit = document.getElementById('controlBit');
-    document.getElementById('rotateBtn').addEventListener('click', ()=>{
-        angle = (angle + 90) % 360;
-        quads.style.transform = `rotate(${angle}deg)`;
-        angleOut.textContent = angle + '°';
-        controlBit.textContent = (angle/90) % 2;
-        addLog(`> Quad rotation: ${angle}° (control=${controlBit.textContent})`);
-    });
-
-    // Terminal logs
-    const logEl = document.getElementById('term-log');
-    const messages = [
-        '> God Tunnel ping: ∞ms',
-        '> Fence 4: printer jam detected (ignored)',
-        '> Shadow Register yawned',
-        '> Phase Register tick',
-        '> Hamilton Step 27 complete',
-        '> Hamilton Step 28 complete',
-        '> Moss refilled milk',
-        '> Jen asked about "the internet box"',
-        '> Roy sighed audibly'
-    ];
-    function addLog(msg, important=false){
-        const div = document.createElement('div');
-        div.className = 'line';
-        div.textContent = msg;
-        if(important) div.style.color = '#ffb000';
-        logEl.appendChild(div);
-        if(logEl.children.length > 12) logEl.removeChild(logEl.firstChild);
-        logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
+    $('seqIdx').textContent = `${idx+1}/18`;
+    
+    // toroid target
+    targetRadius = 50 + (v/27)*160;
+    if(mode==='FUSION') targetRadius = 210 - (v/27)*160;
+    
+    // big G
+    if(v===0){
+      bigG.classList.add('active');
+      setTimeout(()=>bigG.classList.remove('active'), 700);
     }
-    setInterval(()=>{
-        addLog(messages[Math.floor(Math.random()*messages.length)]);
-        // simulate failures creeping up
-        if(Math.random() < 0.3 && failCount < 500){
-            failCount++;
-            failEl.textContent = failCount;
-        }
-    }, 2400);
-
-    // Plasmatonic cycle simulation
-    let plasma = 24.5;
-    const plasmaEl = document.getElementById('plasmaCount');
-    const phaseEl = document.getElementById('phaseVal');
-    setInterval(()=>{
-        plasma = (plasma + 0.1) % 24.6;
-        if(plasma >= 24.5) plasma = 0;
-        plasmaEl.textContent = plasma.toFixed(1);
-        const phase = Math.floor((plasma/24.5)*255).toString(16).toUpperCase().padStart(2,'0');
-        phaseEl.textContent = '0x' + phase;
-    }, 800);
+    
+    // compression
+    $('compRatio').textContent = (v/212).toFixed(5);
+    
+    // fences
+    FENCES.forEach(f=>{
+      $('fence-'+f).classList.toggle('active', v>=f);
+    });
+    
+    // quads
+    const rot = (loops*90 + (idx/18)*90) % 360;
+    $('quadDial').style.transform = `rotate(${rot}deg)`;
+    $('quadRot').textContent = Math.round(rot)+'°';
+    const qActive = (idx % 4) + 1;
+    $('quadActive').textContent = 'Q'+qActive;
+    $('quadPhase').textContent = `${qActive}/4`;
+    // position ring dots
+    for(let i=0;i<4;i++){
+      const a = (rot + i*90) * Math.PI/180;
+      const r = currentRadius + 18;
+      const x = 260 + Math.cos(a)*r, y = 260 + Math.sin(a)*r;
+      const el = $('qr'+i);
+      el.style.transform = `translate(${x-260-2}px, ${y-260-2}px)`;
+      el.style.opacity = i===qActive-1 ? '1' : '0.4';
+      el.style.boxShadow = i===qActive-1 ? '0 0 14px var(--cyan)' : '0 0 6px var(--cyan)';
+    }
+    
+    // hamilton
+    const h = v===27;
+    $('h27').classList.toggle('active', h);
+    $('h28').classList.toggle('active', h);
+    
+    // plasmatonic
+    plasmatonic += (1/24.5) * (mode==='FISSION'?1:-1);
+    $('plasmaCycles').textContent = Math.abs(plasmatonic).toFixed(3);
+    $('plasmaBar').style.width = `${(Math.abs(plasmatonic)%1)*100}%`;
+    
+    // registers
+    const shadow = ((v*73 + loops*13 + idx*7) & 0xFFFF).toString(16).toUpperCase().padStart(4,'0');
+    $('shadowReg').textContent = shadow;
+    const phase = ((plasmatonic*360/24.5) % 360 + 360) % 360;
+    $('phaseReg').textContent = phase.toFixed(1)+'°';
+    
+    // loops & 999
+    if((mode==='FISSION' && idx===SEQ.length-1) || (mode==='FUSION' && idx===0)){
+      loops++;
+    }
+    $('loops').textContent = loops;
+    const p999 = Math.min(100, (loops/35.7)*100);
+    $('point999').textContent = p999.toFixed(1)+'%';
+    $('compoundingBar').style.width = p999+'%';
+    if(p999>=100) $('compoundingBar').style.background = 'linear-gradient(90deg, var(--gold-dim), var(--gold))';
+    
+    // dyson
+    dyson = Math.min(100, dyson + (v/27)*0.35*speed);
+    $('dysonFill').style.width = dyson+'%';
+    $('dysonPct').textContent = Math.floor(dyson)+'%';
+    $('dysonYield').textContent = (dyson*9.99).toFixed(2);
+    $('dysonStatus').textContent = dyson>99 ? 'SATURATED' : dyson>50 ? 'HARVESTING' : 'CHARGING';
+    
+    // costs
+    COSTS.forEach(c=>{
+      const intensity = Math.pow(v/27, 1.5);
+      const bar = document.querySelector(`#cost-${c.n} .bar i`);
+      const logMax = Math.log10(387420489);
+      const h = (Math.log10(c.v)/logMax)*100 * (0.3 + intensity*0.7);
+      bar.style.width = h+'%';
+      document.querySelector(`#cost-${c.n}`).classList.toggle('high', v>=21 && c.n>=7);
+    });
+    
+    // particles
+    spawnParticles(v);
+    
+    // history
+    history.push(v); if(history.length>240) history.shift();
+    drawHistory();
+    
+    // next
+    idx += dir;
+    if(idx>=SEQ.length){ idx=0; }
+    if(idx<0){ idx=SEQ.length-1; }
+  }
+  
+  function spawnParticles(v){
+    const count = mode==='FISSION' ? Math.ceil(v/4) : Math.ceil((27-v)/5);
+    for(let i=0;i<count;i++){
+      particles.push({
+        a: Math.random()*Math.PI*2,
+        r: mode==='FISSION' ? 30 : 220,
+        s: (0.8 + Math.random()*1.2 + v*0.04) * (mode==='FISSION'?1:-1),
+        l: 1,
+        sz: 1.5 + Math.random()*2.5,
+        c: v===0 ? 'gold' : (v>21 ? 'cyan' : 'dim')
+      });
+    }
+  }
+  
+  function drawToroid(){
+    const w=toroid.width, h=toroid.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.save(); ctx.translate(w/2,h/2);
+    
+    // smooth radius
+    currentRadius += (targetRadius - currentRadius)*0.08;
+    
+    // glow rings
+    for(let i=3;i>=0;i--){
+      const r = currentRadius + i*10;
+      const alpha = 0.18 - i*0.04;
+      ctx.beginPath();
+      ctx.arc(0,0,r,0,Math.PI*2);
+      ctx.strokeStyle = mode==='FISSION' ? `rgba(0,229,255,${alpha})` : `rgba(255,215,0,${alpha})`;
+      ctx.lineWidth = 22 - i*4;
+      ctx.shadowColor = mode==='FISSION' ? '#00e5ff' : '#ffd700';
+      ctx.shadowBlur = 25 + i*5;
+      ctx.stroke();
+    }
+    // core
+    ctx.beginPath();
+    ctx.arc(0,0, Math.max(8, currentRadius*0.22), 0, Math.PI*2);
+    const grad = ctx.createRadialGradient(0,0,0,40);
+    grad.addColorStop(0, mode==='FISSION' ? 'rgba(0,229,255,0.9)' : 'rgba(255,215,0,0.9)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.shadowBlur = 30;
+    ctx.shadowColor = mode==='FISSION' ? '#00e5ff' : '#ffd700';
+    ctx.fill();
+    
+    // particles
+    particles = particles.filter(p=>{
+      p.r += p.s;
+      p.l -= 0.015;
+      if(p.l<=0) return false;
+      if(mode==='FISSION' && p.r>240) return false;
+      if(mode==='FUSION' && p.r<20) return false;
+      const x = Math.cos(p.a)*p.r, y = Math.sin(p.a)*p.r;
+      ctx.beginPath();
+      ctx.arc(x,y,p.sz,0,Math.PI*2);
+      ctx.fillStyle = p.c==='gold' ? `rgba(255,215,0,${p.l})` : p.c==='cyan' ? `rgba(0,229,255,${p.l})` : `rgba(0,168,200,${p.l*0.6})`;
+      ctx.shadowColor = p.c==='gold' ? '#ffd700' : '#00e5ff';
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      return true;
+    });
+    
+    ctx.restore();
+    requestAnimationFrame(drawToroid);
+  }
+  
+  function drawHistory(){
+    const c = $('historyCanvas'), x = c.getContext('2d');
+    const w = c.width = c.clientWidth * devicePixelRatio, h = c.height = 90 * devicePixelRatio;
+    x.scale(devicePixelRatio, devicePixelRatio);
+    const W = c.clientWidth, H = 90;
+    x.clearRect(0,0,W,H);
+    // grid
+    x.strokeStyle = 'rgba(0,229,255,0.08)'; x.lineWidth=1;
+    for(let i=0;i<=4;i++){ const y = (H/4)*i; x.beginPath(); x.moveTo(0,y); x.lineTo(W,y); x.stroke(); }
+    // line
+    x.beginPath();
+    x.moveTo(0, H - (history[0]/27)*H);
+    for(let i=1;i<history.length;i++){
+      const px = (i/(history.length-1))*W;
+      const py = H - (history[i]/27)*(H-8) - 4;
+      x.lineTo(px,py);
+    }
+    const grad = x.createLinearGradient(0,0,W,0);
+    grad.addColorStop(0,'rgba(0,229,255,0)'); grad.addColorStop(0.1,'rgba(0,229,255,0.8)'); grad.addColorStop(1,'rgba(0,229,255,1)');
+    x.strokeStyle = grad; x.lineWidth=2; x.shadowColor='#00e5ff'; x.shadowBlur=8; x.stroke();
+    // fill under
+    x.lineTo(W,H); x.lineTo(0,H); x.closePath();
+    const fillGrad = x.createLinearGradient(0,0,0,H);
+    fillGrad.addColorStop(0,'rgba(0,229,255,0.25)'); fillGrad.addColorStop(1,'rgba(0,229,255,0)');
+    x.fillStyle = fillGrad; x.fill();
+  }
+  
+  function startTimer(){
+    if(timer) clearInterval(timer);
+    const interval = (60000/bpm)/speed;
+    timer = setInterval(step, interval);
+  }
+  
+  // controls
+  $('startBtn').onclick = ()=>{
+    running = !running;
+    $('startBtn').textContent = running ? 'STOP' : 'START';
+    $('startBtn').classList.toggle('primary', running);
+    if(running) startTimer(); else clearInterval(timer);
+  };
+  $('speedSlider').oninput = e=>{
+    speed = parseFloat(e.target.value);
+    $('speedVal').textContent = speed.toFixed(2)+'x';
+    if(running) startTimer();
+  };
+  $('modeBtn').onclick = ()=>{
+    setMode(mode==='FISSION' ? 'FUSION' : 'FISSION');
+    dir *= -1;
+    particles = [];
+  };
+  
+  // init
+  setMode('FISSION');
+  drawToroid();
+  drawHistory();
+  step();
+  startTimer();
+  window.addEventListener('resize', drawHistory);
+})();
 </script>
 </body>
 </html>
