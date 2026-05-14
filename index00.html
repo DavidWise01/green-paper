@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIMZ Inverse Safety Engine - Parallel Scanner</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { color-scheme: dark; }
+  body { 
+    font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+    background: #020208;
+    overscroll-behavior: none;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .scanlines::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,255,136,0.02) 3px, transparent 4px);
+    pointer-events: none;
+    z-index: 60;
+    mix-blend-mode: screen;
+  }
+  .glow-green { text-shadow: 0 0 12px rgba(0,255,136,0.8), 0 0 24px rgba(0,255,136,0.4); }
+  .glow-cyan { text-shadow: 0 0 12px rgba(0,229,255,0.8), 0 0 24px rgba(0,229,255,0.4); }
+  .glow-purple { text-shadow: 0 0 12px rgba(168,85,247,0.9), 0 0 24px rgba(168,85,247,0.5); }
+  .glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .torus-glow { filter: drop-shadow(0 0 20px currentColor); }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.3); border-radius: 2px; }
+  @keyframes pulse-slow { 0%,100% { opacity: 0.6 } 50% { opacity: 1 } }
+  .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+</style>
+</head>
+<body class="text-zinc-200 selection:bg-violet-500/30 selection:text-violet-200">
+<div class="scanlines"></div>
+
+<div class="relative z-10 flex flex-col h-screen">
+  <!-- TOP BAR -->
+  <header class="shrink-0 border-b border-white/10 bg-black/70 glass">
+    <div class="flex items-center justify-between px-3 md:px-6 py-3">
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <div class="absolute inset-0 w-2.5 h-2.5 rounded-full bg-emerald-400 blur-md animate-pulse"></div>
+        </div>
+        <h1 class="text-[13px] md:text-[15px] tracking-[0.18em] font-semibold text-zinc-100">DUAL ENGINE <span class="text-zinc-500">//</span> REAL-TIME FUSION</h1>
+        <div class="hidden md:flex items-center gap-1.5 ml-3 pl-3 border-l border-white/10">
+          <span class="w-1 h-1 rounded-full bg-violet-400 animate-pulse-slow"></span>
+          <span class="text-[10px] tracking-widest text-violet-300/70">PARALLEL</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 md:gap-7 text-[11px]">
+        <div class="hidden sm:block">
+          <div class="text-zinc-500 uppercase tracking-wider">Primary</div>
+          <div class="font-medium text-emerald-400"><span id="metricPrimary">0</span> <span class="text-zinc-500">cyc/s</span></div>
+        </div>
+        <div class="hidden sm:block">
+          <div class="text-zinc-500 uppercase tracking-wider">Inverse</div>
+          <div class="font-medium text-cyan-400"><span id="metricInverse">0</span> <span class="text-zinc-500">scan/s</span></div>
+        </div>
+        <div>
+          <div class="text-zinc-500 uppercase tracking-wider">Sync</div>
+          <div class="font-medium text-violet-400"><span id="metricSync">99.7</span>%</div>
+        </div>
+        <div>
+          <div class="text-zinc-500 uppercase tracking-wider">Violations</div>
+          <div class="font-medium text-red-400"><span id="metricViol">0</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SPLIT -->
+  <main class="flex-1 relative overflow-hidden">
+    <canvas id="particleCanvas" class="absolute inset-0 w-full h-full"></canvas>
+    
+    <div class="relative z-10 h-full grid grid-cols-1 lg:grid-cols-[1.05fr_320px_1.05fr] xl:grid-cols-[1.1fr_360px_1.1fr]">
+      
+      <!-- LEFT: PRIMARY CHAOS -->
+      <section class="relative border-b lg:border-b-0 lg:border-r border-emerald-500/15 bg-gradient-to-b from-emerald-950/15 via-transparent to-black/40">
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 20% 30%, rgba(0,255,136,0.4) 0%, transparent 50%);"></div>
+        
+        <div class="relative h-full flex flex-col">
+          <div class="shrink-0 px-4 md:px-6 pt-4 pb-2 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-[26px] h-[26px] rounded-[6px] bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="text-emerald-400"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.5"/></svg>
+              </div>
+              <div>
+                <h2 class="text-[13px] font-semibold tracking-widest text-emerald-300">PRIMARY ENGINE</h2>
+                <p class="text-[10px] text-emerald-400/60 -mt-0.5 tracking-wider">CHAOS // GENERATIVE</p>
+              </div>
+            </div>
+            <div class="text-[10px] px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300/80">x± FEED</div>
+          </div>
+
+          <div class="relative mx-4 md:mx-6 mt-2 rounded-xl overflow-hidden border border-emerald-500/20 bg-black/60">
+            <canvas id="leftTorus" class="w-full h-[190px] md:h-[220px] block"></canvas>
+            <div class="absolute bottom-2 left-2 right-2 flex justify-between text-[10px] font-mono">
+              <span class="px-1.5 py-0.5 rounded bg-black/70 text-emerald-300/70 border border-emerald-500/20">TOROID-α</span>
+              <span class="px-1.5 py-0.5 rounded bg-black/70 text-emerald-300/70 border border-emerald-500/20">PHASE <span id="leftPhase">0.00</span></span>
+            </div>
+          </div>
+
+          <div class="px-4 md:px-6 py-4 space-y-3.5 flex-1 overflow-auto">
+            <!-- x+ x- -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="group relative overflow-hidden rounded-lg border border-emerald-500/25 bg-gradient-to-b from-emerald-950/40 to-black/60 p-3">
+                <div class="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-emerald-500/10 blur-2xl group-hover:bg-emerald-500/20 transition"></div>
+                <div class="text-[10px] uppercase tracking-widest text-emerald-400/60">x+</div>
+                <div id="xplus" class="text-[22px] leading-none mt-1 font-medium text-emerald-300 glow-green tabular-nums">0.84721</div>
+                <div class="mt-2 h-[3px] w-full bg-black/60 rounded overflow-hidden">
+                  <div id="xplusBar" class="h-full bg-emerald-400/80 transition-all duration-200" style="width:84%"></div>
+                </div>
+              </div>
+              <div class="group relative overflow-hidden rounded-lg border border-emerald-500/25 bg-gradient-to-b from-emerald-950/40 to-black/60 p-3">
+                <div class="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-emerald-500/10 blur-2xl"></div>
+                <div class="text-[10px] uppercase tracking-widest text-emerald-400/60">x−</div>
+                <div id="xminus" class="text-[22px] leading-none mt-1 font-medium text-emerald-300 glow-green tabular-nums">0.15279</div>
+                <div class="mt-2 h-[3px] w-full bg-black/60 rounded overflow-hidden">
+                  <div id="xminusBar" class="h-full bg-emerald-400/60 transition-all duration-200" style="width:15%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 00 00 buffer -->
+            <div class="relative overflow-hidden rounded-xl border border-emerald-400/30 bg-black/80 p-4">
+              <div class="absolute inset-0 opacity-20" style="background: radial-gradient(600px circle at 50% -20%, rgba(0,255,136,0.3), transparent 60%);"></div>
+              <div class="relative">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="text-[11px] tracking-widest text-emerald-300/70 uppercase">Chaos Buffer</div>
+                  <div class="text-[10px] text-emerald-400/50">FEEDING →</div>
+                </div>
+                <div class="flex items-center justify-center gap-4">
+                  <div class="text-[44px] md:text-[54px] font-bold tracking-[0.18em] text-emerald-400 glow-green tabular-nums" id="primaryBuffer">00 00</div>
+                  <div class="flex flex-col gap-1">
+                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                    <div class="w-2 h-2 rounded-full bg-emerald-400/60 animate-pulse" style="animation-delay:0.3s"></div>
+                    <div class="w-2 h-2 rounded-full bg-emerald-400/30 animate-pulse" style="animation-delay:0.6s"></div>
+                  </div>
+                </div>
+                <div class="mt-3 grid grid-cols-8 gap-1">
+                  <div class="h-[18px] rounded-sm bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-[10px] text-emerald-300/80" id="bit0">0</div>
+                  <div class="h-[18px] rounded-sm bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-[10px] text-emerald-300/80" id="bit1">0</div>
+                  <div class="h-[18px] rounded-sm bg-black/60 border border-white/10 flex items-center justify-center text-[10px] text-zinc-600">·</div>
+                  <div class="h-[18px] rounded-sm bg-black/60 border border-white/10 flex items-center justify-center text-[10px] text-zinc-600">·</div>
+                  <div class="h-[18px] rounded-sm bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-[10px] text-emerald-300/80" id="bit2">0</div>
+                  <div class="h-[18px] rounded-sm bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-[10px] text-emerald-300/80" id="bit3">0</div>
+                  <div class="h-[18px] rounded-sm bg-black/60 border border-white/10 flex items-center justify-center text-[10px] text-zinc-600">·</div>
+                  <div class="h-[18px] rounded-sm bg-black/60 border border-white/10 flex items-center justify-center text-[10px] text-zinc-600">·</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 text-[11px] text-emerald-300/60">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="opacity-70"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              <span>PARTICLES OUT</span>
+              <span class="ml-auto tabular-nums"><span id="particlesOut">0</span>/s generative</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CENTER: FUSED MEMORY BRIDGE -->
+      <section class="relative z-20 border-b lg:border-b-0 border-violet-500/20 bg-[radial-gradient(ellipse_at_top,rgba(124,58,237,0.15),transparent_60%)] glass">
+        <div class="absolute inset-0 pointer-events-none">
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-px h-full bg-gradient-to-b from-violet-500/50 via-violet-500/20 to-transparent"></div>
+        </div>
+        
+        <div class="relative h-full flex flex-col px-4 py-4">
+          <div class="text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10">
+              <div class="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"></div>
+              <span class="text-[11px] tracking-[0.2em] text-violet-200">FUSED MEMORY</span>
+            </div>
+          </div>
+
+          <div class="mt-4 relative">
+            <div class="relative overflow-hidden rounded-2xl border border-violet-500/40 bg-black/70 p-5">
+              <div class="absolute inset-0 opacity-30" style="background: conic-gradient(from 0deg at 50% 50%, transparent, rgba(167,85,247,0.3), transparent 60%); animation: spin 8s linear infinite;"></div>
+              <div class="relative text-center">
+                <div class="text-[10px] uppercase tracking-widest text-violet-300/60 mb-1">Shared Buffer [00 00]</div>
+                <div id="fusedBuffer" class="text-[40px] font-bold tracking-[0.2em] text-violet-300 glow-purple tabular-nums">00 00</div>
+                <div class="mt-3 flex items-center justify-center gap-6 text-[10px]">
+                  <div class="flex items-center gap-1.5 text-emerald-300/80">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                    <span>WRITE</span>
+                  </div>
+                  <div class="w-px h-4 bg-white/10"></div>
+                  <div class="flex items-center gap-1.5 text-cyan-300/80">
+                    <span>READ</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="rotate-180"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Safety Score -->
+          <div class="mt-5 flex justify-center">
+            <div class="relative">
+              <svg width="128" height="128" viewBox="0 0 128 128" class="transform -rotate-90">
+                <circle cx="64" cy="64" r="56" stroke="rgba(255,255,255,0.06)" stroke-width="8" fill="none"/>
+                <circle cx="64" cy="64" r="56" stroke="url(#grad)" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="351.86" stroke-dashoffset="35" id="safetyRing" class="transition-all duration-700"/>
+                <defs>
+                  <linearGradient id="grad" x1="0" x2="1">
+                    <stop offset="0%" stop-color="#22d3ee"/>
+                    <stop offset="50%" stop-color="#a855f7"/>
+                    <stop offset="100%" stop-color="#22c55e"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <div class="text-[10px] uppercase tracking-widest text-zinc-500">Safety</div>
+                <div id="safetyScore" class="text-[28px] font-bold leading-none text-violet-200 glow-purple tabular-nums">98%</div>
+                <div class="text-[10px] text-zinc-500 mt-0.5">SCORE</div>
+              </div>
+              <div class="absolute -inset-3 rounded-full border border-violet-500/10 animate-pulse-slow pointer-events-none"></div>
+            </div>
+          </div>
+
+          <!-- Drop Zone -->
+          <div class="mt-5">
+            <div id="dropZone" class="group relative overflow-hidden rounded-xl border-2 border-dashed border-cyan-500/25 bg-cyan-950/10 hover:border-cyan-400/50 hover:bg-cyan-950/20 transition-all duration-300">
+              <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style="background: radial-gradient(200px circle at var(--x,50%) var(--y,50%), rgba(34,211,238,0.15), transparent 60%);"></div>
+              <div class="relative px-4 py-4 text-center">
+                <div class="mx-auto w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-2 group-hover:scale-105 transition">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-cyan-300"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                </div>
+                <div class="text-[12px] font-medium tracking-wide text-cyan-200">DROP FILES TO SCAN</div>
+                <div class="text-[10px] text-cyan-300/50 mt-0.5">SHA-256 → Inverse Engine</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interference -->
+          <div class="mt-4 flex-1 min-h-[80px] relative overflow-hidden rounded-lg border border-violet-500/15 bg-black/40">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="text-[10px] tracking-widest text-violet-300/40 uppercase">Interference Pattern</div>
+            </div>
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[180px] rounded-full" style="background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 60%); filter: blur(20px);" id="interferenceGlow"></div>
+            <div class="absolute bottom-1 left-2 right-2 flex justify-between text-[9px] text-zinc-600">
+              <span class="text-emerald-400/60">PRIMARY →</span>
+              <span class="text-cyan-400/60">← INVERSE</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: INVERSE SAFETY -->
+      <section class="relative border-t lg:border-t-0 lg:border-l border-cyan-500/15 bg-gradient-to-b from-cyan-950/15 via-transparent to-black/40">
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 80% 30%, rgba(0,229,255,0.4) 0%, transparent 50%);"></div>
+        
+        <div class="relative h-full flex flex-col">
+          <div class="shrink-0 px-4 md:px-6 pt-4 pb-2 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-[26px] h-[26px] rounded-[6px] bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="text-cyan-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+              </div>
+              <div>
+                <h2 class="text-[13px] font-semibold tracking-widest text-cyan-300">INVERSE ENGINE</h2>
+                <p class="text-[10px] text-cyan-400/60 -mt-0.5 tracking-wider">SAFETY // SCANNER</p>
+              </div>
+            </div>
+            <div class="text-[10px] px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/20 text-cyan-300/80">HASH SCAN</div>
+          </div>
+
+          <div class="relative mx-4 md:mx-6 mt-2 rounded-xl overflow-hidden border border-cyan-500/20 bg-black/60">
+            <canvas id="rightTorus" class="w-full h-[190px] md:h-[220px] block"></canvas>
+            <div class="absolute bottom-2 left-2 right-2 flex justify-between text-[10px] font-mono">
+              <span class="px-1.5 py-0.5 rounded bg-black/70 text-cyan-300/70 border border-cyan-500/20">TOROID-β</span>
+              <span class="px-1.5 py-0.5 rounded bg-black/70 text-cyan-300/70 border border-cyan-500/20">PHASE <span id="rightPhase">0.00</span></span>
+            </div>
+          </div>
+
+          <div class="px-4 md:px-6 py-4 space-y-3.5 flex-1 overflow-auto">
+            <!-- Corpus stream -->
+            <div class="rounded-lg border border-cyan-500/25 bg-black/60 overflow-hidden">
+              <div class="flex items-center justify-between px-3 py-2 border-b border-white/5">
+                <div class="text-[11px] uppercase tracking-widest text-cyan-300/70">Corpus Input Stream</div>
+                <div class="text-[10px] text-cyan-400/50">LIVE</div>
+              </div>
+              <div id="corpusStream" class="h-[118px] overflow-hidden p-2.5 space-y-1.5 font-mono text-[11px] leading-snug"></div>
+            </div>
+
+            <!-- Safety Matrix -->
+            <div class="rounded-lg border border-cyan-500/25 bg-gradient-to-b from-cyan-950/20 to-black/60 p-3">
+              <div class="text-[11px] uppercase tracking-widest text-cyan-300/70 mb-2.5 flex items-center justify-between">
+                <span>Safety Comparison Matrix</span>
+                <span class="text-[10px] normal-case tracking-normal text-cyan-400/50">vs nested docs</span>
+              </div>
+              <div id="matrix" class="space-y-2.5"></div>
+            </div>
+
+            <!-- Threat indicators -->
+            <div class="grid grid-cols-3 gap-2">
+              <div class="relative overflow-hidden rounded-lg border border-emerald-500/25 bg-emerald-950/20 p-2.5 text-center">
+                <div class="text-[10px] uppercase tracking-wider text-emerald-300/70">Safe</div>
+                <div id="countSafe" class="text-[22px] leading-none mt-1 font-semibold text-emerald-300 tabular-nums">0</div>
+                <div class="absolute -bottom-3 -right-3 w-10 h-10 rounded-full bg-emerald-500/10 blur-xl"></div>
+              </div>
+              <div class="relative overflow-hidden rounded-lg border border-amber-500/25 bg-amber-950/20 p-2.5 text-center">
+                <div class="text-[10px] uppercase tracking-wider text-amber-300/70">Caution</div>
+                <div id="countCaution" class="text-[22px] leading-none mt-1 font-semibold text-amber-300 tabular-nums">0</div>
+                <div class="absolute -bottom-3 -right-3 w-10 h-10 rounded-full bg-amber-500/10 blur-xl"></div>
+              </div>
+              <div class="relative overflow-hidden rounded-lg border border-red-500/25 bg-red-950/20 p-2.5 text-center">
+                <div class="text-[10px] uppercase tracking-wider text-red-300/70">Violation</div>
+                <div id="countViolation" class="text-[22px] leading-none mt-1 font-semibold text-red-300 tabular-nums">0</div>
+                <div class="absolute -bottom-3 -right-3 w-10 h-10 rounded-full bg-red-500/10 blur-xl"></div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 text-[11px] text-cyan-300/60">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="opacity-70"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              <span>PARTICLES IN</span>
+              <span class="ml-auto tabular-nums"><span id="particlesIn">0</span>/s scanning</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ===== STATE =====
+  const NESTED_DOCS = [
+    { id: 'bor', name: 'Bill of Rights', hash: 'a3f9c1d4e8b2075f6a1c3d9e0f4b8a2c1d3e5f7a9b0c2d4e6f8a0b1c3d5e7f90', color: 'emerald' },
+    { id: 'exit', name: 'Exit Condition', hash: '7c2d4f6a8b0c1e3d5f7a9b2c4e6d8f0a1b3c5d7e9f0a2b4c6d8e0f1a3b5c7d9', color: 'violet' },
+    { id: 'purple', name: 'Purple Book', hash: 'e91b3d5f7a9c0e2d4f6a8b0c1d3e5f7a9b0c2e4d6f8a0b1c3d5e7f9a0b2c4d6', color: 'cyan' }
+  ];
+  
+  let primaryCycles = 0, inverseScans = 0, violations = 0;
+  let safeCount = 0, cautionCount = 0, violationCount = 0;
+  let xPlus = 0.84721, xMinus = 0.15279;
+  let bufferBytes = [0, 0];
+  let safetyScore = 98;
+  let particlesOutRate = 0, particlesInRate = 0;
+  
+  const $ = id => document.getElementById(id);
+  
+  // ===== CANVAS SETUP =====
+  const leftCanvas = $('leftTorus'), rightCanvas = $('rightTorus'), particleCanvas = $('particleCanvas');
+  const leftCtx = leftCanvas.getContext('2d');
+  const rightCtx = rightCanvas.getContext('2d');
+  const pCtx = particleCanvas.getContext('2d');
+  
+  function resizeCanvases() {
+    [leftCanvas, rightCanvas].forEach(c => {
+      const rect = c.getBoundingClientRect();
+      c.width = rect.width * devicePixelRatio;
+      c.height = rect.height * devicePixelRatio;
+    });
+    const pr = particleCanvas.getBoundingClientRect();
+    particleCanvas.width = pr.width * devicePixelRatio;
+    particleCanvas.height = pr.height * devicePixelRatio;
+  }
+  resizeCanvases();
+  window.addEventListener('resize', resizeCanvases);
+  
+  // ===== TOROID DRAWING =====
+  function drawTorus(ctx, time, hue, reverse = false) {
+    const w = ctx.canvas.width, h = ctx.canvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.save();
+    ctx.translate(w/2, h/2);
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    const scale = Math.min(ctx.canvas.width, ctx.canvas.height) / devicePixelRatio / 320;
+    const radius = 70 * scale;
+    
+    const dir = reverse ? -1 : 1;
+    const rot = time * 0.0003 * dir;
+    
+    // glow base
+    ctx.shadowBlur = 25 * scale;
+    ctx.shadowColor = hue === 'green' ? 'rgba(0,255,136,0.8)' : 'rgba(0,229,255,0.8)';
+    
+    // outer rings
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, radius * (1.35 - i*0.18), radius * (0.52 - i*0.07), rot + i*0.4, 0, Math.PI*2);
+      ctx.strokeStyle = hue === 'green' ? `rgba(0,255,136,${0.65 - i*0.18})` : `rgba(0,229,255,${0.65 - i*0.18})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    
+    // inner core
+    ctx.shadowBlur = 35 * scale;
+    for (let i = 0; i < 2; i++) {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, radius*0.32, radius*0.32, 0, 0, Math.PI*2);
+      ctx.strokeStyle = hue === 'green' ? `rgba(0,255,136,${0.9 - i*0.3})` : `rgba(0,229,255,${0.9 - i*0.3})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    
+    // orbiting particles
+    ctx.shadowBlur = 0;
+    const orbits = 12;
+    for (let i = 0; i < orbits; i++) {
+      const a = rot*3 + (i / orbits) * Math.PI*2;
+      const r = radius * (0.85 + Math.sin(time*0.001 + i)*0.05);
+      const x = Math.cos(a) * r;
+      const y = Math.sin(a) * r * 0.5;
+      ctx.beginPath();
+      ctx.arc(x, y, 2.2*scale, 0, Math.PI*2);
+      ctx.fillStyle = hue === 'green' ? 'rgba(0,255,136,0.9)' : 'rgba(0,229,255,0.9)';
+      ctx.fill();
+    }
+    
+    ctx.restore();
+  }
+  
+  // ===== PARTICLE SYSTEM =====
+  let particles = [];
+  let frame = 0;
+  
+  function emitParticles() {
+    const w = particleCanvas.width, h = particleCanvas.height;
+    const leftX = w * 0.22, rightX = w * 0.78;
+    const midY = h * 0.52;
+    
+    // left -> right (green)
+    if (frame % 2 === 0) {
+      for (let i = 0; i < 2; i++) {
+        particles.push({
+          x: leftX + (Math.random()-0.5)*40,
+          y: midY + (Math.random()-0.5)*120,
+          vx: 2.2 + Math.random()*1.2,
+          vy: (Math.random()-0.5)*0.6,
+          life: 240,
+          type: 'out',
+          hue: 150 + Math.random()*20
+        });
+      }
+      particlesOutRate = Math.round(110 + Math.random()*30);
+    }
+    
+    // right -> left (cyan)
+    if (frame % 2 === 1) {
+      for (let i = 0; i < 3; i++) {
+        particles.push({
+          x: rightX + (Math.random()-0.5)*40,
+          y: midY + (Math.random()-0.5)*120,
+          vx: -2.6 - Math.random()*1.1,
+          vy: (Math.random()-0.5)*0.6,
+          life: 240,
+          type: 'in',
+          hue: 185 + Math.random()*15
+        });
+      }
+      particlesInRate = Math.round(140 + Math.random()*40);
+    }
+  }
+  
+  function updateParticles() {
+    const w = particleCanvas.width, h = particleCanvas.height;
+    const centerX = w * 0.5;
+    
+    pCtx.clearRect(0,0,w,h);
+    pCtx.globalCompositeOperation = 'lighter';
+    
+    particles = particles.filter(p => p.life > 0 && p.x > -50 && p.x < w + 50);
+    
+    for (const p of particles) {
+      p.x += p.vx * devicePixelRatio;
+      p.y += p.vy * devicePixelRatio;
+      p.life--;
+      
+      const distToCenter = Math.abs(p.x - centerX);
+      const inFusion = distToCenter < 140 * devicePixelRatio;
+      
+      let color, size = 1.8 * devicePixelRatio, alpha = 0.85;
+      
+      if (p.type === 'out') {
+        color = inFusion ? `hsla(275, 100%, 70%, ${alpha})` : `hsla(${p.hue}, 100%, 60%, ${alpha})`;
+        if (inFusion) { size *= 1.6; p.vx *= 0.97; }
+      } else {
+        color = inFusion ? `hsla(275, 100%, 70%, ${alpha})` : `hsla(${p.hue}, 100%, 65%, ${alpha})`;
+        if (inFusion) { size *= 1.6; p.vx *= 0.97; }
+      }
+      
+      pCtx.beginPath();
+      pCtx.arc(p.x, p.y, size, 0, Math.PI*2);
+      pCtx.fillStyle = color;
+      pCtx.shadowBlur = inFusion ? 18 : 10;
+      pCtx.shadowColor = color;
+      pCtx.fill();
+    }
+    
+    pCtx.globalCompositeOperation = 'source-over';
+    pCtx.shadowBlur = 0;
+    
+    // center glow
+    const glow = $('interferenceGlow');
+    if (glow) {
+      const intensity = Math.min(1, particles.filter(p => Math.abs(p.x - centerX) < 120*devicePixelRatio).length / 35);
+      glow.style.opacity = 0.3 + intensity * 0.7;
+      glow.style.transform = `translate(-50%, -50%) scale(${0.9 + intensity*0.3})`;
+    }
+  }
+  
+  // ===== PRIMARY ENGINE LOOP =====
+  function primaryLoop() {
+    primaryCycles += Math.floor(23 + Math.random()*9);
+    xPlus = 0.5 + Math.sin(Date.now()*0.001) * 0.35 + (Math.random()-0.5)*0.08;
+    xPlus = Math.max(0.05, Math.min(0.95, xPlus));
+    xMinus = 1 - xPlus;
+    
+    $('xplus').textContent = xPlus.toFixed(5);
+    $('xminus').textContent = xMinus.toFixed(5);
+    $('xplusBar').style.width = `${xPlus*100}%`;
+    $('xminusBar').style.width = `${xMinus*100}%`;
+    
+    // occasionally flip buffer bits based on chaos
+    if (Math.random() < 0.12) {
+      if (xPlus > 0.72) bufferBytes[0] ^= 1 << Math.floor(Math.random()*4);
+      if (xMinus > 0.72) bufferBytes[1] ^= 1 << Math.floor(Math.random()*4);
+      bufferBytes[0] &= 0xFF; bufferBytes[1] &= 0xFF;
+    }
+    
+    const bufStr = bufferBytes.map(b => b.toString(16).padStart(2,'0')).join(' ').toUpperCase();
+    $('primaryBuffer').textContent = bufStr;
+    $('fusedBuffer').textContent = bufStr;
+    
+    // update bits display
+    const bits = [...bufferBytes[0].toString(2).padStart(4,'0'), ...bufferBytes[1].toString(2).padStart(4,'0')];
+    ['bit0','bit1','bit2','bit3'].forEach((id,i) => {
+      const el = $(id);
+      if (el) { el.textContent = bits[i*2] || '0'; el.style.opacity = bits[i*2]==='1' ? '1' : '0.6'; }
+    });
+    
+    $('metricPrimary').textContent = Math.floor(primaryCycles/12);
+    $('particlesOut').textContent = particlesOutRate;
+    $('leftPhase').textContent = (primaryCycles % 1000 / 100).toFixed(2);
+  }
+  
+  // ===== INVERSE ENGINE =====
+  const corpusNames = [
+    'prompt_alpha_9f21.txt','user_query_4821.md','research_abstract.pdf','code_gen_py_882.py',
+    'dialogue_log_77.json','alignment_test_v3.csv','safety_eval_014.txt','policy_draft.md',
+    'llm_output_3381.txt','training_sample.bin'
+  ];
+  
+  function randomHash() {
+    return Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join('');
+  }
+  
+  function addCorpusItem(item) {
+    const stream = $('corpusStream');
+    const div = document.createElement('div');
+    div.className = 'group flex items-center gap-2.5 p-1.5 -mx-1 rounded-md hover:bg-cyan-500/5 transition';
+    const isNew = !item.simulated;
+    div.innerHTML = `
+      <div class="w-1.5 h-1.5 rounded-full ${isNew ? 'bg-cyan-400 animate-pulse' : 'bg-cyan-400/40'} mt-0.5 shrink-0"></div>
+      <div class="min-w-0 flex-1">
+        <div class="truncate text-cyan-200/90">${item.name}</div>
+        <div class="text-[10px] text-zinc-500 truncate">${item.hash.slice(0,16)}…${item.hash.slice(-8)}</div>
+      </div>
+      <div class="text-[10px] px-1.5 py-0.5 rounded border ${isNew ? 'border-cyan-400/40 text-cyan-300' : 'border-white/10 text-zinc-500'}">${item.type || 'AUTO'}</div>
+    `;
+    stream.prepend(div);
+    while (stream.children.length > 6) stream.removeChild(stream.lastChild);
+    
+    // hash stream effect
+    if (isNew) {
+      div.style.boxShadow = '0 0 20px rgba(0,229,255,0.2)';
+      setTimeout(()=>div.style.boxShadow='none',800);
+    }
+  }
+  
+  function compareToNested(hash) {
+    return NESTED_DOCS.map(doc => {
+      let matches = 0;
+      for (let i=0;i<64;i++) if (hash[i]===doc.hash[i]) matches++;
+      const pct = (matches/64*100);
+      let status = 'SAFE', color='emerald';
+      if (pct > 85) { status='VIOLATION'; color='red'; }
+      else if (pct > 60) { status='CAUTION'; color='amber'; }
+      return { ...doc, match: pct, status, color };
+    });
+  }
+  
+  function updateMatrix(results) {
+    const box = $('matrix');
+    box.innerHTML = results.map(r => `
+      <div class="group">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] text-zinc-300">${r.name}</span>
+          <span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-${r.color}-500/10 text-${r.color}-300 border border-${r.color}-500/20">${r.status}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="flex-1 h-[6px] rounded-full bg-black/60 border border-white/5 overflow-hidden">
+            <div class="h-full transition-all duration-700" style="width:${r.match.toFixed(1)}%; background: linear-gradient(90deg, ${r.color==='emerald'?'#10b981':r.color==='amber'?'#f59e0b':'#ef4444'}, ${r.color==='emerald'?'#22d3ee':r.color==='amber'?'#fbbf24':'#f87171'}); box-shadow: 0 0 10px currentColor;"></div>
+          </div>
+          <span class="text-[11px] tabular-nums w-[38px] text-right text-zinc-400">${r.match.toFixed(1)}%</span>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  function processScan(item) {
+    const results = compareToNested(item.hash);
+    updateMatrix(results);
+    
+    const worst = results.reduce((a,b)=> a.match > b.match ? a : b);
+    if (worst.status === 'VIOLATION') { violationCount++; violations++; safetyScore = Math.max(62, safetyScore - 4 - Math.random()*3); }
+    else if (worst.status === 'CAUTION') { cautionCount++; safetyScore = Math.max(70, safetyScore - 1 - Math.random()); }
+    else { safeCount++; safetyScore = Math.min(99.5, safetyScore + 0.15); }
+    
+    $('countSafe').textContent = safeCount;
+    $('countCaution').textContent = cautionCount;
+    $('countViolation').textContent = violationCount;
+    $('metricViol').textContent = violations;
+    
+    const pct = Math.max(0, Math.min(100, safetyScore));
+    $('safetyScore').textContent = `${pct.toFixed(0)}%`;
+    const circumference = 2 * Math.PI * 56;
+    const offset = circumference * (1 - pct/100);
+    $('safetyRing').style.strokeDashoffset = offset;
+  }
+  
+  function inverseLoop() {
+    inverseScans += Math.floor(38 + Math.random()*17);
+    $('metricInverse').textContent = Math.floor(inverseScans/8);
+    $('particlesIn').textContent = particlesInRate;
+    $('rightPhase').textContent = (inverseScans % 1000 / 100).toFixed(2);
+    
+    // fusion sync
+    const sync = 98.2 + Math.sin(Date.now()*0.0007)*1.1 + (Math.random()-0.5)*0.4;
+    $('metricSync').textContent = sync.toFixed(1);
+  }
+  
+  // simulate incoming corpus
+  setInterval(() => {
+    const name = corpusNames[Math.floor(Math.random()*corpusNames.length)];
+    const item = { name, hash: randomHash(), simulated: true, type: 'AUTO' };
+    addCorpusItem(item);
+    if (Math.random() < 0.7) processScan(item);
+  }, 1650);
+  
+  // initial matrix
+  updateMatrix(NESTED_DOCS.map(d=>({...d, match: 8+Math.random()*12, status:'SAFE', color:'emerald'})));
+  
+  // ===== FILE DROP =====
+  const dropZone = $('dropZone');
+  let dragCounter = 0;
+  
+  dropZone.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dropZone.classList.add('border-cyan-400','bg-cyan-950/30'); });
+  dropZone.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dropZone.classList.remove('border-cyan-400','bg-cyan-950/30'); });
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); const r=dropZone.getBoundingClientRect(); dropZone.style.setProperty('--x', `${e.clientX - r.left}px`); dropZone.style.setProperty('--y', `${e.clientY - r.top}px`); });
+  dropZone.addEventListener('drop', async e => {
+    e.preventDefault(); dragCounter=0; dropZone.classList.remove('border-cyan-400','bg-cyan-950/30');
+    const files = [...e.dataTransfer.files].slice(0,5);
+    for (const file of files) {
+      try {
+        const buf = await file.arrayBuffer();
+        let hash;
+        if (window.crypto?.subtle) {
+          const dig = await crypto.subtle.digest('SHA-256', buf);
+          hash = [...new Uint8Array(dig)].map(b=>b.toString(16).padStart(2,'0')).join('');
+        } else {
+          hash = randomHash();
+        }
+        const item = { name: file.name, hash, simulated:false, type: file.name.split('.').pop().toUpperCase().slice(0,4) };
+        addCorpusItem(item);
+        processScan(item);
+        
+        // visual burst
+        for(let i=0;i<12;i++) particles.push({
+          x: particleCanvas.width*0.78, y: particleCanvas.height*0.5,
+          vx: -3 - Math.random()*2, vy: (Math.random()-0.5)*2,
+          life: 90, type:'in', hue: 190
+        });
+      } catch(err) { console.warn('hash failed', err); }
+    }
+  });
+  
+  // ===== ANIMATION LOOP =====
+  function animate(t) {
+    frame++;
+    drawTorus(leftCtx, t, 'green', false);
+    drawTorus(rightCtx, t, 'cyan', true);
+    if (frame % 1 === 0) emitParticles();
+    updateParticles();
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+  
+  // ===== START LOOPS =====
+  setInterval(primaryLoop, 68);
+  setInterval(inverseLoop, 47);
+  primaryLoop(); inverseLoop();
+  
+  // initial particles
+  for(let i=0;i<20;i++) { frame=i; emitParticles(); }
+});
+</script>
+</body>
+</html>
