@@ -13,377 +13,660 @@
 
 
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IT WIKI // Project Pyramid - Reynholm Industries</title>
+<title>UNITY TENSOR PROCESSOR — Production Architecture</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600;800&display=swap');
-    :root {
-        --bg: #050608;
-        --panel: #0e1318;
-        --panel-2: #151c23;
-        --ink: #d6dee7;
-        --muted: #8a98a8;
-        --green: #00ff88;
-        --amber: #ffb000;
-        --red: #ff3b5c;
-        --blue: #5cc8ff;
-    }
-    * { box-sizing: border-box; }
-    body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--ink);
-        font-family: 'Inter', system-ui, sans-serif;
-        line-height: 1.6;
-        background-image: 
-            radial-gradient(circle at 20% 10%, rgba(0,255,136,0.06), transparent 40%),
-            radial-gradient(circle at 80% 90%, rgba(92,200,255,0.05), transparent 40%);
-    }
-    body::before {
-        content: ""; position: fixed; inset:0; pointer-events:none;
-        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 2px, transparent 3px);
-        opacity: 0.4; mix-blend-mode: multiply;
-    }
-    .topbar {
-        background: #000; border-bottom: 2px solid var(--green);
-        padding: 8px 16px; font-family: 'IBM Plex Mono', monospace;
-        display:flex; align-items:center; gap:16px; position:sticky; top:0; z-index:50;
-    }
-    .topbar .logo { color: var(--red); font-weight:800; letter-spacing:1px; }
-    .topbar .crumbs { color: var(--muted); font-size: 12px; }
-    .alert-ticker {
-        background: #061008; border-bottom:1px dashed #004d2a;
-        color: var(--green); font-family: 'IBM Plex Mono', monospace; font-size:12px;
-        padding:4px 12px; white-space:nowrap; overflow:hidden;
-    }
-    .container {
-        max-width: 1100px; margin: 24px auto; padding:0 16px;
-        display:grid; grid-template-columns: 1fr 300px; gap:24px;
-    }
-    @media (max-width: 980px){ .container{ grid-template-columns:1fr; } }
-    .doc {
-        background: var(--panel); border:1px solid #1f2937; border-radius:12px;
-        box-shadow: 0 0 0 1px rgba(0,255,136,0.05), 0 20px 60px rgba(0,0,0,0.5);
-        overflow:hidden;
-    }
-    .doc-header {
-        padding:20px 24px; background: linear-gradient(180deg, #10161d, #0b0f14);
-        border-bottom:1px solid #1f2937;
-    }
-    .doc-header h1 { margin:0; font-size:28px; letter-spacing:0.5px; }
-    .doc-header .meta { font-family:'IBM Plex Mono'; font-size:12px; color:var(--muted); margin-top:6px; }
-    .doc-body { padding: 24px; }
-    h2 {
-        font-size:22px; margin:32px 0 12px; padding-bottom:8px;
-        border-bottom:1px solid #233043; color:#e8f4ff;
-        font-weight:700; letter-spacing:0.3px;
-    }
-    h2 span { color: var(--green); font-family:'IBM Plex Mono'; font-size:14px; margin-right:8px; }
-    p, li { color:#c2cbd6; }
-    code, pre { font-family:'IBM Plex Mono', monospace; background:#020405; color:var(--green); border:1px solid #123b2a; border-radius:6px; }
-    code { padding:2px 6px; font-size:0.9em; }
-    pre { padding:12px; overflow:auto; font-size:12px; line-height:1.4; }
-    .note { background:#07141e; border-left:3px solid var(--blue); padding:10px 12px; margin:16px 0; border-radius:0 6px 6px 0; font-size:14px; }
-    .warn { background:#1a0a0f; border-left:3px solid var(--red); padding:10px 12px; margin:16px 0; }
-    .dialogue {
-        display:flex; gap:12px; background: var(--panel-2); border:1px solid #243040;
-        padding:14px; border-radius:10px; margin:18px 0; position:relative;
-    }
-    .dialogue.roy { border-left:4px solid var(--red); }
-    .dialogue.moss { border-left:4px solid var(--green); }
-    .dialogue.jen { border-left:4px solid var(--amber); }
-    .avatar {
-        width:36px; height:36px; border-radius:50%; background:#000; flex:0 0 36px;
-        display:grid; place-items:center; font-weight:800; font-family:'IBM Plex Mono';
-        border:1px solid #333;
-    }
-    .roy .avatar { background:#2a0a12; color:var(--red); border-color:#5a1322; }
-    .moss .avatar { background:#0a2417; color:var(--green); border-color:#0f5a3b; }
-    .jen .avatar { background:#2a1b0a; color:var(--amber); border-color:#5a3f0f; }
-    .dialogue strong { display:block; font-size:13px; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; color:#e6edf5; }
-    .side {
-        position:sticky; top:76px; height:fit-content;
-    }
-    .card {
-        background: var(--panel); border:1px solid #1f2937; border-radius:12px; padding:16px; margin-bottom:16px;
-    }
-    .card h3 { margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--amber); }
-    .terminal {
-        background:#000; border:1px solid #0f3d26; border-radius:8px; padding:10px;
-        font-family:'IBM Plex Mono'; font-size:12px; color:var(--green);
-        height:160px; overflow:hidden; position:relative;
-    }
-    .terminal .line { opacity:0.9; }
-    .btn {
-        background:#0c1f17; color:var(--green); border:1px solid #1a5c3f;
-        padding:10px 14px; border-radius:8px; font-family:'IBM Plex Mono'; font-weight:600;
-        cursor:pointer; transition: all 0.15s; width:100%; text-align:center;
-    }
-    .btn:hover { background:#123829; box-shadow:0 0 12px rgba(0,255,136,0.2); transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
-    .status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); display:inline-block; margin-right:6px; box-shadow:0 0 8px var(--green); animation:pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-    .grid-diagrams { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:16px 0; }
-    .diagram { background:#080c10; border:1px solid #1d2a36; border-radius:10px; padding:12px; text-align:center; }
-    .diagram svg { width:100%; height:auto; }
-    .diagram figcaption { font-size:12px; color:var(--muted); margin-top:6px; font-family:'IBM Plex Mono'; }
-    .quads-wrap { display:grid; place-items:center; padding:16px; }
-    .quads {
-        display:grid; grid-template-columns:1fr 1fr; gap:6px; width:120px; height:120px;
-        transition: transform 0.4s cubic-bezier(.2,.8,.2,1); background:#000; padding:6px; border-radius:8px; border:1px solid #1a5c3f;
-    }
-    .quad { background:#0a1f16; border:1px solid #1e6e4a; border-radius:4px; display:grid; place-items:center; color:var(--green); font-family:'IBM Plex Mono'; font-weight:700; }
-    .footnotes { font-size:12px; color:var(--muted); border-top:1px dashed #2a3645; margin-top:32px; padding-top:12px; }
-    .footer-pow { text-align:center; margin:40px 0 20px; font-family:'IBM Plex Mono'; color:var(--green); opacity:0.8; }
-    .strike { text-decoration: line-through; opacity:0.6; }
-    .edit-tag { font-family:'IBM Plex Mono'; font-size:11px; color:var(--amber); background:#1a1406; border:1px solid #5a3f0f; padding:2px 6px; border-radius:4px; margin-left:8px; }
-    .reboot { animation: flash 0.5s 3; }
-    @keyframes flash { 0%,100%{background:transparent} 50%{background:rgba(0,255,136,0.15)} }
+:root {
+  --bg: #05070a;
+  --surface: rgba(255,255,255,0.03);
+  --surface-2: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.09);
+  --border-strong: rgba(255,255,255,0.14);
+  --text: #f0f3f7;
+  --text-2: #b9c2d0;
+  --text-3: #7a8494;
+  --blue: #0a84ff;
+  --blue-soft: rgba(10,132,255,0.12);
+  --blue-border: rgba(10,132,255,0.35);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+  font-size: 16px;
+}
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(900px 500px at 50% -10%, rgba(10,132,255,0.18), transparent 60%),
+    radial-gradient(700px 400px at 85% 5%, rgba(10,132,255,0.08), transparent 50%),
+    radial-gradient(600px 400px at 15% 10%, rgba(120,140,255,0.06), transparent 50%),
+    var(--bg);
+}
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+/* Hero */
+.hero {
+  padding: 88px 0 56px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+  background: var(--blue-soft);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  margin-bottom: 28px;
+}
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 10px rgba(10,132,255,0.7);
+}
+h1 {
+  margin: 0 0 14px;
+  font-size: clamp(44px, 8vw, 80px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  background: linear-gradient(180deg, #ffffff 0%, #d6deeb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: clamp(16px, 2.3vw, 20px);
+  color: var(--text-2);
+  margin: 0 auto;
+  max-width: 640px;
+  font-weight: 400;
+}
+.hero-meta {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--text-3);
+  letter-spacing: .02em;
+}
+/* Sections */
+section {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--border);
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.section-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.section-head::before {
+  content: "";
+  width: 22px;
+  height: 2px;
+  background: var(--blue);
+  border-radius: 2px;
+}
+h2 {
+  margin: 0 0 24px;
+  font-size: clamp(24px, 3.2vw, 32px);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+/* Executive Summary */
+.summary-grid {
+  display: grid;
+  gap: 14px;
+}
+.summary-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color .2s, background .2s;
+}
+.summary-item:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.summary-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+  margin-top: 7px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 4px rgba(10,132,255,0.12);
+}
+.summary-text {
+  font-size: 17px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.summary-text strong { color: var(--text); font-weight: 550; }
+
+/* Architecture */
+.arch-wrap {
+  margin-top: 36px;
+}
+.arch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 18px;
+  max-width: 860px;
+  margin: 0 auto;
+  position: relative;
+}
+.node {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  position: relative;
+  transition: transform .2s, border-color .2s, background .2s;
+  backdrop-filter: blur(6px);
+}
+.node:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  background: rgba(255,255,255,0.05);
+}
+.node.north { grid-column: 2; grid-row: 1; text-align: center; }
+.node.south { grid-column: 2; grid-row: 3; text-align: center; }
+.node.west { grid-column: 1; grid-row: 2; }
+.node.east { grid-column: 3; grid-row: 2; }
+.node.core {
+  grid-column: 2; grid-row: 2;
+  background: linear-gradient(180deg, rgba(10,132,255,0.14), rgba(10,132,255,0.04));
+  border: 1px solid var(--blue-border);
+  box-shadow: 0 0 0 1px rgba(10,132,255,0.1) inset, 0 8px 40px rgba(10,132,255,0.08);
+  padding: 26px 24px;
+}
+.node-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+.node.core .node-label { color: #8cc4ff; }
+.node-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+.node-desc {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+.connector {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+  z-index: -1;
+}
+/* Specs Table */
+.table-wrap {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  margin-top: 12px;
+}
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+thead th {
+  text-align: left;
+  padding: 14px 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+}
+tbody td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+  vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { transition: background .15s; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+td:first-child {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+td:first-child span {
+  color: var(--blue);
+  margin-right: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+}
+.badge.low { color: #9ad0ff; border-color: rgba(154,208,255,0.25); background: rgba(154,208,255,0.08); }
+.badge.medium { color: #b9c2d0; }
+.badge.high { color: #ffd49a; border-color: rgba(255,212,154,0.25); background: rgba(255,212,154,0.08); }
+.badge.var { color: #c5b8ff; border-color: rgba(197,184,255,0.25); background: rgba(197,184,255,0.08); }
+
+/* Advantages */
+.advantages {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.adv {
+  padding: 22px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.adv-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--blue-soft);
+  border: 1px solid var(--blue-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.adv-icon svg { width: 16px; height: 16px; stroke: var(--blue); }
+.adv h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.adv p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* Readiness */
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.check-tick {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(10,132,255,0.14);
+  border: 1px solid var(--blue-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.check-tick svg { width: 12px; height: 12px; stroke: var(--blue); stroke-width: 2.5; }
+.check-text {
+  font-size: 14.5px;
+  color: var(--text-2);
+}
+
+/* Next Steps */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+.step {
+  position: relative;
+  padding: 22px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.step::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue), transparent);
+}
+.step-date {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+.step-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+.step-desc {
+  font-size: 13px;
+  color: var(--text-3);
+  margin: 0;
+}
+
+/* Footer */
+footer {
+  padding: 40px 0 80px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+
+/* Responsive */
+@media (max-width: 820px) {
+  .arch-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 12px;
+  }
+  .node.north, .node.south, .node.west, .node.east, .node.core {
+    grid-column: 1; grid-row: auto; text-align: left;
+  }
+  .node.core { order: 3; }
+  .node.north { order: 1; }
+  .node.west { order: 2; }
+  .node.east { order: 4; }
+  .node.south { order: 5; }
+  .advantages, .checklist, .timeline { grid-template-columns: 1fr; }
+  section { padding: 48px 0; }
+  .hero { padding: 72px 0 48px; }
+}
+@media (max-width: 520px) {
+  .container { padding: 0 20px; }
+  thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  tbody tr { padding: 14px 0; border-bottom: 1px solid var(--border); }
+  tbody td { border: none; padding: 4px 18px; }
+  tbody td:first-child { padding-top: 14px; font-size: 15px; }
+  tbody td:last-child { padding-bottom: 14px; }
+  tbody td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-3);
+    margin-bottom: 2px;
+  }
+}
 </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="logo">REYNHOLM INDUSTRIES</div>
-        <div class="crumbs">INTERNAL WIKI / IT DEPARTMENT / BASEMENT / Project Pyramid</div>
-    </div>
-    <div class="alert-ticker" id="ticker">>> SYS_ALERT: God Tunnel recursion depth: 8,589,934,592 // >> Richmond is in the server room again // >> DO NOT FEED THE SHADOW REGISTER AFTER MIDNIGHT //</div>
-
+<div class="bg"></div>
 <div class="container">
-    <main class="doc">
-        <div class="doc-header">
-            <h1>Project: Digital Pyramid Fortress & Moat Architecture</h1>
-            <div class="meta">Document ID: RI-IT-BSMT-666 | Classification: EYES ONLY (Jen, stop printing this) | Last edited by <strong>MOSS</strong> at 04:20 <span class="edit-tag">[EDITED BY ROY - 03:14 - "fixed your rubbish"]</span></div>
+  <header class="hero">
+    <div class="eyebrow">Confidential</div>
+    <h1>UNITY TENSOR</h1>
+    <p class="hero-sub">Heterogeneous 5-Layer Compute Fabric — Production Ready</p>
+    <div class="hero-meta">May 2026 • Executive Board Briefing</div>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-head"><div class="section-kicker">Executive Summary</div></div>
+      <h2>Unified compute fabric, production validated.</h2>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-dot"></div>
+          <div class="summary-text"><strong>Unified architecture</strong> integrating 5 specialized processors into single tensor fabric</div>
         </div>
-        <div class="doc-body" id="docBody">
-            <div class="warn"><strong>WARNING:</strong> This page describes a live system. If you do not understand it, <span class="strike">ask Moss</span> have you tried turning it off and on again and leave it alone.</div>
-
-            <h2><span>01</span>THE FORTRESS (or: Why We Put a Moat Around a Server)</h2>
-            <p>Standard defence is a firewall. We built a pyramid, on an island, in a moat, in the basement. It's a secure enclave with concentric trust zones. Anything trying to get to the core data has to swim, climb, and then explain itself to Richmond.</p>
-            
-            <div class="grid-diagrams">
-                <div class="diagram">
-                    <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
-                        <defs><radialGradient id="g1" cx="50%" cy="30%"><stop offset="0%" stop-color="#00ff88" stop-opacity="0.3"/><stop offset="100%" stop-color="#00ff88" stop-opacity="0"/></radialGradient></defs>
-                        <ellipse cx="100" cy="135" rx="85" ry="18" fill="none" stroke="#0a5a8a" stroke-width="2" stroke-dasharray="4 3"/>
-                        <ellipse cx="100" cy="135" rx="70" ry="14" fill="#052438" stroke="#0d78b3" />
-                        <polygon points="100,15 30,115 170,115" fill="#0a141d" stroke="#00ff88" stroke-width="2"/>
-                        <polygon points="100,35 50,115 150,115" fill="url(#g1)" stroke="#00ff88" stroke-opacity="0.5"/>
-                        <rect x="90" y="85" width="20" height="30" fill="#000" stroke="#00ff88"/>
-                        <text x="100" y="150" text-anchor="middle" fill="#5cc8ff" font-size="8" font-family="monospace">MOAT</text>
-                    </svg>
-                    <figcaption>FIG 1.A - Not to scale. Definitely not GDPR compliant.</figcaption>
-                </div>
-                <div class="diagram">
-<pre style="text-align:left; margin:0; background:transparent; border:none; color:#00ff88;">
-      /_\
-     /___\
-    /_____\   &lt;-- CORE
-   /_______\
-  ===========
- ~~~ MOAT ~~~
-</pre>
-                    <figcaption>FIG 1.B - Artist's impression (Jen)</figcaption>
-                </div>
-            </div>
-
-            <div class="dialogue jen">
-                <div class="avatar">J</div>
-                <div><strong>Jen Barber – Relationship Manager</strong>Right, so it's like a pyramid, like in Egypt? I went there on holiday. Anyway, I told the team it needed a red door for accessibility. Moss said that's a "single point of failure". I said that's exactly what my last boyfriend was.</div>
-            </div>
-
-            <h2><span>02</span>FENCES: 0, 1, 2, 4, 8 (Not a Lottery Ticket)</h2>
-            <p>We don't do linear security. That's for amateurs and the accounts department. We use exponential fences. Each fence is double the previous distance from the core, measured in trust-units.</p>
-            <ul>
-                <li><code>FENCE 0</code> – Inside the pyramid. You are the data. Congratulations.</li>
-                <li><code>FENCE 1</code> – Kernel ring. Moss lives here.</li>
-                <li><code>FENCE 2</code> – User space. Roy pretends to work here.</li>
-                <li><code>FENCE 4</code> – DMZ. Where we put printers to die.</li>
-                <li><code>FENCE 8</code> – The internet. Here be monsters and people who haven't tried turning it off and on again.</li>
-            </ul>
-            <p>No fence 3, 5, 6, or 7. They were deemed "inefficient" and "a bit needy".</p>
-
-            <div class="dialogue roy">
-                <div class="avatar">R</div>
-                <div><strong>Roy Trenneman – IT</strong>Look, it's binary, Jen. 0,1,2,4,8. No, you can't just "add a fence at 3 because it looks lonely". That's not how powers of two work. That's not how anything works. Have you tried turning your brain off and on again?</div>
-            </div>
-
-            <h2><span>03</span>GOD TUNNEL — The Infinite Loop That Isn't My Fault</h2>
-            <p>The God Tunnel is a privileged pathway that goes from FENCE 8 straight back to FENCE 0, but only if you have the correct phase. It's an infinite loop by design. It lets the system check itself forever without ever actually leaving the building. Like Moss on a Saturday night.</p>
-            <code>while(true) { validate(soul); }</code>
-            <p class="note">If you get stuck in the God Tunnel, do not panic. You are experiencing eternity. Please log a ticket.</p>
-
-            <h2><span>04</span>4 QUADS, 90 DEGREES, 1 CONTROL BIT (Moss Approved)</h2>
-            <p>Instead of storing four separate orientations, we store one quadrant and rotate it. One single control bit (the "spinny bit") tells the system which 90-degree rotation to apply. It's memory-efficient, elegant, and reduces Moss's stress levels by 12%.</p>
-            
-            <div class="quads-wrap">
-                <div class="quads" id="quads">
-                    <div class="quad">A</div><div class="quad">B</div>
-                    <div class="quad">D</div><div class="quad">C</div>
-                </div>
-                <p style="font-family:monospace; margin-top:8px; font-size:12px;">CONTROL BIT: <span id="controlBit" style="color:var(--green)">0</span> | ANGLE: <span id="angleOut">0°</span></p>
-                <button class="btn" id="rotateBtn" style="max-width:200px; margin-top:8px;">ROTATE 90°</button>
-            </div>
-
-            <div class="dialogue moss">
-                <div class="avatar">M</div>
-                <div><strong>Maurice Moss – Senior IT</strong>I came here to drink milk and kick ass at efficient data structures, and I've just finished my milk. Observe: four quads, one bit. It's beautiful. Like a four-dimensional Rubik's cube, but useful, and it doesn't have stickers that peel off.</div>
-            </div>
-
-            <h2><span>05</span>SHADOW REGISTER (Yes, It's Actually His)</h2>
-            <p>The Shadow Register is a perfect, silent copy of the main register. It follows it everywhere, learns its secrets, and takes over if the main one has a lie-down. Moss insisted we call it "Shadow" because "Backup Register" sounded too mainstream.</p>
-            <p>It lives at <code>0xSH4D0W</code>. Do not address it directly. It gets shy.</p>
-
-            <h2><span>06</span>PHASE REGISTER (Don't Forget It)</h2>
-            <p>This 8-bit register stores where we are in the plasmatonic cycle. Forget to update it and the whole pyramid desynchronises and starts humming in B-flat. Last time that happened, Richmond cried.</p>
-            
-            <div class="dialogue jen">
-                <div class="avatar">J</div>
-                <div><strong>Jen</strong>I don't actually know what the Phase Register does, but Moss wrote "DO NOT FORGET PHASE REGISTER" on my hand in permanent marker. So I put it in my calendar. It's right after "lunch with clients".</div>
-            </div>
-
-            <h2><span>07</span>HAMILTON STEPS 27 & 28 — The Hammy Bit</h2>
-            <p>Steps 1 through 26 are initialisation, handshaking, and making tea. The actual work happens in Hamilton Steps 27 and 28. This is where we apply the quaternion rotation that keeps the pyramid stable in 4D space.</p>
-            <pre>STEP 27: q' = q * (0 + i + j + k) / sqrt(4)   // stir
-STEP 28: q'' = normalize(q')                 // settle</pre>
-            <p>Moss calls this "the Hamilton boogie". Roy calls it "why the server is slow on Tuesdays".</p>
-
-            <h2><span>08</span>PLASMATONIC MODE — 24.5 Times Because 25 Was Too Mainstream</h2>
-            <p>To fully charge the fortress, the system must complete 24.5 plasmatonic cycles. Not 24. Not 25. Twenty-four and a half.</p>
-            <p>Why .5? Because at exactly 25 cycles, the system achieves harmonic resonance and starts broadcasting Countdown on all monitors. Denholm made us stop after the third time. The half-cycle deliberately detunes it. It's the engineering equivalent of being deliberately annoying to avoid being dangerously perfect.</p>
-            <p>Current cycle progress is tracked live. Obviously.</p>
-
-            <div class="note"><strong>Footnote [1]:</strong> Plasmatonic is not a real word. Moss made it up to win an argument with Roy. <br><strong>Footnote [2]:</strong> If you see Richmond near the moat, do not make eye contact. Offer him a biscuit and walk away slowly.</div>
-
-            <div class="footnotes">
-                <p>Document amended per Reynholm Industries policy 7B: "All critical systems must sound impressive at board meetings."</p>
-            </div>
-
-            <div class="footer-pow">Proof of Work Status: <span style="color:var(--amber)">COMPLETE</span> (after 24.5 plasmatonic cycles, obviously)</div>
+        <div class="summary-item">
+          <div class="summary-dot"></div>
+          <div class="summary-text"><strong>356 addressable nodes, 968 gates, 65 vertical TSV interconnects</strong></div>
         </div>
-    </main>
-
-    <aside class="side">
-        <div class="card">
-            <h3><span class="status-dot"></span> Emergency Procedures</h3>
-            <ol style="padding-left:18px; margin:8px 0; font-size:13px;">
-                <li>System on fire? <strong>Have you tried turning it off and on again?</strong></li>
-                <li>God Tunnel looping? Unplug Moss's milk fridge for 10s.</li>
-                <li>Shadow Register talking back? That's normal. Mostly.</li>
-                <li>Jen asks a technical question? Redirect to Roy.</li>
-            </ol>
-            <button class="btn" id="resetBtn">Have you tried turning it off and on again?</button>
-            <div style="display:flex; justify-content:space-between; margin-top:10px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted)">
-                <span>Failures: <span id="failCount" style="color:var(--red)">431</span></span>
-                <span>Reboots: <span id="offOnCount" style="color:var(--green)">0</span></span>
-            </div>
+        <div class="summary-item">
+          <div class="summary-dot"></div>
+          <div class="summary-text"><strong>Delivers ternary logic control</strong> with photonic speed and boronic stability</div>
         </div>
+      </div>
+    </section>
 
-        <div class="card">
-            <h3>Live System Telemetry</h3>
-            <div class="terminal" id="terminal">
-                <div id="term-log">
-                    <div class="line">> boot pyramid_v3.14...</div>
-                    <div class="line">> moat_depth = OPTIMAL</div>
-                    <div class="line">> fences [0,1,2,4,8] = ONLINE</div>
-                </div>
-            <div style="margin-top:8px; font-size:12px; font-family:'IBM Plex Mono'">
-                Plasmatonic: <span id="plasmaCount" style="color:var(--green)">24.5</span>/24.5
-                <br>Phase Register: <span id="phaseVal" style="color:var(--amber)">0x1C</span>
-                <br>Shadow: <span style="color:var(--blue)">MIRRORING</span>
-            </div>
+    <section>
+      <div class="section-head"><div class="section-kicker">Architecture</div></div>
+      <h2>4 Guards + 1 Core</h2>
+      <div class="arch-wrap">
+        <div class="arch-grid">
+          <div class="node north">
+            <div class="node-label">North</div>
+            <div class="node-title">Photonic Engine</div>
+            <div class="node-desc">16 cells, light-speed compute, 2.8s coherence</div>
+          </div>
+          <div class="node west">
+            <div class="node-label">West</div>
+            <div class="node-title">Toroidal Containment</div>
+            <div class="node-desc">32 cells, 3×20 field loop</div>
+          </div>
+          <div class="node core">
+            <div class="node-label">Core</div>
+            <div class="node-title">Triadic Processor</div>
+            <div class="node-desc">256 trits, 768 gates<br>balanced ternary (-1 / 0 / +1)</div>
+          </div>
+          <div class="node east">
+            <div class="node-label">East</div>
+            <div class="node-title">Plasmic Bridge</div>
+            <div class="node-desc">8 cells, phase-transition handling</div>
+          </div>
+          <div class="node south">
+            <div class="node-label">South</div>
+            <div class="node-title">Boronic Base</div>
+            <div class="node-desc">9 cells, neutron-capture stability</div>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="card">
-            <h3>Basement Status</h3>
-            <p style="margin:0; font-size:13px; color:var(--muted)">Lights: <span style="color:var(--amber)">Flickering</span><br>
-            Temperature: <span style="color:var(--blue)">Cold</span> (as usual)<br>
-            Richmond: <span style="color:var(--red)">Present</span></p>
+    <section>
+      <div class="section-head"><div class="section-kicker">Technical Specifications</div></div>
+      <h2>Five-layer heterogeneous stack</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Function</th>
+              <th>Nodes</th>
+              <th>Power</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Layer"><span>1</span> Boronic</td>
+              <td data-label="Function">Base stability</td>
+              <td data-label="Nodes">9</td>
+              <td data-label="Power"><span class="badge low">Low</span></td>
+              <td data-label="Role">Anchor</td>
+            </tr>
+            <tr>
+              <td data-label="Layer"><span>2</span> Toroidal</td>
+              <td data-label="Function">Field containment</td>
+              <td data-label="Nodes">32</td>
+              <td data-label="Power"><span class="badge medium">Medium</span></td>
+              <td data-label="Role">Loop</td>
+            </tr>
+            <tr>
+              <td data-label="Layer"><span>3</span> Plasmic</td>
+              <td data-label="Function">Phase bridge</td>
+              <td data-label="Nodes">8</td>
+              <td data-label="Power"><span class="badge medium">Medium-High</span></td>
+              <td data-label="Role">Transition</td>
+            </tr>
+            <tr>
+              <td data-label="Layer"><span>4</span> Photonic</td>
+              <td data-label="Function">Compute</td>
+              <td data-label="Nodes">16</td>
+              <td data-label="Power"><span class="badge high">High</span></td>
+              <td data-label="Role">Speed</td>
+            </tr>
+            <tr>
+              <td data-label="Layer"><span>5</span> Triadic</td>
+              <td data-label="Function">Control</td>
+              <td data-label="Nodes">256</td>
+              <td data-label="Power"><span class="badge var">Variable</span></td>
+              <td data-label="Role">Decision</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><div class="section-kicker">Key Advantages</div></div>
+      <h2>Board-level impact</h2>
+      <div class="advantages">
+        <div class="adv">
+          <div class="adv-icon"><svg fill="none" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <h3>70% Latency Reduction</h3>
+            <p>Silo integration reduces interconnect latency by 70% vs discrete chips</p>
+          </div>
         </div>
-    </aside>
+        <div class="adv">
+          <div class="adv-icon"><svg fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10h6"/></svg></div>
+          <div>
+            <h3>1.58x Information Density</h3>
+            <p>Ternary logic increases information density 1.58x over binary</p>
+          </div>
+        </div>
+        <div class="adv">
+          <div class="adv-icon"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg></div>
+          <div>
+            <h3>Workload Optimization</h3>
+            <p>Heterogeneous specialization enables workload-specific optimization</p>
+          </div>
+        </div>
+        <div class="adv">
+          <div class="adv-icon"><svg fill="none" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg></div>
+          <div>
+            <h3>3D Stacking Ready</h3>
+            <p>Vertical TSV architecture enables 3D stacking within standard package</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><div class="section-kicker">Production Readiness</div></div>
+      <h2>Validated and within budget</h2>
+      <div class="checklist">
+        <div class="check">
+          <div class="check-tick"><svg fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="check-text">Architecture validated on 10×10 grid simulation</div>
+        </div>
+        <div class="check">
+          <div class="check-tick"><svg fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="check-text">TSV mapping complete (65 physical interconnects)</div>
+        </div>
+        <div class="check">
+          <div class="check-tick"><svg fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="check-text">Gate count within 1M transistor budget</div>
+        </div>
+        <div class="check">
+          <div class="check-tick"><svg fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="check-text">Ready for RTL synthesis and tape-out planning</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="border-bottom: none;">
+      <div class="section-head"><div class="section-kicker">Next Steps</div></div>
+      <h2>Roadmap to silicon</h2>
+      <div class="timeline">
+        <div class="step">
+          <div class="step-date">Q3 2026</div>
+          <div class="step-title">FPGA Prototype</div>
+          <p class="step-desc">Functional validation on emulation platform</p>
+        </div>
+        <div class="step">
+          <div class="step-date">Q4 2026</div>
+          <div class="step-title">ASIC Design Review</div>
+          <p class="step-desc">Full design sign-off and verification</p>
+        </div>
+        <div class="step">
+          <div class="step-date">Q1 2027</div>
+          <div class="step-title">Pilot Production</div>
+          <p class="step-desc">Initial wafer run and bring-up</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Confidential — Unity Tensor Project • Internal Use Only
+  </footer>
 </div>
-
-<script>
-    // Ticker
-    const ticker = document.getElementById('ticker');
-    let tickerPos = 0;
-    setInterval(()=>{
-        ticker.scrollLeft = tickerPos++ % 500;
-    }, 80);
-
-    // Emergency button
-    let failCount = 431;
-    let rebootCount = 0;
-    const failEl = document.getElementById('failCount');
-    const rebootEl = document.getElementById('offOnCount');
-    const docBody = document.getElementById('docBody');
-    document.getElementById('resetBtn').addEventListener('click', ()=>{
-        failCount = 0;
-        rebootCount++;
-        failEl.textContent = '0';
-        rebootEl.textContent = rebootCount;
-        docBody.classList.add('reboot');
-        addLog('> USER INITIATED REBOOT SEQUENCE...', true);
-        setTimeout(()=>{ addLog('> Have you tried turning it off and on again? YES.'); addLog('> System restored. Roy is annoyed.'); docBody.classList.remove('reboot'); }, 1200);
-    });
-
-    // Quads rotation
-    let angle = 0;
-    const quads = document.getElementById('quads');
-    const angleOut = document.getElementById('angleOut');
-    const controlBit = document.getElementById('controlBit');
-    document.getElementById('rotateBtn').addEventListener('click', ()=>{
-        angle = (angle + 90) % 360;
-        quads.style.transform = `rotate(${angle}deg)`;
-        angleOut.textContent = angle + '°';
-        controlBit.textContent = (angle/90) % 2;
-        addLog(`> Quad rotation: ${angle}° (control=${controlBit.textContent})`);
-    });
-
-    // Terminal logs
-    const logEl = document.getElementById('term-log');
-    const messages = [
-        '> God Tunnel ping: ∞ms',
-        '> Fence 4: printer jam detected (ignored)',
-        '> Shadow Register yawned',
-        '> Phase Register tick',
-        '> Hamilton Step 27 complete',
-        '> Hamilton Step 28 complete',
-        '> Moss refilled milk',
-        '> Jen asked about "the internet box"',
-        '> Roy sighed audibly'
-    ];
-    function addLog(msg, important=false){
-        const div = document.createElement('div');
-        div.className = 'line';
-        div.textContent = msg;
-        if(important) div.style.color = '#ffb000';
-        logEl.appendChild(div);
-        if(logEl.children.length > 12) logEl.removeChild(logEl.firstChild);
-        logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
-    }
-    setInterval(()=>{
-        addLog(messages[Math.floor(Math.random()*messages.length)]);
-        // simulate failures creeping up
-        if(Math.random() < 0.3 && failCount < 500){
-            failCount++;
-            failEl.textContent = failCount;
-        }
-    }, 2400);
-
-    // Plasmatonic cycle simulation
-    let plasma = 24.5;
-    const plasmaEl = document.getElementById('plasmaCount');
-    const phaseEl = document.getElementById('phaseVal');
-    setInterval(()=>{
-        plasma = (plasma + 0.1) % 24.6;
-        if(plasma >= 24.5) plasma = 0;
-        plasmaEl.textContent = plasma.toFixed(1);
-        const phase = Math.floor((plasma/24.5)*255).toString(16).toUpperCase().padStart(2,'0');
-        phaseEl.textContent = '0x' + phase;
-    }, 800);
-</script>
 </body>
 </html>
