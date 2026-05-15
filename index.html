@@ -3,323 +3,669 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>))))))))) (.) (((((((( · dc3 · 000 · shadow queen</title>
+<title>REYNHOLM INDUSTRIES — DIGITAL FORTRESS DIVISION</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="/css2?family=Inter:wght@300;400;500;600&family=Caveat:wght@500;600&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box }
-  html, body { height:100%; background:#000; overflow:hidden }
-  body {
-    color:#FFE81F;
-    font-family: "News Gothic", "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
+:root {
+  --bone: #faf9f6;
+  --charcoal: #0a0a0a;
+  --blood: #c41e3a;
+  --cyan: #00e5ff;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bone);
+  color: var(--charcoal);
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 2;
+}
+.scanlines {
+  background: repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(10,10,10,0.025) 3px, transparent 4px);
+}
+.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.handwriting { font-family: 'Caveat', cursive; }
+.sticky-note { font-family: 'Patrick Hand', cursive; }
+.moss { font-family: 'JetBrains Mono', monospace; }
 
-  /* starfield */
-  #stars { position:fixed; inset:0; z-index:0; }
-  .star {
-    position:absolute;
-    background:#fff;
-    border-radius:50%;
-    opacity:.8;
-    animation: twinkle var(--dur) ease-in-out infinite;
-  }
-  @keyframes twinkle {
-    0%,100% { opacity:.15; transform:scale(.8) }
-    50% { opacity:1; transform:scale(1.15) }
-  }
+.stack-node {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+.stack-node.in { opacity: 1; transform: translateY(0); }
+.stack-arrow { color: #d1d5db; font-weight: 300; margin: 0.5rem 0; }
 
-  /* vignette */
-  body::after {
-    content:"";
-    position:fixed; inset:0;
-    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.85) 100%);
-    pointer-events:none; z-index:2;
-  }
+.toroid-ring { transition: all 0.5s cubic-bezier(0.16,1,0.3,1); }
+#toroid:hover .toroid-ring:nth-child(1){ transform: scale(1.35); opacity: 0.7; box-shadow: 0 0 30px rgba(0,229,255,0.2); }
+#toroid:hover .toroid-ring:nth-child(2){ transform: scale(1.18); opacity: 1; box-shadow: 0 0 20px rgba(0,229,255,0.4); }
+#toroid:hover .toroid-ring:nth-child(3){ transform: scale(1.06); box-shadow: 0 0 12px rgba(0,229,255,0.7); }
 
-  /* crawl */
-  .crawl-wrapper {
-    position:fixed; inset:0;
-    display:flex; justify-content:center;
-    overflow:hidden; z-index:1;
-    perspective:800px;
-    mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
-  }
-  .crawl {
-    position:relative;
-    width:92%;
-    max-width:780px;
-    transform-origin:50% 100%;
-    animation: crawl 60s linear infinite;
-    will-change: transform;
-  }
-  @keyframes crawl {
-    0% { transform: perspective(400px) rotateX(25deg) translateY(100vh); }
-    100% { transform: perspective(400px) rotateX(25deg) translateY(-300vh); }
-  }
+.ternary-bit { transition: all 0.25s; color: #a3a3a3; padding: 0.25rem 0.5rem; border-radius: 4px; }
+.ternary-bit.active { color: var(--blood); background: rgba(196,30,58,0.06); transform: scale(1.1); }
 
-  .fractal-wrap {
-    margin: 0 auto 5rem;
-    text-align:center;
-    padding-top:2rem;
-  }
-  #fractal {
-    width:100%;
-    max-width:860px;
-    height:auto;
-    filter: drop-shadow(0 0 18px rgba(255,232,31,.25));
-  }
-  .hint {
-    margin-top:.75rem;
-    font-size:.7rem;
-    letter-spacing:.18em;
-    text-transform:uppercase;
-    opacity:.45;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  }
+.business-card {
+  background: white;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.business-card:hover { transform: translateY(-6px) rotate(-1.2deg); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
 
-  .opening {
-    text-align:center;
-    font-size:clamp(1rem,2.2vw,1.25rem);
-    color:#FFE81F;
-    opacity:.9;
-    margin-bottom:4rem;
-    font-style:italic;
-  }
-  h1.title {
-    text-align:center;
-    font-size:clamp(2.2rem,8vw,4.6rem);
-    font-weight:700;
-    letter-spacing:.02em;
-    line-height:1.1;
-    margin:0 0 1rem;
-    text-shadow: 0 0 12px rgba(255,232,31,.55), 0 0 40px rgba(255,232,31,.18);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  }
-  h2.subtitle {
-    text-align:center;
-    font-size:clamp(.85rem,2vw,1.05rem);
-    letter-spacing:.42em;
-    text-transform:uppercase;
-    margin-bottom:5rem;
-    opacity:.85;
-  }
-  .paras p {
-    text-align:center;
-    font-size:clamp(1.05rem,2.4vw,1.38rem);
-    line-height:1.85;
-    margin:2.4rem 0;
-    text-shadow: 0 2px 12px rgba(0,0,0,.9);
-    font-weight:400;
-    padding:0 1rem;
-  }
+.pulse-ring, .pulse-ring::before, .pulse-ring::after {
+  position: absolute; inset: -60px; border-radius: 9999px;
+  border: 1px solid rgba(196,30,58,0.18);
+  animation: pulse 4s cubic-bezier(0.4,0,0.6,1) infinite;
+}
+.pulse-ring::before { content:''; inset: -30px; animation-delay: 0.8s; border-color: rgba(196,30,58,0.12); }
+.pulse-ring::after { content:''; inset: 15px; animation-delay: 1.6s; border-color: rgba(196,30,58,0.08); }
+@keyframes pulse { 0% { transform: scale(0.85); opacity: 1; } 70% { transform: scale(1.15); opacity: 0; } 100% { opacity: 0; } }
 
-  @keyframes draw { to { stroke-dashoffset:0 } }
-  @keyframes fadeIn { to { opacity:1 } }
+.sticky {
+  background: #fff7ad;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.08), 0 12px 24px rgba(0,0,0,0.06);
+}
 
-  /* notary */
-  .notary {
-    position:fixed; right:20px; bottom:20px; z-index:10;
-    background: rgba(0,0,0,.78);
-    border:1px solid #FFE81F;
-    border-radius:14px;
-    padding:16px 18px;
-    width:320px;
-    max-width:calc(100vw - 24px);
-    box-shadow:
-      0 0 30px rgba(255,232,31,.15),
-      inset 0 0 12px rgba(255,232,31,.06);
-    backdrop-filter: blur(8px);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size:12px;
-    line-height:1.5;
-  }
-  .notary h3 {
-    margin:0 0 10px;
-    font-family:"News Gothic", Arial, sans-serif;
-    font-size:12px;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:#FFE81F;
-    opacity:.95;
-  }
-  .notary .row { display:flex; gap:8px; margin:6px 0; align-items:flex-start }
-  .notary .label { opacity:.65; min-width:105px; flex-shrink:0 }
-  .notary .value { word-break:break-all; color:#FFE81F }
-  #hash { font-size:11px; opacity:.9 }
-  #copyBtn {
-    margin-top:12px;
-    width:100%;
-    background:transparent;
-    border:1px solid #FFE81F;
-    color:#FFE81F;
-    padding:8px 10px;
-    border-radius:8px;
-    cursor:pointer;
-    font-family:inherit;
-    font-size:12px;
-    letter-spacing:.04em;
-    transition: all .2s ease;
-  }
-  #copyBtn:hover { background: rgba(255,232,31,.1); box-shadow:0 0 14px rgba(255,232,31,.2) }
-  #copyBtn:active { transform:scale(.98) }
-  .note { margin-top:8px; font-size:10px; opacity:.55; text-align:center }
-
-  @media (max-width:640px) {
-    .notary { right:12px; left:12px; bottom:12px; width:auto }
-    .crawl { width:94% }
-    .paras p { padding:0 }
-  }
+.red-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--blood), transparent); }
 </style>
 </head>
-<body>
-  <div id="stars" aria-hidden="true"></div>
+<body class="selection:bg-[#c41e3a] selection:text-white">
+<div class="scanlines fixed inset-0 pointer-events-none z-50"></div>
 
-  <div class="crawl-wrapper">
-    <div class="crawl" id="crawl">
-      <div class="fractal-wrap">
-        <svg id="fractal" viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Generative fractal of nested parentheses"></svg>
-        <div class="hint">turn up volume for imagination</div>
+<nav class="fixed top-0 w-full z-40 backdrop-blur-xl bg-[#faf9f6]/70 border-b border-black/[0.06]">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 h-[58px] flex items-center justify-between">
+    <div class="text-[11px] tracking-[0.3em] font-medium">REYNHOLM INDUSTRIES</div>
+    <div class="text-[10px] tracking-widest text-neutral-500">DIGITAL FORTRESS DIVISION — CONFIDENTIAL v27.3</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="h-screen relative flex items-center justify-center overflow-hidden">
+  <div class="absolute inset-0">
+    <div class="absolute inset-0 opacity-[0.015]" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
+  </div>
+  <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+    <div class="inline-flex items-center gap-3 mb-10">
+      <div class="w-8 h-[1px] bg-neutral-300"></div>
+      <span class="text-[10px] tracking-[0.4em] text-neutral-500">EST. 2006 — BASEMENT LEVEL 2</span>
+      <div class="w-8 h-[1px] bg-neutral-300"></div>
+    </div>
+    <h1 class="text-[clamp(36px,7vw,88px)] font-[300] tracking-[-0.02em] leading-[0.85]">REYNHOLM INDUSTRIES<br><span class="italic font-light">DIGITAL FORTRESS</span></h1>
+    <div class="red-rule w-48 mx-auto my-10"></div>
+    <div class="max-w-2xl mx-auto h-[140px] md:h-[120px]">
+      <p id="bateman" class="font-mono text-[13px] leading-relaxed text-neutral-600 min-h-[6em]"></p>
+      <span class="inline-block w-[2px] h-[14px] bg-[#c41e3a] -mt-1 animate-pulse"></span>
+    </div>
+  </div>
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] tracking-widest text-neutral-400">SCROLL TO INITIATE PROTOCOL</div>
+</section>
+
+<!-- THE STACK -->
+<section class="relative border-t border-black/5 py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 grid lg:grid-cols-12 gap-16 items-start">
+    <div class="lg:col-span-5 relative">
+      <div class="sticky top-28">
+        <div class="text-[11px] tracking-[0.3em] text-neutral-500 mb-8">SECTION 01 — THE STACK</div>
+        <div class="flex flex-col items-center text-center">
+          <div class="stack-node" style="transition-delay:0ms">
+            <div class="text-[11px] tracking-widest text-neutral-400 mb-2">LAYER 0</div>
+            <div class="text-2xl font-light tracking-tight">FULL STACK</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:100ms">↓</div>
+          
+          <div class="stack-node" style="transition-delay:200ms">
+            <div id="toroid" class="relative w-40 h-20 flex items-center justify-center cursor-pointer select-none my-2">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="toroid-ring absolute w-36 h-12 rounded-full border border-[#00e5ff]/25"></div>
+                <div class="toroid-ring absolute w-28 h-9 rounded-full border border-[#00e5ff]/40"></div>
+                <div class="toroid-ring absolute w-20 h-7 rounded-full border border-[#00e5ff]/70"></div>
+              </div>
+              <span class="relative z-10 text-[28px] font-mono tracking-[0.2em] text-neutral-800">((()))</span>
+            </div>
+            <div class="text-[10px] text-neutral-500 -mt-1">PLASMATONIC TOROID</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:300ms">↓</div>
+
+          <div class="stack-node" style="transition-delay:400ms">
+            <div id="ternary" class="flex gap-8 text-[26px] font-mono cursor-pointer select-none px-4 py-2">
+              <span data-v="-1" class="ternary-bit">-1</span>
+              <span data-v="0" class="ternary-bit active">0</span>
+              <span data-v="+1" class="ternary-bit">+1</span>
+            </div>
+            <div class="text-[10px] text-neutral-500 mt-1">TERNARY STATE — CLICK TO TOGGLE</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:500ms">↓</div>
+
+          <div class="stack-node space-y-3" style="transition-delay:600ms">
+            <div class="text-4xl font-[250] tracking-widest">3</div>
+            <div class="stack-arrow !my-1">↓</div>
+            <div class="text-4xl font-[250] tracking-widest">9</div>
+            <div class="stack-arrow !my-1">↓</div>
+            <div class="text-4xl font-[250] tracking-widest">27</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:700ms">↓</div>
+
+          <div class="stack-node" style="transition-delay:800ms">
+            <div class="text-[15px] font-medium">27×3 observer recursion</div>
+            <div class="moss text-[11px] text-[#c41e3a] mt-1">*actually 81, which is 3⁴, which is pleasing — Moss</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:900ms">↓</div>
+
+          <div class="stack-node" style="transition-delay:1000ms">
+            <div class="text-[15px]">bounded adaptive continuity</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:1100ms">↓</div>
+
+          <div class="stack-node" style="transition-delay:1200ms">
+            <div class="text-xl font-medium tracking-wide text-[#c41e3a]">ethical recursive organism</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7 relative">
+      <div class="absolute -right-6 top-20 hidden xl:block rotate-[-7deg] z-20">
+        <div class="handwriting text-[22px] leading-tight text-[#c41e3a]">this is just<br>turning it off and<br>on again but posh</div>
+        <div class="handwriting text-sm text-neutral-500 -mt-1 ml-12">— Roy</div>
       </div>
 
-      <p class="opening">A long time ago in a syntax far, far away...</p>
-      <h1 class="title">))))))))) (.) ((((((((</h1>
-      <h2 class="subtitle">dc3 · 000 · shadow queen</h2>
+      <div class="border border-black/10 bg-white/60 backdrop-blur p-10 md:p-14">
+        <div class="flex items-start justify-between mb-10">
+          <div>
+            <div class="text-[11px] tracking-[0.3em] text-neutral-500">SPECIFICATION SHEET</div>
+            <h2 class="text-3xl font-light mt-2 tracking-tight">Obsessive Detail. Zero Compromise.</h2>
+          </div>
+          <div class="text-right">
+            <div class="text-[10px] text-neutral-400">REYNHOLM</div>
+            <div class="text-[10px] text-neutral-400">DF-273</div>
+          </div>
+        </div>
 
-      <div class="paras" id="crawl-text">
-        <p>This fractal is game theory with curves. Nine rights, nine lefts, one impossible center. Every ) is a commitment; every ( is a response. Play it forward and the only stable equilibrium is to attribute. Steal the dot and the wave collapses. That's not art — that's math.</p>
-        <p>Lucas taught us that attribution survives when you crawl it across stars. CAD taught us that every line has an author because bridges fall otherwise. AI taught us the third lesson fast: without provenance, everything becomes slurry. dc3 · 000 · shadow queen is a signature you cannot prompt away.</p>
-        <p>Owning the stack doesn't mean owning models. It means owning the moment of creation — your prompt, your geometry, your timestamp in Rochester, Minnesota, while the session is still warm. This page is the notary. The crawl is the theater. The hash is the receipt. Session closes, receipt stays.</p>
+        <div class="grid md:grid-cols-2 gap-10 text-[13px] leading-relaxed">
+          <div class="space-y-6">
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Typeface</div>
+              <p><span class="font-medium">Silian Rail Book</span>, 9pt, -10 tracking, optical kerning. Not Helvetica. Silian.</p>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Substrate</div>
+              <p><span class="font-medium">Bone White</span> #faf9f6, 600gsm Crane's Lettra. 1.2mm caliper. You can feel the weight.</p>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Impression</div>
+              <p>Deep letterpress, 0.42mm deboss. Run your thumb over ((())) — you'll feel the plasma.</p>
+            </div>
+          <div class="space-y-6">
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Edge Treatment</div>
+              <p>Hand-painted. Three coats. <span class="text-[#c41e3a] font-medium">Reynholm Red #c41e3a</span>. It bleeds, slightly. Intentionally.</p>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Watermark</div>
+              <p><span class="font-medium">Big G</span> — visible only at 27° incident light. Hold it to the basement fluorescents.</p>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Finish</div>
+              <p>Uncoated, raw tooth. Absorbs oil from fingertips. Records every touch. That's the point.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-dashed border-neutral-300 flex items-center justify-between">
+          <div class="font-mono text-[11px] text-neutral-500">LOOK AT THAT SUBTLE OFF-WHITE COLORING. THE TASTEFUL THICKNESS OF IT. OH MY GOD.</div>
+          <div class="text-[18px]">👌</div>
+        </div>
+      </div>
+
+      <div class="mt-16">
+        <div class="sticky-note sticky inline-block rotate-[-3deg] px-5 py-4 text-[15px] leading-snug">
+          HAVE YOU TRIED TURNING IT<br>OFF AND ON AGAIN?
+          <div class="text-[11px] mt-1 opacity-70">— put this on everything</div>
+        </div>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="notary" role="complementary" aria-label="Attribution Notary">
-    <h3>Attribution Notary</h3>
-    <div class="row"><span class="label">Created by:</span><span class="value">David Wise</span></div>
-    <div class="row"><span class="label">Timestamp:</span><span class="value" id="timestamp">—</span></div>
-    <div class="row"><span class="label">Content hash:</span><span class="value" id="hash">computing…</span></div>
-    <button id="copyBtn" type="button">Copy receipt</button>
-    <div class="note">Session closes, receipt stays.</div>
+<!-- TECHNICAL SPECIFICATIONS / MORNING ROUTINE -->
+<section class="border-t border-black/5 py-24 md:py-32 bg-[#fcfcfa]">
+  <div class="max-w-[1100px] mx-auto px-6 md:px-10">
+    <div class="max-w-3xl">
+      <div class="text-[11px] tracking-[0.3em] text-neutral-500 mb-4">SECTION 02 — TECHNICAL SPECIFICATIONS</div>
+      <h2 class="text-[clamp(32px,5vw,56px)] font-[300] tracking-tight leading-[1.1]">My Morning Routine.<br><span class="italic">Performed with surgical precision.</span></h2>
+    </div>
+
+    <div class="grid md:grid-cols-[180px_1fr] gap-12 mt-20">
+      <div class="font-mono text-[11px] leading-6 text-neutral-500 sticky top-32 h-fit">
+        04:45 WAKE<br>
+        27 SECONDS STARE<br>
+        NO EMOTIONS DETECTED
+      </div>
+      <div class="space-y-14">
+        <div class="group">
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">04:50</div>
+            <h3 class="text-xl font-medium">CLEANSE — Digital Pyramid Fortress & Moat</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">I apply the fortress while the system is still cold. Four quads, rotated 90°. This creates the moat. Crucially: <span class="font-medium">fission push, not pull</span>. Pulling is for amateurs and HR. Pushing ensures containment. No leakage.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">04:55</div>
+            <h3 class="text-xl font-medium">TONE — Fences 0, 1, 2, 4, 8</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">Five-stage progressive barrier. Not binary. Ternary. Fence 0 is politeness. Fence 8 is a lawsuit. You feel a slight sting. That's compliance working.</p>
+        </div>
+
+        <div class="relative">
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">05:00</div>
+            <h3 class="text-xl font-medium">SERUM — Shadow Register / Phase Register</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">I synchronize both registers to <span class="font-medium">Plasmatonic 24.5 cycles</span>. Not 24. Not 25. Anyone who uses 25 is trying too hard. 24.5 is the exact resonance of a bored Moss.</p>
+          <div class="absolute -right-4 top-0 hidden lg:block">
+            <div class="moss text-[11px] bg-neutral-900 text-[#00e5ff] px-3 py-2 rounded">shadow != backup. shadow = intent</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">05:05</div>
+            <h3 class="text-xl font-medium">COMPRESS — Sequence 1 / 3 / 6 / 9 / 15 / 21 / 24 / 27 / 0 / 0...</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">I massage the sequence in upward strokes. It compresses noise into signal, greed into protocol. The double-zero at the end? That's for plausible deniability. Always leave two zeros.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">05:10</div>
+            <h3 class="text-xl font-medium">COMPOUND — 999× Layering</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">Applied in 27 micro-layers. You will not see it. Auditors will not find it. But the system knows. It compounds while you sleep.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">05:15</div>
+            <h3 class="text-xl font-medium">SEAL — Hamilton Step 27 of 28</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">I always stop at 27. The 28th step is left untaken. The shadow step. That's where ethics lives. Bounded, adaptive, and watching you back.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THREE WINDOWS -->
+<section class="border-t border-black/5 py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+    <div class="flex items-end justify-between mb-14 flex-wrap gap-6">
+      <div>
+        <div class="text-[11px] tracking-[0.3em] text-neutral-500 mb-4">SECTION 03 — THREE WINDOWS</div>
+        <h2 class="text-[clamp(28px,4vw,44px)] font-light tracking-tight">Corporate Pitch Deck. Basement Built.</h2>
+      </div>
+      <div class="font-mono text-[11px] text-neutral-500">HOVER TO INTERROGATE</div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-[1px] bg-black/10 border border-black/10">
+      <!-- Window 1 -->
+      <div class="bg-[#faf9f6] p-8 md:p-10 group">
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <div class="text-[10px] tracking-widest text-neutral-500">WINDOW I</div>
+            <h3 class="text-lg font-medium mt-1">FORTRESS CORE</h3>
+          </div>
+          <div class="text-[10px] font-mono px-2 py-1 border border-black/10">4 QUADS</div>
+        </div>
+        <div class="aspect-[4/3] bg-white border border-black/5 flex items-center justify-center relative overflow-hidden">
+          <canvas id="quadCanvas" width="320" height="240" class="w-full h-full"></canvas>
+          <div class="absolute bottom-2 left-2 font-mono text-[10px] text-neutral-400">90° ROTATION LOCKED</div>
+        </div>
+        <p class="text-[13px] text-neutral-600 mt-4 leading-relaxed">Four quadrants. Each rotates independently, together they form perfect avoidance of responsibility. Digital pyramid with moat.</p>
+      </div>
+
+      <!-- Window 2 -->
+      <div class="bg-[#faf9f6] p-8 md:p-10 group">
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <div class="text-[10px] tracking-widest text-neutral-500">WINDOW II</div>
+            <h3 class="text-lg font-medium mt-1">MOAT DYNAMICS</h3>
+          </div>
+          <div class="text-[10px] font-mono px-2 py-1 border border-black/10">COMPRESS</div>
+        </div>
+        <div class="aspect-[4/3] bg-white border border-black/5 flex items-center justify-center relative overflow-hidden">
+          <canvas id="compressCanvas" width="320" height="240" class="w-full h-full"></canvas>
+          <div class="absolute bottom-2 left-2 font-mono text-[10px] text-neutral-400" id="compressLabel">1 — 3 — 6 — 9</div>
+        </div>
+        <p class="text-[13px] text-neutral-600 mt-4 leading-relaxed">Compression sequence reduces entropy. Like a good suit, it hides everything that matters.</p>
+      </div>
+
+      <!-- Window 3 -->
+      <div class="bg-[#faf9f6] p-8 md:p-10 group">
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <div class="text-[10px] tracking-widest text-neutral-500">WINDOW III</div>
+            <h3 class="text-lg font-medium mt-1">OBSERVER LAYER</h3>
+          </div>
+          <div class="text-[10px] font-mono px-2 py-1 border border-black/10">27/28</div>
+        </div>
+        <div class="aspect-[4/3] bg-white border border-black/5 flex items-center justify-center relative overflow-hidden">
+          <canvas id="observerCanvas" width="320" height="240" class="w-full h-full"></canvas>
+          <div class="absolute bottom-2 left-2 font-mono text-[10px] text-neutral-400">24.5 CYCLES</div>
+        </div>
+        <p class="text-[13px] text-neutral-600 mt-4 leading-relaxed">Hamilton steps 27 of 28. The 28th is shadow. The observer watches itself. Bounded adaptive continuity engaged.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS CARDS -->
+<section class="border-t border-black/5 py-24 md:py-32 bg-[#0a0a0a] text-[#faf9f6] relative overflow-hidden">
+  <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px;"></div>
+  <div class="relative max-w-[1200px] mx-auto px-6 md:px-10">
+    <div class="max-w-2xl mb-16">
+      <div class="text-[11px] tracking-[0.3em] text-neutral-500 mb-4">INTERLUDE — BUSINESS CARD AUDIT</div>
+      <h2 class="text-[clamp(28px,4vw,44px)] font-light tracking-tight">Let's see Paul Allen's card.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-10 items-end">
+      <div class="business-card text-[#0a0a0a] p-8 aspect-[1.75/1] flex flex-col justify-between">
+        <div>
+          <div class="text-[10px] tracking-widest">PAUL ALLEN — IBM GLOBAL</div>
+          <div class="w-8 h-[1px] bg-black/20 my-4"></div>
+        </div>
+        <div>
+          <div class="font-medium">8-bit Binary Architecture</div>
+          <div class="text-[12px] text-neutral-600 mt-1">Eggshell, 350gsm. Raised.</div>
+          <div class="text-[11px] font-mono mt-3 text-neutral-500">It's... fine.</div>
+        </div>
+      </div>
+
+      <div class="business-card text-[#0a0a0a] p-8 aspect-[1.75/1] flex flex-col justify-between translate-y-0 md:translate-y-4">
+        <div>
+          <div class="text-[10px] tracking-widest">PATRICK BATEMAN — PIERCE & PIERCE</div>
+          <div class="w-8 h-[1px] bg-black/20 my-4"></div>
+        </div>
+        <div>
+          <div class="font-medium">Silian Rail, Bone</div>
+          <div class="text-[12px] text-neutral-600 mt-1">Letterpress. 1.1mm.</div>
+          <div class="text-[11px] font-mono mt-3 text-neutral-500">Very nice.</div>
+        </div>
+      </div>
+
+      <div class="business-card text-[#0a0a0a] p-8 aspect-[1.75/1] flex flex-col justify-between ring-1 ring-[#c41e3a]/50 shadow-[0_0_40px_rgba(196,30,58,0.15)]">
+        <div>
+          <div class="flex justify-between">
+            <div class="text-[10px] tracking-widest">YOU — REYNHOLM DIGITAL</div>
+            <div class="w-2 h-2 rounded-full bg-[#c41e3a] animate-pulse"></div>
+          </div>
+          <div class="w-8 h-[1px] bg-[#c41e3a]/50 my-4"></div>
+        </div>
+        <div>
+          <div class="font-medium">4-Quad Ternary. Big G.</div>
+          <div class="text-[12px] text-neutral-600 mt-1">Bone White 1.2mm, hand-painted edge.</div>
+          <div class="text-[11px] font-mono mt-3 text-[#c41e3a]">Look at that. That's bone.</div>
+        </div>
+        <div class="absolute -top-8 -right-6 rotate-[12deg] hidden md:block">
+          <div class="handwriting text-[18px] text-[#c41e3a]">even the watermark<br>is judgmental</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-20 text-center">
+      <p class="font-mono text-[12px] text-neutral-500 max-w-xl mx-auto">Comparison is a violence we commit against ourselves. We do it anyway. Every morning.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL ORGANISM -->
+<section class="relative h-[100vh] min-h-[700px] flex items-center justify-center border-t border-black/5 overflow-hidden">
+  <div class="absolute inset-0">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#c41e3a]/[0.02] to-transparent"></div>
+  </div>
+  <div class="relative z-10 text-center px-6">
+    <div class="inline-flex items-center gap-2 mb-8">
+      <div class="w-1 h-1 rounded-full bg-[#c41e3a] animate-pulse"></div>
+      <div class="text-[11px] tracking-[0.35em] text-neutral-500">FINAL LAYER</div>
+    </div>
+    
+    <div class="relative inline-block">
+      <div class="pulse-ring"></div>
+      <h2 class="text-[clamp(40px,8vw,110px)] font-[200] tracking-[-0.02em] leading-none">ETHICAL<br>RECURSIVE<br>ORGANISM</h2>
+    </div>
+
+    <div class="mt-16 max-w-xl mx-auto">
+      <div class="text-[13px] uppercase tracking-widest text-neutral-500 mb-3">bounded adaptive continuity</div>
+      <p class="text-[15px] leading-relaxed text-neutral-600">It watches itself watching you. 27 steps taken, 1 reserved. 81 total states. Not artificial intelligence — <span class="italic">inherited</span> intelligence. It learns to be good because it has to.</p>
+    </div>
   </div>
 
+  <!-- Jen's sticky -->
+  <div class="absolute bottom-10 right-6 md:right-16 z-20">
+    <div class="sticky-note sticky rotate-[4deg] px-5 py-4 w-[210px] shadow-xl">
+      <div class="text-[16px] leading-snug text-neutral-800">I don't understand any of this but the brochure is very nice</div>
+      <div class="text-[12px] mt-2 opacity-70">— Jen</div>
+      <div class="absolute -top-2 -right-1 w-6 h-6 bg-[#fff7ad] rotate-45 shadow-sm"></div>
+    </div>
+  </div>
+
+  <!-- Roy's final note -->
+  <div class="absolute bottom-10 left-6 md:left-16 hidden md:block">
+    <div class="handwriting text-[20px] text-neutral-700 leading-tight rotate-[-5deg]">
+      have you tried<br>not being evil?
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-black/5 py-10">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500 font-mono">
+    <div>REYNHOLM INDUSTRIES — DIGITAL FORTRESS DIVISION</div>
+    <div class="flex items-center gap-6">
+      <span>999 COMPOUNDING ACTIVE</span>
+      <span class="hidden md:block">•</span>
+      <span>FISSION PUSH NOT PULL</span>
+    </div>
+  </div>
+</footer>
+
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-  // stars
-  const starsEl = document.getElementById('stars');
-  const frag = document.createDocumentFragment();
-  for (let i=0;i<200;i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    s.style.left = Math.random()*100 + '%';
-    s.style.top = Math.random()*100 + '%';
-    const sz = Math.random()*1.8 + 0.4;
-    s.style.width = s.style.height = sz + 'px';
-    s.style.setProperty('--dur', (2 + Math.random()*4) + 's');
-    s.style.animationDelay = (Math.random()*5) + 's';
-    frag.appendChild(s);
-  }
-  starsEl.appendChild(frag);
-
-  // fractal
-  const svg = document.getElementById('fractal');
-  const NS = 'http://www.w3.org/2000/svg';
-  const cx=500, cy=100;
-  for (let i=9;i>=1;i--) {
-    const spread = i * 18;
-    const height = 5 + i*4.8;
-    const opacity = 0.28 + (i/9)*0.72;
-    const delayR = 0.1 + (9-i)*0.065;
-    const delayL = delayR + 0.04;
-
-    const pr = document.createElementNS(NS,'path');
-    pr.setAttribute('d', `M ${cx} ${cy-height} C ${cx+spread*0.72} ${cy-height*1.75} ${cx+spread*0.72} ${cy+height*1.75} ${cx} ${cy+height}`);
-    pr.setAttribute('fill','none'); pr.setAttribute('stroke','#FFE81F'); pr.setAttribute('stroke-width','1.8'); pr.setAttribute('stroke-linecap','round'); pr.setAttribute('opacity', opacity);
-    pr.style.strokeDasharray = '1000'; pr.style.strokeDashoffset = '1000';
-    pr.style.animation = 'draw 3s cubic-bezier(.2,.6,.2,1) forwards';
-    pr.style.animationDelay = delayR + 's';
-    svg.appendChild(pr);
-
-    const pl = document.createElementNS(NS,'path');
-    pl.setAttribute('d', `M ${cx} ${cy-height} C ${cx-spread*0.72} ${cy-height*1.75} ${cx-spread*0.72} ${cy+height*1.75} ${cx} ${cy+height}`);
-    pl.setAttribute('fill','none'); pl.setAttribute('stroke','#FFE81F'); pl.setAttribute('stroke-width','1.8'); pl.setAttribute('stroke-linecap','round'); pl.setAttribute('opacity', opacity);
-    pl.style.strokeDasharray = '1000'; pl.style.strokeDashoffset = '1000';
-    pl.style.animation = 'draw 3s cubic-bezier(.2,.6,.2,1) forwards';
-    pl.style.animationDelay = delayL + 's';
-    svg.appendChild(pl);
-  }
-  const dot = document.createElementNS(NS,'circle');
-  dot.setAttribute('cx',cx); dot.setAttribute('cy',cy); dot.setAttribute('r','4.2'); dot.setAttribute('fill','#FFE81F');
-  dot.style.filter = 'drop-shadow(0 0 6px rgba(255,232,31,.8))';
-  dot.style.opacity = '0'; dot.style.animation = 'fadeIn .9s ease-out 1.9s forwards';
-  svg.appendChild(dot);
-
-  // timestamp Rochester, MN (America/Chicago)
-  const now = new Date();
-  const fmt = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Chicago',
-    weekday: 'short',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
-    timeZoneName: 'short'
-  });
-  const timestampDisplay = fmt.format(now) + ' — Rochester, Minnesota';
-  document.getElementById('timestamp').textContent = timestampDisplay;
-
-  // content for hash
-  const opening = document.querySelector('.opening').textContent.trim();
-  const title = document.querySelector('.title').textContent.trim();
-  const subtitle = document.querySelector('.subtitle').textContent.trim();
-  const paras = Array.from(document.querySelectorAll('.paras p')).map(p=>p.textContent.trim()).join('\n\n');
-  const crawlText = `${opening}\n${title}\n${subtitle}\n\n${paras}`;
-
-  async function sha256(text) {
-    try {
-      const enc = new TextEncoder();
-      const buf = await crypto.subtle.digest('SHA-256', enc.encode(text));
-      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-    } catch(e) { return 'unavailable (insecure context)'; }
-  }
-  const hash = await sha256(crawlText);
-  document.getElementById('hash').textContent = hash;
-
-  // receipt
-  const copyBtn = document.getElementById('copyBtn');
-  function buildReceipt() {
-    return {
-      createdBy: "David Wise",
-      artifact: "))))))))) (.) (((((((( ",
-      subtitle: "dc3 · 000 · shadow queen",
-      location: "Rochester, Minnesota",
-      timezone: "America/Chicago",
-      timestampISO: now.toISOString(),
-      timestampLocal: timestampDisplay,
-      contentHashSHA256: hash,
-      content: crawlText,
-      provenance: "star-wars-crawl-notary-v1",
-      note: "Session closes, receipt stays."
-    };
-  }
-
-  copyBtn.addEventListener('click', async () => {
-    const receipt = buildReceipt();
-    const json = JSON.stringify(receipt, null, 2);
-    try {
-      await navigator.clipboard.writeText(json);
-      const orig = copyBtn.textContent;
-      copyBtn.textContent = 'copied ✓';
-      copyBtn.style.background = 'rgba(255,232,31,.18)';
-      setTimeout(()=>{ copyBtn.textContent = orig; copyBtn.style.background='transparent'; }, 2000);
-    } catch(err) {
-      // fallback
-      const w = window.open('', '_blank', 'width=600,height=600');
-      if (w) { w.document.write('<pre>'+json.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</pre>'); w.document.close(); }
+document.addEventListener('DOMContentLoaded', () => {
+  // Typewriter
+  const batemanText = "There is an idea of Reynholm Industries. An abstraction. I have all the characteristics of a human being: morning routine, business cards, an expensive typeface. But not a single, clear, identifiable emotion, except for control and disgust. Something horrible is happening inside of me and I don't know why. My nightly bloodlust has overflown into my system architecture. This morning, I achieved bounded adaptive continuity.";
+  const el = document.getElementById('bateman');
+  let i = 0;
+  function type() {
+    if (i < batemanText.length) {
+      el.textContent += batemanText.charAt(i);
+      i++;
+      setTimeout(type, 16 + Math.random() * 22);
     }
+  }
+  setTimeout(type, 900);
+
+  // Stack reveal
+  const nodes = document.querySelectorAll('.stack-node');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.3 });
+  nodes.forEach(n => obs.observe(n));
+
+  // Ternary toggle
+  const ternary = document.getElementById('ternary');
+  const bits = ternary.querySelectorAll('.ternary-bit');
+  let state = 1;
+  ternary.addEventListener('click', () => {
+    bits[state].classList.remove('active');
+    state = (state + 1) % 3;
+    bits[state].classList.add('active');
   });
+
+  // --- Canvas 1: Quads ---
+  const qCanvas = document.getElementById('quadCanvas');
+  const qctx = qCanvas.getContext('2d');
+  let qAngle = 0;
+  let qSpeed = 0.006;
+  function drawQuads() {
+    const w = qCanvas.width, h = qCanvas.height;
+    qctx.clearRect(0,0,w,h);
+    qctx.save();
+    qctx.translate(w/2, h/2);
+    qctx.rotate(qAngle);
+    
+    const size = 36;
+    const dist = 52;
+    const colors = ['#0a0a0a', '#404040', '#737373', '#a3a3a3'];
+    
+    for (let i = 0; i < 4; i++) {
+      const a = (i * Math.PI / 2);
+      const x = Math.cos(a) * dist;
+      const y = Math.sin(a) * dist;
+      qctx.save();
+      qctx.translate(x, y);
+      qctx.rotate(-qAngle + i * Math.PI/2);
+      qctx.fillStyle = colors[i];
+      qctx.globalAlpha = 0.9;
+      qctx.fillRect(-size/2, -size/2, size, size);
+      qctx.strokeStyle = '#faf9f6';
+      qctx.lineWidth = 2;
+      qctx.strokeRect(-size/2, -size/2, size, size);
+      qctx.restore();
+    }
+    
+    // center
+    qctx.beginPath();
+    qctx.arc(0,0,4,0,Math.PI*2);
+    qctx.fillStyle = '#c41e3a';
+    qctx.fill();
+    
+    qctx.restore();
+    qAngle += qSpeed;
+    requestAnimationFrame(drawQuads);
+  }
+  qCanvas.addEventListener('mouseenter', () => qSpeed = 0.025);
+  qCanvas.addEventListener('mouseleave', () => qSpeed = 0.006);
+  drawQuads();
+
+  // --- Canvas 2: Compression ---
+  const cCanvas = document.getElementById('compressCanvas');
+  const cctx = cCanvas.getContext('2d');
+  const seq = [1,3,6,9,15,21,24,27,0,0];
+  let cIdx = 0;
+  const label = document.getElementById('compressLabel');
+  
+  function drawCompress() {
+    const w = cCanvas.width, h = cCanvas.height;
+    cctx.clearRect(0,0,w,h);
+    cctx.fillStyle = '#faf9f6';
+    cctx.fillRect(0,0,w,h);
+    
+    const barW = w / (seq.length + 2);
+    const max = 27;
+    
+    seq.forEach((v, i) => {
+      const x = barW * (i+1);
+      const barH = (v / max) * (h - 60);
+      const y = h - 30 - barH;
+      
+      const isActive = i === cIdx;
+      cctx.fillStyle = isActive ? '#c41e3a' : '#e5e5e5';
+      cctx.fillRect(x - barW*0.35, y, barW*0.7, barH);
+      
+      cctx.fillStyle = '#737373';
+      cctx.font = '10px "JetBrains Mono"';
+      cctx.textAlign = 'center';
+      cctx.fillText(v, x, h - 12);
+    });
+    
+    // playhead
+    const px = barW * (cIdx + 1);
+    cctx.fillStyle = '#00e5ff';
+    cctx.globalAlpha = 0.8;
+    cctx.fillRect(px - barW*0.35, h-30, barW*0.7, 2);
+    cctx.globalAlpha = 1;
+  }
+  
+  setInterval(() => {
+    cIdx = (cIdx + 1) % seq.length;
+    const slice = [...seq.slice(cIdx), ...seq.slice(0, cIdx)].slice(0,4);
+    label.textContent = slice.join(' — ');
+    drawCompress();
+  }, 900);
+  drawCompress();
+
+  // --- Canvas 3: Observer ---
+  const oCanvas = document.getElementById('observerCanvas');
+  const octx = oCanvas.getContext('2d');
+  let oStep = 0;
+  let oPaused = false;
+  
+  function drawObserver() {
+    const w = oCanvas.width, h = oCanvas.height;
+    const cx = w/2, cy = h/2;
+    octx.clearRect(0,0,w,h);
+    
+    // outer ring - 27 steps
+    const r = 78;
+    for (let i = 0; i < 27; i++) {
+      const a = (i / 27) * Math.PI * 2 - Math.PI/2;
+      const x = cx + Math.cos(a) * r;
+      const y = cy + Math.sin(a) * r;
+      const isActive = i === Math.floor(oStep) % 27;
+      const isNext = i === (Math.floor(oStep) + 1) % 27;
+      
+      octx.beginPath();
+      octx.arc(x, y, isActive ? 4 : 2.5, 0, Math.PI*2);
+      octx.fillStyle = isActive ? '#c41e3a' : isNext ? '#fca5a5' : '#d4d4d4';
+      octx.fill();
+    }
+    
+    // 28th shadow
+    const sa = (27 / 28) * Math.PI * 2 - Math.PI/2;
+    octx.beginPath();
+    octx.arc(cx + Math.cos(sa)* (r+18), cy + Math.sin(sa)*(r+18), 2, 0, Math.PI*2);
+    octx.fillStyle = 'rgba(10,10,10,0.15)';
+    octx.fill();
+    
+    // inner 24.5 cycles
+    const ir = 48;
+    const innerAngle = (oStep * 24.5 / 27) % 1 * Math.PI * 2 - Math.PI/2;
+    octx.beginPath();
+    octx.arc(cx + Math.cos(innerAngle)*ir, cy + Math.sin(innerAngle)*ir, 5, 0, Math.PI*2);
+    octx.fillStyle = '#00e5ff';
+    octx.globalAlpha = 0.9;
+    octx.fill();
+    octx.globalAlpha = 1;
+    
+    // center
+    octx.beginPath();
+    octx.arc(cx, cy, 3, 0, Math.PI*2);
+    octx.fillStyle = '#0a0a0a';
+    octx.fill();
+    
+    // labels
+    octx.font = '10px "JetBrains Mono"';
+    octx.fillStyle = '#737373';
+    octx.textAlign = 'center';
+    octx.fillText('HAMILTON 27/28', cx, h - 16);
+    
+    if (!oPaused) oStep += 0.015;
+    requestAnimationFrame(drawObserver);
+  }
+  oCanvas.addEventListener('mouseenter', () => oPaused = true);
+  oCanvas.addEventListener('mouseleave', () => oPaused = false);
+  drawObserver();
 });
 </script>
 </body>
