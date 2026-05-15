@@ -1,529 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>UNITY TENSOR — There and Back Again</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>UNITY TENSOR // Persistence Engine</title>
 <style>
-:root {
-  --bg: #050507;
-  --page: #0d0e13;
-  --page-2: #10121a;
-  --ink: #e8e2d5;
-  --ink-2: #c8c2b4;
-  --muted: #8a8376;
-  --gold: #d4b577;
-  --gold-2: #a88c5a;
-  --border: #25262f;
-  --line: rgba(212,181,119,0.18);
-}
-* { box-sizing: border-box; }
-html, body { height: 100%; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 18px;
-  line-height: 1.75;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  counter-reset: page;
-}
-.backdrop {
-  position: fixed; inset: 0;
-  background:
-    radial-gradient(1400px 900px at 50% -15%, #1b1c25 0%, transparent 60%),
-    radial-gradient(900px 700px at 85% 120%, #14151c 0%, transparent 55%),
-    #050507;
-  z-index: -2;
-}
-.backdrop::after {
-  content: ""; position: absolute; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
-  mix-blend-mode: soft-light;
-}
-.book { padding: 56px 16px 120px; }
-.page {
-  counter-increment: page;
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  margin: 48px auto;
-  background: linear-gradient(180deg, var(--page-2) 0%, var(--page) 70%);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.03) inset,
-    0 30px 80px rgba(0,0,0,0.75),
-    0 2px 10px rgba(0,0,0,0.6);
-  padding: 88px 92px 100px;
-  min-height: 1120px;
-  overflow: hidden;
-}
-.page::before {
-  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212,181,119,0.55), transparent);
-  opacity: .7;
-}
-.page::after {
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(600px 200px at 50% 0%, rgba(212,181,119,0.06), transparent 70%);
-  pointer-events: none;
-}
-.page-number {
-  position: absolute; bottom: 26px; left: 0; right: 0;
-  text-align: center;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px; letter-spacing: .18em; color: var(--muted); opacity: .75;
-}
-.page-number::after { content: counter(page); }
-
-.eyebrow {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
-  color: var(--gold-2); margin-bottom: 10px;
-}
-h1, h2, h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 500;
-  color: #f4efe6;
-  margin: 0 0 .4em;
-  line-height: 1.15;
-}
-h1 { font-size: clamp(44px, 6vw, 74px); letter-spacing: .02em; }
-h2 { font-size: 36px; margin-top: .2em; }
-h3 { font-size: 24px; color: var(--gold); margin: 1.6em 0 .6em; }
-p { margin: 0 0 1.1em; color: var(--ink); }
-.lead { font-size: 22px; line-height: 1.55; color: var(--ink-2); }
-.small { font-size: 15px; color: var(--muted); }
-.mono { font-family: 'IBM Plex Mono', monospace; }
-hr.gold { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--line), transparent); margin: 32px 0; }
-
-/* COVER */
-.page.cover { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 1120px; }
-.cover-inner { max-width: 720px; padding: 0 20px; }
-.symbol-wrap { position: relative; display: inline-block; margin-bottom: 18px; }
-.symbol {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(90px, 15vw, 150px);
-  font-weight: 300; line-height: 1; letter-spacing: -.03em;
-  color: var(--gold);
-  text-shadow: 0 0 40px rgba(212,181,119,.25), 0 0 90px rgba(212,181,119,.15);
-  animation: breathe 4.5s ease-in-out infinite;
-}
-.symbol-glow {
-  position: absolute; inset: -20% -30%;
-  background: radial-gradient(closest-side, rgba(212,181,119,.18), transparent 70%);
-  filter: blur(20px); z-index: -1; animation: pulse 4.5s ease-in-out infinite;
-}
-@keyframes breathe { 0%,100%{ transform: scale(1); opacity:.92 } 50%{ transform: scale(1.04); opacity:1 } }
-@keyframes pulse { 0%,100%{ opacity:.6 } 50%{ opacity:1 } }
-.subtitle {
-  font-size: 21px; font-style: italic; color: var(--ink-2); margin: 8px 0 26px;
-}
-.tagline {
-  font-family: 'Inter', sans-serif; font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase;
-  color: var(--gold-2); margin-bottom: 72px;
-}
-.cover-meta {
-  display: flex; gap: 28px; justify-content: center; align-items: center;
-  border-top: 1px solid rgba(255,255,255,.08); padding-top: 22px;
-  font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted);
-}
-.cover-meta .author { color: var(--ink-2); font-weight: 500; }
-
-/* JOURNEY */
-.journey-inline { font-family: 'IBM Plex Mono'; color: var(--gold); padding: 0 .2em; }
-.journey-diagram {
-  margin: 36px 0 28px; padding: 32px;
-  border: 1px solid var(--border); border-radius: 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.2));
-  display: grid; place-items: center;
-}
-.journey {
-  position: relative; width: 100%; max-width: 520px; height: 140px;
-}
-.journey .j { position: absolute; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond'; font-size: 72px; color: var(--gold); opacity: .9; }
-.journey .left { left: 0; }
-.journey .right { right: 0; }
-.journey .dot { left: 50%; transform: translate(-50%,-50%); font-size: 84px; line-height: 1; text-shadow: 0 0 24px rgba(212,181,119,.4); }
-.journey .orbit { position: absolute; inset: 0; }
-.journey .orbit::before {
-  content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; background: var(--ink); border-radius: 50%;
-  box-shadow: 0 0 12px rgba(255,255,255,.6);
-  offset-path: path('M 30 70 C 140 0, 380 0, 490 70 C 380 140, 140 140, 30 70 Z');
-  animation: travel 6s linear infinite;
-}
-@keyframes travel { 0%{ offset-distance:0% } 100%{ offset-distance:100% } }
-.stages { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 28px; margin-top: 24px; }
-.stage { display: flex; gap: 10px; align-items: baseline; }
-.stage b { font-family: 'IBM Plex Mono'; font-size: 12px; color: var(--gold-2); width: 96px; flex: 0 0 auto; }
-
-/* SPEC */
-.spec-grid {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin: 24px 0 28px;
-}
-.spec {
-  border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: rgba(0,0,0,.25);
-}
-.spec span { display: block; font-family: 'Inter'; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-.spec strong { font-family: 'IBM Plex Mono'; font-size: 22px; color: var(--ink); font-weight: 500; }
-.callout {
-  border-left: 3px solid var(--gold); padding: 14px 18px; background: rgba(212,181,119,.06);
-  margin: 24px 0; color: var(--ink-2); font-style: italic;
-}
-
-/* GUARDS */
-.guards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 28px 0; }
-.guard {
-  border: 1px solid var(--border); border-radius: 12px; padding: 20px; background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
-  transition: transform .25s ease, border-color .25s ease;
-}
-.guard:hover { transform: translateY(-2px); border-color: rgba(212,181,119,.4); }
-.guard h4 { margin: 0 0 6px; font-family: 'Inter'; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold-2); }
-.guard .name { font-family: 'Cormorant Garamond'; font-size: 26px; margin-bottom: 8px; }
-.guard .meta { font-family: 'IBM Plex Mono'; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
-table.clean { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 16px; }
-table.clean th, table.clean td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.07); }
-table.clean th { font-family: 'Inter'; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 500; }
-
-/* TSV */
-.tsv-wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 28px; align-items: start; margin-top: 24px; }
-.tsv-grid {
-  display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; padding: 18px;
-  border: 1px solid var(--border); border-radius: 12px; background: rgba(0,0,0,.3);
-}
-.tsv-dot { width: 100%; aspect-ratio: 1; border-radius: 50%; background: #1a1c23; border: 1px solid #22242d; position: relative; }
-.tsv-dot.active { background: radial-gradient(circle, var(--gold) 0%, #8d6f3a 60%, #2a2418 100%); box-shadow: 0 0 10px rgba(212,181,119,.4), inset 0 0 6px rgba(0,0,0,.8); border-color: var(--gold-2); }
-.tsv-dot.active::after { content:""; position: absolute; inset:-3px; border-radius:50%; border:1px solid rgba(212,181,119,.3); }
-
-/* MATH */
-.formula-block { margin: 26px 0; }
-.formula {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
-  padding: 14px 16px; border: 1px dashed rgba(255,255,255,.12); border-radius: 10px;
-  background: rgba(255,255,255,.01); margin-bottom: 10px;
-}
-.f-label { font-family: 'Inter'; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
-.f-eq { font-family: 'IBM Plex Mono'; font-size: 16px; color: var(--ink); }
-
-/* LISTS */
-.checklist { list-style: none; padding: 0; margin: 18px 0; }
-.checklist li { padding-left: 28px; position: relative; margin: 10px 0; }
-.checklist li::before { content: "—"; position: absolute; left: 0; color: var(--gold-2); }
-
-.apps { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-top: 20px; }
-.app { border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: rgba(0,0,0,.2); }
-.app h5 { margin: 0 0 6px; font-family: 'Inter'; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-2); }
-
-/* LICENSE */
-.license-box { border: 1px solid var(--border); border-radius: 12px; padding: 22px; background: rgba(0,0,0,.25); margin: 22px 0; }
-.sig { font-family: 'Cormorant Garamond'; font-size: 64px; color: var(--gold); line-height: 1; margin-top: 24px; }
-
-/* RESPONSIVE */
-@media (max-width: 840px) {
-  .page { padding: 56px 24px 80px; min-height: auto; margin: 28px auto; }
-  .spec-grid { grid-template-columns: 1fr 1fr; }
-  .guards { grid-template-columns: 1fr; }
-  .tsv-wrap { grid-template-columns: 1fr; }
-  .stages { grid-template-columns: 1fr; }
-  .apps { grid-template-columns: 1fr; }
-}
-@media print {
-  body { background: white; }
-  .backdrop { display: none; }
-  .book { padding: 0; }
-  .page { box-shadow: none; border: 1px solid #ccc; page-break-after: always; min-height: auto; background: white; color: black; }
-  .page-number { color: #666; }
-}
+:root{--amber:#fde68a;--yellow:#facc15;--purple:#a855f7;--orange:#f59e0b;--cyan:#22d3ee;--bg:#000}
+*{box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{margin:0;background:#000;color:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;-webkit-font-smoothing:antialiased}
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(148,163,184,.07)1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.07)1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at center,black 60%,transparent 100%);pointer-events:none;z-index:0}
+header{position:fixed;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);border-bottom:1px solid rgba(253,230,138,.12);z-index:50;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);text-shadow:0 0 8px rgba(253,230,138,.5)}
+header .right{opacity:.6;color:#94a3b8}
+.viewport{position:relative;width:100vw;height:100vh}
+.pages{display:flex;height:100%;width:1000vw;transition:transform .7s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.page{width:100vw;height:100vh;flex:0 0 100vw;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 24px 80px;position:relative;overflow-y:auto;overflow-x:hidden}
+.page-content{width:100%;max-width:1100px;text-align:center;z-index:2}
+h1{font-size:clamp(36px,9vw,84px);line-height:.9;margin:0 0 16px;color:#fff;letter-spacing:.02em;text-shadow:0 0 24px rgba(253,230,138,.7),0 0 60px rgba(253,230,138,.3)}
+h2{font-size:clamp(24px,4vw,40px);margin:0 0 12px;font-weight:600;letter-spacing:.02em}
+h3{font-size:18px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.15em;opacity:.8}
+p{max-width:720px;margin:0 auto 16px;line-height:1.6;color:#cbd5e1;font-size:15px}
+.subtitle{color:var(--amber);text-shadow:0 0 12px rgba(253,230,138,.6);margin-bottom:24px;font-size:clamp(14px,2.5vw,20px);letter-spacing:.12em;text-transform:uppercase}
+.tagline{margin-top:24px;font-size:13px;letter-spacing:.14em;color:#94a3b8;text-transform:uppercase}
+.author{margin-top:32px;font-size:13px;color:#94a3b8;letter-spacing:.1em}
+.egg{width:min(28vmin,180px);height:min(36vmin,240px);margin:0 auto 32px;border-radius:50%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 25%,#fffce8 0%,#fde68a 25%,#f59e0b 55%,rgba(245,158,11,0)70%);box-shadow:0 0 40px rgba(253,230,138,.9),0 0 100px rgba(253,230,138,.5),inset 0 -20px 40px rgba(245,158,11,.4),inset 0 20px 30px rgba(255,255,255,.3);animation:eggPulse 3s ease-in-out infinite;position:relative}
+.egg:after{content:"";position:absolute;inset:-20px;border-radius:inherit;background:radial-gradient(circle,rgba(253,230,138,.2),transparent 60%);filter:blur(20px);z-index:-1}
+@keyframes eggPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.6);border:1px solid rgba(253,230,138,.2);color:var(--amber);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:40;transition:.2s;backdrop-filter:blur(6px);font-size:24px;user-select:none}
+.nav-btn:hover{background:rgba(253,230,138,.1);box-shadow:0 0 20px rgba(253,230,138,.3)}
+.nav-btn.left{left:12px}.nav-btn.right{right:12px}
+.nav-btn:active{transform:translateY(-50%) scale(.95)}
+.dots{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:40;padding:8px 14px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08);border-radius:20px;backdrop-filter:blur(8px)}
+.dot{width:6px;height:6px;border-radius:50%;background:#475569;transition:.3s;cursor:pointer}
+.dot.active{width:24px;border-radius:3px;background:var(--amber);box-shadow:0 0 10px rgba(253,230,138,.8)}
+.counter{position:fixed;bottom:22px;right:20px;font-size:11px;letter-spacing:.15em;color:#64748b;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.06);z-index:40}
+.diagram{position:relative;width:min(84vmin,520px);height:min(84vmin,520px);margin:0 auto}
+.guard{position:absolute;width:110px;height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:16px;background:rgba(5,5,5,.8);border:1px solid;backdrop-filter:blur(10px);font-size:11px;letter-spacing:.12em;text-transform:uppercase;transition:.3s;cursor:pointer}
+.guard:hover{transform:scale(1.08);z-index:5}
+.guard .val{font-size:28px;font-weight:700;line-height:1}
+.guard.north{top:0;left:50%;transform:translateX(-50%);color:var(--yellow);border-color:rgba(250,204,21,.5);box-shadow:0 0 30px rgba(250,204,21,.2),inset 0 0 20px rgba(250,204,21,.05)}
+.guard.east{top:50%;right:0;transform:translateY(-50%);color:var(--purple);border-color:rgba(168,85,247,.5);box-shadow:0 0 30px rgba(168,85,247,.2),inset 0 0 20px rgba(168,85,247,.05)}
+.guard.south{bottom:0;left:50%;transform:translateX(-50%);color:var(--orange);border-color:rgba(245,158,11,.5);box-shadow:0 0 30px rgba(245,158,11,.2),inset 0 0 20px rgba(245,158,11,.05)}
+.guard.west{top:50%;left:0;transform:translateY(-50%);color:var(--cyan);border-color:rgba(34,211,238,.5);box-shadow:0 0 30px rgba(34,211,238,.2),inset 0 0 20px rgba(34,211,238,.05)}
+.guard.north:hover{transform:translateX(-50%) scale(1.08)}
+.guard.south:hover{transform:translateX(-50%) scale(1.08)}
+.guard.east:hover{transform:translateY(-50%) scale(1.08)}
+.guard.west:hover{transform:translateY(-50%) scale(1.08)}
+.egg-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:190px;height:190px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(253,230,138,.3),rgba(0,0,0,.9) 70%);border:2px solid rgba(253,230,138,.4);box-shadow:0 0 60px rgba(253,230,138,.3),inset 0 0 40px rgba(253,230,138,.15);cursor:pointer;transition:.3s;z-index:2}
+.egg-core:hover{box-shadow:0 0 80px rgba(253,230,138,.5),inset 0 0 50px rgba(253,230,138,.25);border-color:rgba(253,230,138,.7)}
+.egg-core .label{font-size:11px;letter-spacing:.2em;color:var(--amber);opacity:.8;margin-bottom:6px}
+.egg-core .value{font-size:28px;color:#fff;text-shadow:0 0 20px rgba(253,230,138,.8);font-weight:700;letter-spacing:.05em}
+.egg-core.pulse{animation:corePulse .4s ease}
+@keyframes corePulse{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.1)}100%{transform:translate(-50%,-50%) scale(1)}}
+.status-line{margin-top:24px;font-size:12px;letter-spacing:.14em;color:#94a3b8;text-transform:uppercase}
+.stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin:20px 0}
+.stat{padding:10px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;min-width:140px}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:4px}
+.stat .v{font-size:20px;color:var(--amber);text-shadow:0 0 10px rgba(253,230,138,.4)}
+canvas{display:block;margin:0 auto;background:#020202;border-radius:16px;box-shadow:0 0 40px rgba(0,0,0,.8),inset 0 0 20px rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06)}
+.canvas-wrap{position:relative;display:inline-block}
+.canvas-glow{position:absolute;inset:-20px;z-index:-1;filter:blur(30px);opacity:.5;border-radius:30px}
+.controls{margin-top:16px;display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;border-radius:8px;font-family:inherit;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.2s}
+.btn:hover{background:rgba(255,255,255,.1);border-color:rgba(253,230,138,.4);color:var(--amber);box-shadow:0 0 15px rgba(253,230,138,.2)}
+.btn.active{background:rgba(253,230,138,.15);border-color:var(--amber);color:var(--amber)}
+input[type="range"]{width:160px;accent-color:var(--amber)}
+textarea{width:min(90vw,420px);height:80px;background:rgba(0,0,0,.7);border:1px solid rgba(168,85,247,.3);border-radius:8px;color:#e2e8f0;padding:10px;font-family:inherit;font-size:13px;resize:none;box-shadow:0 0 20px rgba(168,85,247,.1) inset}
+textarea:focus{outline:none;border-color:var(--purple);box-shadow:0 0 20px rgba(168,85,247,.2) inset,0 0 15px rgba(168,85,247,.2)}
+.lab-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:640px;margin:20px auto}
+.lab-cell{position:relative;padding:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px}
+.lab-cell canvas{width:100%;height:auto;border-radius:8px}
+.lab-cell .label{margin-top:8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8}
+.unity-btn{margin-top:20px;padding:14px 28px;font-size:14px;background:linear-gradient(90deg,rgba(250,204,21,.2),rgba(168,85,247,.2),rgba(245,158,11,.2),rgba(34,211,238,.2));border:1px solid rgba(253,230,138,.5);color:var(--amber);border-radius:12px;cursor:pointer;letter-spacing:.15em;text-transform:uppercase;font-weight:600;box-shadow:0 0 30px rgba(253,230,138,.2);transition:.3s}
+.unity-btn:hover{transform:scale(1.05);box-shadow:0 0 50px rgba(253,230,138,.4)}
+.unity-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);background:rgba(0,0,0,.92);border:2px solid var(--amber);padding:30px 40px;border-radius:16px;font-size:18px;color:var(--amber);text-shadow:0 0 20px rgba(253,230,138,.8);letter-spacing:.15em;text-transform:uppercase;opacity:0;pointer-events:none;z-index:200;transition:.4s;box-shadow:0 0 80px rgba(253,230,138,.5);text-align:center}
+.unity-msg.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+body.unity-active{background:#000;animation:unityFlash 3s ease}
+@keyframes unityFlash{0%,100%{background:#000}10%,30%,50%{background:radial-gradient(circle at center,rgba(253,230,138,.15),#000 70%)}20%,40%{background:radial-gradient(circle at center,rgba(168,85,247,.1),#000 70%)}}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;max-width:800px;margin:24px auto;text-align:left}
+.spec{padding:12px 16px;background:rgba(255,255,255,.02);border-left:3px solid var(--amber);border-radius:0 8px 8px 0}
+.spec .k{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#94a3b8}
+.spec .v{font-size:14px;margin-top:4px;color:#e2e8f0}
+.note{max-width:720px;margin:28px auto;padding:20px;background:rgba(253,230,138,.03);border:1px solid rgba(253,230,138,.15);border-radius:12px;font-size:13px;line-height:1.7;color:#cbd5e1;text-align:left}
+.glow-yellow{color:var(--yellow);text-shadow:0 0 12px rgba(250,204,21,.6)}
+.glow-purple{color:var(--purple);text-shadow:0 0 12px rgba(168,85,247,.6)}
+.glow-orange{color:var(--orange);text-shadow:0 0 12px rgba(245,158,11,.6)}
+.glow-cyan{color:var(--cyan);text-shadow:0 0 12px rgba(34,211,238,.6)}
+@media (max-width:768px){.guard{width:84px;height:84px}.guard .val{font-size:22px}.egg-core{width:150px;height:150px}.egg-core .value{font-size:22px}.nav-btn{width:40px;height:40px;font-size:20px}.lab-grid{grid-template-columns:1fr;max-width:320px}}
 </style>
 </head>
 <body>
-<div class="backdrop"></div>
-<main class="book">
+<div class="grid-bg"></div>
+<header><div>UNITY TENSOR // 4 Guards Around 1 Egg</div><div class="right">PERSISTENCE ENGINE STATUS_4</div></header>
 
-<!-- PAGE 1 COVER -->
-<section class="page cover">
-  <div class="cover-inner">
-    <div class="symbol-wrap">
-      <div class="symbol">)(.</div>
-      <div class="symbol-glow"></div>
-    </div>
+<div class="viewport" id="viewport">
+ <div class="pages" id="pages">
+  <!-- PAGE 1 -->
+  <section class="page">
+   <div class="page-content">
+    <div class="egg"></div>
     <h1>UNITY TENSOR</h1>
-    <div class="subtitle">There and Back Again — 4 Guards Around 1 Egg</div>
-    <div class="tagline">First Author Implementation of Balanced Ternary Compute Fabric</div>
-    <div class="cover-meta">
-      <div class="author">David Wise</div>
-      <div class="date">May 15, 2026</div>
-      <div>Whitepaper v1.0</div>
+    <div class="subtitle">Persistence Engine Status</div>
+    <div class="author">First Author: David Wise • 2026</div>
+    <div class="tagline">1 Egg (Triadic 256/768) + 4 Guards = Unity</div>
+   </div>
+  </section>
+  <!-- PAGE 2 -->
+  <section class="page">
+   <div class="page-content">
+    <h2 style="margin-bottom:24px">Overview</h2>
+    <div class="diagram">
+     <div class="guard north"><div class="val">16</div><div>PHOTONIC</div></div>
+     <div class="guard east"><div class="val">8</div><div>PLASMIC</div></div>
+     <div class="guard south"><div class="val">9</div><div>BORONIC</div></div>
+     <div class="guard west"><div class="val">32</div><div>TOROIDAL</div></div>
+     <div class="egg-core" id="eggCore"><div class="label">EGG CORE</div><div class="value" id="eggValue">256/768</div></div>
     </div>
-  </div>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 2 ABSTRACT -->
-<section class="page">
-  <div class="eyebrow">Whitepaper</div>
-  <h2>Abstract</h2>
-  <p class="lead">1 → many → 1. Leave the point, explore the boundary, return to the point.</p>
-  <p>This document describes the first complete heterogeneous architecture integrating balanced ternary logic <span class="mono">(–1, 0, +1)</span> with photonic, plasmic, boronic, and toroidal compute layers. No prior art combines these five modalities into a single tensor fabric.</p>
-  <p>The Unity Tensor implements a central ternary core — the <em>Egg</em> (256 trits, 768 ternary gates) — surrounded by four specialized computational guards. Interconnection is achieved via 65 through-silicon vias (TSVs) arranged on a 100-point routing grid, enabling 3D heterogeneous stacking at sub-nanosecond synchronization.</p>
-  <p>Unlike binary approximations of neural weights, balanced ternary provides native representation for inhibition, pass-through, and excitation — the fundamental operations of both biological neurons and modern transformer architectures. This is not theoretical: the architecture is defined to fabrication-ready specifications and represents the first author claim to a unified 4+1 compute fabric.</p>
-  <hr class="gold">
-  <p class="small"><strong>Keywords:</strong> balanced ternary, heterogeneous compute, photonic interconnect, plasmic bridge, boronic stability, toroidal containment, TSV 3D, steerable AI, first author.</p>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 3 JOURNEY -->
-<section class="page">
-  <div class="eyebrow">Principle</div>
-  <h2>1. The Journey Principle</h2>
-  <p>The notation <span class="journey-inline">)(.</span> encodes the complete computational cycle. It is not symbolic decoration — it is operational logic.</p>
-  
-  <div class="journey-diagram">
-    <div class="journey">
-      <div class="j left">)</div>
-      <div class="j dot">.</div>
-      <div class="j right">(</div>
-      <div class="orbit"></div>
+    <div class="status-line">65 TSVs converge • 100-grid base • silo collapsed to singularity</div>
+    <p style="margin-top:20px;opacity:.7">Click egg to cycle triadic states. Hover guards for coherence fields.</p>
+   </div>
+  </section>
+  <!-- PAGE 3 -->
+  <section class="page">
+   <div class="page-content">
+    <h2 style="color:var(--amber);text-shadow:0 0 12px rgba(253,230,138,.6)">The Egg Core</h2>
+    <p>Triadic Core operates at 256/768 active capacity. Persistence memory depth visualized as Mandelbrot zoom — infinite detail from finite bounds.</p>
+    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(253,230,138,.3),transparent 70%)"></div><canvas id="mandel" width="300" height="300"></canvas></div>
+    <div class="stats"><div class="stat"><div class="k">Capacity</div><div class="v">768</div></div><div class="stat"><div class="k">Active</div><div class="v" id="statActive">256</div></div><div class="stat"><div class="k">Resonance Mode</div><div class="v">Triadic</div></div></div>
+   </div>
+  </section>
+  <!-- PAGE 4 -->
+  <section class="page">
+   <div class="page-content">
+    <h2 class="glow-yellow">Guard 1 • Photonic</h2><h3>Value 16</h3>
+    <p>Light-speed coherence field active. Maintains instantaneous state sync across threads.</p>
+    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(250,204,21,.4),transparent 70%)"></div><canvas id="julia" width="320" height="320"></canvas></div>
+    <div class="controls"><button class="btn active" id="coherenceBtn">Coherence On</button></div>
+   </div>
+  </section>
+  <!-- PAGE 5 -->
+  <section class="page">
+   <div class="page-content">
+    <h2 class="glow-purple">Guard 2 • Plasmic</h2><h3>Value 8</h3>
+    <p>Plasma containment stable. Buffers volatile writes before commit.</p>
+    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(168,85,247,.4),transparent 70%)"></div><canvas id="plasma" width="320" height="320"></canvas></div>
+    <div class="controls" style="flex-direction:column"><textarea id="plasmaBuffer" placeholder="Type to test persistence... survives reload"></textarea><div style="font-size:11px;color:#64748b;margin-top:6px;letter-spacing:.1em">PERSISTENCE DEMO • localStorage backed</div></div>
+   </div>
+  </section>
+  <!-- PAGE 6 -->
+  <section class="page">
+   <div class="page-content">
+    <h2 class="glow-orange">Guard 3 • Boronic</h2><h3>Value 9</h3>
+    <p>Boron lattice resonating. Provides structural integrity for 100-grid base.</p>
+    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(245,158,11,.35),transparent 70%)"></div><canvas id="hex" width="340" height="340"></canvas></div>
+    <p style="font-size:12px;opacity:.7">Scroll to zoom lattice • self-healing every 3.2s</p>
+   </div>
+  </section>
+  <!-- PAGE 7 -->
+  <section class="page">
+   <div class="page-content">
+    <h2 class="glow-cyan">Guard 4 • Toroidal</h2><h3>Value 32</h3>
+    <p>Toroid spin at 32Hz. Circulates energy, prevents data decay.</p>
+    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(34,211,238,.35),transparent 70%)"></div><canvas id="torus" width="340" height="340"></canvas></div>
+    <div class="controls"><label style="font-size:11px;letter-spacing:.12em;color:#94a3b8">SPIN RATE</label><input type="range" id="spinSlider" min="1" max="64" value="32"><span id="spinVal" style="font-size:12px;color:var(--cyan);min-width:40px">32 Hz</span></div>
+   </div>
+  </section>
+  <!-- PAGE 8 -->
+  <section class="page">
+   <div class="page-content">
+    <h2 style="color:#fff;text-shadow:0 0 20px rgba(255,255,255,.3)">65 TSVs Converge</h2>
+    <p>Through-Silicon-Vias as data channels. 65 independent paths collapse into singularity at egg core.</p>
+    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(253,230,138,.25),transparent 70%)"></div><canvas id="tsv" width="380" height="380"></canvas></div>
+    <div class="controls"><button class="btn" id="incTSV">Increment Persistence Counter</button><div class="stat" style="min-width:100px"><div class="k">Stored</div><div class="v" id="tsvCount">0</div></div></div>
+   </div>
+  </section>
+  <!-- PAGE 9 -->
+  <section class="page">
+   <div class="page-content">
+    <h2>Engine Abilities Live Lab</h2><p>All four guards operating in parallel.</p>
+    <div class="lab-grid">
+     <div class="lab-cell"><canvas id="labPhotonic" width="260" height="260"></canvas><div class="label glow-yellow">Photonic coherence</div></div>
+     <div class="lab-cell"><canvas id="labPlasmic" width="260" height="260"></canvas><div class="label glow-purple">Plasmic buffer</div></div>
+     <div class="lab-cell"><canvas id="labBoronic" width="260" height="260"></canvas><div class="label glow-orange">Boronic lattice</div></div>
+     <div class="lab-cell"><canvas id="labToroidal" width="260" height="260"></canvas><div class="label glow-cyan">Toroidal circulation</div></div>
     </div>
-  </div>
-
-  <p><strong>)</strong> — leave the center. <strong>(</strong> — encounter the boundary and invert. <strong>.</strong> — return to origin, changed.</p>
-  
-  <p>In computing terms, every operation follows this cycle: seed a state, split into differential potentials, explore the boundary conditions under pressure, then compress back to a resolved ternary value.</p>
-
-  <h3>Compute Correspondences</h3>
-  <div class="stages">
-    <div class="stage"><b>1. SEED</b><span>Initialize at 0 (balanced rest)</span></div>
-    <div class="stage"><b>2. SPLIT</b><span>Generate –1 / +1 potentials</span></div>
-    <div class="stage"><b>3. BOUNDARY</b><span>Encounter guard limits</span></div>
-    <div class="stage"><b>4. PRESSURE</b><span>Photonic/plasmic load</span></div>
-    <div class="stage"><b>5. SHADOW</b><span>Boronic neutron damping</span></div>
-    <div class="stage"><b>6. INVERSION</b><span>–1 ↔ +1 flip</span></div>
-    <div class="stage"><b>7. REFLECTION</b><span>Toroidal recirculation</span></div>
-    <div class="stage"><b>8. EXPANSION</b><span>Fan-out to guards (1→many)</span></div>
-    <div class="stage"><b>9. COMPRESSION</b><span>Reduce via TSVs (many→1)</span></div>
-    <div class="stage"><b>10. REST</b><span>Return to 0 or hold</span></div>
-    <div class="stage"><b>11. RETURN</b><span>Write back to Egg</span></div>
-  </div>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 4 EGG -->
-<section class="page">
-  <div class="eyebrow">Core</div>
-  <h2>2. The Egg — Ternary Core</h2>
-  <p>The Egg is the central control fabric. It is not a co-processor. It is the decision authority for all four guards.</p>
-
-  <div class="spec-grid">
-    <div class="spec"><span>Trits</span><strong>256</strong></div>
-    <div class="spec"><span>Ternary Gates</span><strong>768</strong></div>
-    <div class="spec"><span>States</span><strong>3²⁵⁶</strong></div>
-    <div class="spec"><span>Encoding</span><strong>–1 / 0 / +1</strong></div>
-    <div class="spec"><span>Logic Family</span><strong>N-Z-P</strong></div>
-    <div class="spec"><span>Clock</span><strong>Asynchronous</strong></div>
-  </div>
-
-  <h3>Why Balanced Ternary</h3>
-  <ul class="checklist">
-    <li><strong>1.585× density</strong> vs binary: log₂(3) ≈ 1.585 bits per trit.</li>
-    <li><strong>Native neural weights:</strong> –1 (inhibit), 0 (pass), +1 (excite) requires no quantization hack.</li>
-    <li><strong>Signed math for free:</strong> no two's complement, no sign bit.</li>
-    <li><strong>Steerable AI:</strong> natural null state enables true gating and safety interlocks.</li>
-    <li><strong>Lower switching:</strong> balanced transitions reduce peak current ~30% in simulations.</li>
-  </ul>
-
-  <div class="callout">
-    First author claim: prior work treats ternary as academic curiosity. Unity Tensor implements ternary as the <em>central control fabric</em> for a heterogeneous multi-physics processor, with defined TSV interface to photonic, plasmic, boronic, and toroidal layers.
-  </div>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 5 GUARDS -->
-<section class="page">
-  <div class="eyebrow">Architecture</div>
-  <h2>3. The Four Guards</h2>
-  <p>Four specialized compute domains surround the Egg. They do not compete — they guard.</p>
-
-  <div class="guards">
-    <div class="guard">
-      <h4>North</h4>
-      <div class="name">Photonic</div>
-      <div class="meta">16 nodes • light-speed</div>
-      <p>Silicon photonic matrix for matrix-multiply and FFT. WDM 16λ, ~2ps latency. Handles expansion phase (1→many).</p>
+    <button class="unity-btn" id="unityBtn">Achieve Unity</button>
+   </div>
+  </section>
+  <!-- PAGE 10 -->
+  <section class="page">
+   <div class="page-content">
+    <h2>First Author Notes & Specs</h2>
+    <div class="specs">
+     <div class="spec"><div class="k">Architecture</div><div class="v">Unity Core</div></div>
+     <div class="spec"><div class="k">Persistence Modes</div><div class="v">Triadic</div></div>
+     <div class="spec"><div class="k">Guards</div><div class="v">4 (16/8/9/32)</div></div>
+     <div class="spec"><div class="k">Grid</div><div class="v">100×100</div></div>
+     <div class="spec"><div class="k">TSVs</div><div class="v">65</div></div>
+     <div class="spec"><div class="k">Silo State</div><div class="v">Collapsed</div></div>
     </div>
-    <div class="guard">
-      <h4>East</h4>
-      <div class="name">Plasmic</div>
-      <div class="meta">8 nodes • phase-transition</div>
-      <p>Surface-plasmon bridge for analog thresholding and non-linear activation. Serves as boundary detector.</p>
-    </div>
-    <div class="guard">
-      <h4>South</h4>
-      <div class="name">Boronic</div>
-      <div class="meta">9 nodes • neutron-capture</div>
-      <p>Boron-10 doped stability base. Provides error damping, thermal neutron capture, and shadow-state memory.</p>
-    </div>
-    <div class="guard">
-      <h4>West</h4>
-      <div class="name">Toroidal</div>
-      <div class="meta">32 nodes • 3×20 containment</div>
-      <p>Nested toroidal coils for field recirculation and energy recovery. Manages compression phase (many→1).</p>
-    </div>
-  </div>
+    <div class="note"><strong style="color:var(--amber);letter-spacing:.1em">DAVID WISE — DESIGN INTENT</strong><br><br>Persistence is not storage. It is physical memory. The Egg is not a metaphor for a database — it is a singularity where 65 TSVs converge into one coherent field. Each guard is a coherence layer: Photonic for instant sync, Plasmic for volatile grace, Boronic for structure, Toroidal for circulation. Four guards around one egg prevent drift. Triadic 256/768 is deliberate — never full, never empty, always resonating. Unity is achieved when all four fractals interfere constructively. This is version 4 of the status engine. It persists because it must.</div>
+    <div style="margin-top:24px;font-size:11px;letter-spacing:.15em;color:#475569;text-transform:uppercase">Contact: first.author @ unitytensor • Version Persistence-Engine-Status_4</div>
+   </div>
+  </section>
+ </div>
+</div>
 
-  <table class="clean">
-    <thead><tr><th>Guard</th><th>Primary Role</th><th>Interface</th><th>Power Domain</th></tr></thead>
-    <tbody>
-      <tr><td>North Photonic (16)</td><td>Parallel expansion</td><td>Optical TSV</td><td>12–18 mW/lane</td></tr>
-      <tr><td>East Plasmic (8)</td><td>Non-linear boundary</td><td>Plasmon coupler</td><td>5–9 mW</td></tr>
-      <tr><td>South Boronic (9)</td><td>Stability & memory</td><td>Charge trap</td><td>&lt;2 mW static</td></tr>
-      <tr><td>West Toroidal (32)</td><td>Recirculation</td><td>Inductive TSV</td><td>Energy recovery</td></tr>
-    </tbody>
-  </table>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 6 TSV -->
-<section class="page">
-  <div class="eyebrow">Interconnect</div>
-  <h2>4. TSV Interconnect Fabric</h2>
-  <p>Sixty-five vertical through-silicon vias form the nervous system. They are placed on a 100-point (10×10) routing grid, allowing reconfiguration and redundancy.</p>
-  
-  <div class="tsv-wrap">
-    <div>
-      <div class="tsv-grid" id="tsv"></div>
-      <p class="small" style="text-align:center; margin-top:8px;">100-point grid — 65 active TSVs (gold)</p>
-    </div>
-    <div>
-      <h3>How Guards Feed the Egg</h3>
-      <ul class="checklist">
-        <li>North → 24 TSVs (high bandwidth optical down-conversion)</li>
-        <li>East → 12 TSVs (analog differential pairs)</li>
-        <li>South → 13 TSVs (stability feedback)</li>
-        <li>West → 16 TSVs (power & recirculated data)</li>
-      </ul>
-      <p>3D stacking: Photonic on top, Egg in middle, Boronic base, with Plasmic and Toroidal at interposer edges. Latency Egg-to-any-guard &lt; 180ps.</p>
-    </div>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 7 MATH -->
-<section class="page">
-  <div class="eyebrow">Theory</div>
-  <h2>5. Mathematics of Unity</h2>
-  
-  <div class="formula-block">
-    <div class="formula"><div class="f-label">Information Density</div><div class="f-eq">I<sub>t</sub> = log₂(3) ≈ 1.58496 bits/trit</div></div>
-    <div class="formula"><div class="f-label">State Space (Egg)</div><div class="f-eq">S = 3²⁵⁶ ≈ 1.39 × 10¹²²</div></div>
-    <div class="formula"><div class="f-label">Total Nodes</div><div class="f-eq">N = 321 (guards) + 256 (egg) = 577</div></div>
-    <div class="formula"><div class="f-label">Guard Sum</div><div class="f-eq">16 + 8 + 9 + 32 = 65 primary nodes</div></div>
-    <div class="formula"><div class="f-label">Power Scaling (est.)</div><div class="f-eq">P<sub>ternary</sub> ∝ n<sup>1.26</sup> &nbsp; vs &nbsp; P<sub>binary</sub> ∝ n<sup>1.585</sup></div></div>
-  </div>
-
-  <h3>Why 4 + 1 = 1</h3>
-  <p>Four guards explore the boundary (many). The Egg remains the point (one). The TSV fabric compresses the many back to one each cycle. Unity is not the sum — it is the return.</p>
-  <p class="mono" style="margin-top:18px; color:var(--gold-2);">Unity = (North ⊕ East ⊕ South ⊕ West) ⟜ Egg → )(.</p>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 8 WHY NOW -->
-<section class="page">
-  <div class="eyebrow">Context</div>
-  <h2>6. Why Now</h2>
-  <p>Binary scaling is hitting physical and economic limits. AI does not want bits — it wants weights.</p>
-  <ul class="checklist">
-    <li><strong>Nobody is doing ternary at scale.</strong> Research stops at 4-trit demos. No heterogeneous fabric exists.</li>
-    <li><strong>Binary is expensive for AI.</strong> Emulating –1/0/+1 with INT8 wastes energy and silicon.</li>
-    <li><strong>AI needs steerability.</strong> A native zero state enables true inhibition, not just scaled multiplication.</li>
-    <li><strong>Photonics is ready.</strong> Silicon photonics and 3D TSV stacking are now production processes.</li>
-    <li><strong>First author matters.</strong> This is the first complete architecture specifying all five layers with interconnect.</li>
-  </ul>
-  <p>This whitepaper establishes prior art and first author implementation of the Unity Tensor fabric, ready for tape-out discussion.</p>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 9 APPLICATIONS -->
-<section class="page">
-  <div class="eyebrow">Use Cases</div>
-  <h2>7. Applications</h2>
-  <div class="apps">
-    <div class="app"><h5>AI Safety</h5><p>Native –1/0/+1 enables hard inhibition paths. Zero = true off, not low probability.</p></div>
-    <div class="app"><h5>Interpretable Models</h5><p>Ternary weights map directly to human concepts: oppose / ignore / support.</p></div>
-    <div class="app"><h5>Low-Power Edge</h5><p>30–40% switching reduction from balanced encoding. Boronic base holds state at <2mW.</p></div>
-    <div class="app"><h5>High-Performance Training</h5><p>Photonic North performs 16-wide optical MAC per cycle, feeding Egg directly.</p></div>
-    <div class="app"><h5>Steerable Systems</h5><p>Anthropic-style constitutional steering implemented in hardware via ternary gates.</p></div>
-    <div class="app"><h5>Scientific Compute</h5><p>Toroidal recirculation for iterative solvers with energy recovery.</p></div>
-  </div>
-  <p style="margin-top:28px;">The fabric is workload-agnostic but excels where ternary logic, safety, and energy are primary constraints.</p>
-  <div class="page-number"></div>
-</section>
-
-<!-- PAGE 10 LICENSE -->
-<section class="page">
-  <div class="eyebrow">License & Author</div>
-  <h2>8. License & Author</h2>
-  
-  <div class="license-box">
-    <p><strong>Public Research License:</strong> This whitepaper and architecture description are released under <span class="mono">CC BY-NC-SA 4.0</span> for research and education. You may study, simulate, and build non-commercial prototypes with attribution to David Wise.</p>
-    <p style="margin-top:12px;"><strong>Commercial Use:</strong> Commercial fabrication, sale, or deployment requires a direct license from the author.</p>
-  </div>
-
-  <h3>Industry Standard Terms</h3>
-  <table class="clean">
-    <tbody>
-      <tr><td>Upfront License</td><td>$150,000 – $500,000 (field-dependent)</td></tr>
-      <tr><td>Royalty</td><td>1% – 3% of chip ASP</td></tr>
-      <tr><td>Term</td><td>Perpetual, per product family</td></tr>
-      <tr><td>Includes</td><td>Architecture, TSV map, guard specs, first-author attestation</td></tr>
-    </tbody>
-  </table>
-
-  <p>Contact for licensing, tape-out partnerships, and foundry introduction.</p>
-  <p class="mono small">david [at] unitytensor [dot] org — First Author: David Wise — May 15, 2026</p>
-
-  <div class="sig">)(.</div>
-  <p class="small" style="margin-top:-8px;">There and back again.</p>
-  <div class="page-number"></div>
-</section>
-
-</main>
+<button class="nav-btn left" id="prev">‹</button>
+<button class="nav-btn right" id="next">›</button>
+<div class="dots" id="dots"></div>
+<div class="counter" id="counter">1/10</div>
+<div class="unity-msg" id="unityMsg">UNITY ACHIEVED<br><span style="font-size:12px;opacity:.8">All guards synchronized</span></div>
 
 <script>
-// Generate TSV grid 10x10 with 65 active
-const tsv = document.getElementById('tsv');
-const total = 100;
-const activeCount = 65;
-// Deterministic active pattern for visual
-const activeSet = new Set();
-while(activeSet.size < activeCount){
-  // create a spread pattern favoring center and guards
-  const i = Math.floor(Math.pow(Math.random(), 0.8) * total);
-  activeSet.add(i);
-}
-// Ensure symmetric look
-[22,23,24,25,26,27,32,33,34,35,36,37,42,43,44,45,46,47,52,53,54,55,56,57].forEach(n=>activeSet.add(n));
+const pagesEl=document.getElementById('pages');const total=10;let current=0;const counter=document.getElementById('counter');const dots=document.getElementById('dots');
+for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);dots.appendChild(d)}
+function updateUI(){pagesEl.style.transform=`translateX(-${current*100}vw)`;counter.textContent=`${current+1}/${total}`;document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===current))}
+function goTo(i){current=Math.max(0,Math.min(total-1,i));updateUI();initPage(current)}
+document.getElementById('prev').onclick=()=>goTo(current-1);document.getElementById('next').onclick=()=>goTo(current+1);
+window.addEventListener('keydown',e=>{if(e.key==='ArrowRight')goTo(current+1);if(e.key==='ArrowLeft')goTo(current-1)});
+let startX=0;const vp=document.getElementById('viewport');
+vp.addEventListener('touchstart',e=>startX=e.touches[0].clientX,{passive:true});
+vp.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>50){dx<0?goTo(current+1):goTo(current-1)}});
 
-for(let i=0;i<total;i++){
-  const d=document.createElement('div');
-  d.className='tsv-dot'+(activeSet.has(i)?' active':'');
-  tsv.appendChild(d);
+const eggCore=document.getElementById('eggCore');const eggValue=document.getElementById('eggValue');const statActive=document.getElementById('statActive');let eggState=0;const eggVals=[256,512,768];
+eggCore?.addEventListener('click',()=>{eggState=(eggState+1)%3;const v=eggVals[eggState];eggValue.textContent=v+'/768';statActive.textContent=v;eggCore.classList.add('pulse');setTimeout(()=>eggCore.classList.remove('pulse'),400)});
+
+const initialized=Array(total).fill(false);
+function initPage(i){if(initialized[i])return;initialized[i]=true;switch(i){case 2:initMandel();break;case 3:initJulia();break;case 4:initPlasma();break;case 5:initHex();break;case 6:initTorus();break;case 7:initTSV();break;case 8:initLab();break;}}
+initPage(0);initPage(1);initPage(2);
+
+function initMandel(){
+ const c=document.getElementById('mandel');const ctx=c.getContext('2d');const w=c.width,h=c.height;let last=0;
+ function draw(t){
+  if(current!==2){requestAnimationFrame(draw);return}
+  if(t-last<140){requestAnimationFrame(draw);return}last=t;
+  const img=ctx.createImageData(w,h);const d=img.data;
+  const zoom=0.9+0.25*Math.sin(t*0.0003);const cx=-0.743643887+0.0001*Math.cos(t*0.00007);const cy=0.1318259+0.0001*Math.sin(t*0.00007);const scale=1.6*zoom;
+  for(let y=0;y<h;y++){for(let x=0;x<w;x++){let zx=0,zy=0;const c0x=(x-w/2)/(w*0.5)*scale+cx;const c0y=(y-h/2)/(h*0.5)*scale+cy;let i=0;const max=90;while(zx*zx+zy*zy<4&&i<max){const xt=zx*zx-zy*zy+c0x;zy=2*zx*zy+c0y;zx=xt;i++}const p=(y*w+x)*4;const v=i===max?0:Math.pow(i/max,0.6)*255;d[p]=253;d[p+1]=230;d[p+2]=138;d[p+3]=v*0.85;}}
+  ctx.putImageData(img,0,0);ctx.strokeStyle='rgba(253,230,138,0.25)';ctx.lineWidth=1.5;
+  for(let r=1;r<=3;r++){ctx.beginPath();ctx.arc(w/2,h/2,32*r+8*Math.sin(t*0.001+r),0,Math.PI*2);ctx.stroke()}
+  requestAnimationFrame(draw)
+ }draw(0)
 }
 
-// Subtle parallax for cover symbol
-const symbol = document.querySelector('.symbol');
-if(symbol){
-  document.addEventListener('mousemove', (e)=>{
-    const x = (e.clientX / window.innerWidth - 0.5) * 6;
-    const y = (e.clientY / window.innerHeight - 0.5) * -6;
-    symbol.style.transform = `translate(${x}px, ${y}px) scale(1.02)`;
-  });
+function initJulia(){
+ const c=document.getElementById('julia');const ctx=c.getContext('2d');const w=c.width,h=c.height;let coherence=true;const btn=document.getElementById('coherenceBtn');btn.onclick=()=>{coherence=!coherence;btn.classList.toggle('active',coherence);btn.textContent=coherence?'Coherence On':'Coherence Off'};let last=0;
+ function draw(t){
+  if(current!==3){requestAnimationFrame(draw);return}
+  if(!coherence){requestAnimationFrame(draw);return}
+  if(t-last<80){requestAnimationFrame(draw);return}last=t;
+  const img=ctx.createImageData(w,h);const d=img.data;const zoom=1.2+0.3*Math.sin(t*0.0004);const angle=t*0.0002;const ca=Math.cos(angle),sa=Math.sin(angle);const cr=-0.8,ci=0.156;
+  for(let y=0;y<h;y++){for(let x=0;x<w;x++){let nx=(x-w/2)/(w*0.5)*zoom;let ny=(y-h/2)/(h*0.5)*zoom;const rx=nx*ca-ny*sa;const ry=nx*sa+ny*ca;let zx=rx,zy=ry;let i=0;const max=100;while(zx*zx+zy*zy<4&&i<max){const xt=zx*zx-zy*zy+cr;zy=2*zx*zy+ci;zx=xt;i++}const p=(y*w+x)*4;const v=i===max?0:Math.pow(i/max,0.5)*255;d[p]=250;d[p+1]=204;d[p+2]=21;d[p+3]=v;}}
+  ctx.putImageData(img,0,0);requestAnimationFrame(draw)
+ }draw(0)
 }
+
+function initPlasma(){
+ const c=document.getElementById('plasma');const ctx=c.getContext('2d');const w=c.width,h=c.height;let mx=0,my=0,last=0;
+ c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();mx=(e.clientX-r.left-w/2)*0.05;my=(e.clientY-r.top-h/2)*0.05});
+ c.addEventListener('touchmove',e=>{const t=e.touches[0];const r=c.getBoundingClientRect();mx=(t.clientX-r.left-w/2)*0.05;my=(t.clientY-r.top-h/2)*0.05},{passive:true});
+ function draw(t){
+  if(current!==4){requestAnimationFrame(draw);return}
+  if(t-last<50){requestAnimationFrame(draw);return}last=t;
+  const img=ctx.createImageData(w,h);const d=img.data;const tt=t*0.001;
+  for(let y=0;y<h;y++){for(let x=0;x<w;x++){const xv=x+mx*10,yv=y+my*10;const v=Math.sin(xv*0.03+tt)+Math.sin(yv*0.035-tt*1.1)+Math.sin(Math.hypot(xv-w/2,yv-h/2)*0.045+tt*0.7)+Math.sin((xv+yv)*0.02-tt*0.9);const n=(v+4)/8;const p=(y*w+x)*4;d[p]=120+n*90;d[p+1]=40+n*30;d[p+2]=180+n*75;d[p+3]=210;}}
+  ctx.putImageData(img,0,0);requestAnimationFrame(draw)
+ }draw(0);
+ const ta=document.getElementById('plasmaBuffer');ta.value=localStorage.getItem('plasmicBuffer')||'';ta.addEventListener('input',()=>localStorage.setItem('plasmicBuffer',ta.value))
+}
+
+function initHex(){
+ const c=document.getElementById('hex');const ctx=c.getContext('2d');const w=c.width,h=c.height;let scale=1;let healTimer=0;
+ c.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(0.5,Math.min(2,scale-e.deltaY*0.001))},{passive:false});
+ function hexPath(x,y,r){ctx.beginPath();for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/6;const px=x+Math.cos(a)*r;const py=y+Math.sin(a)*r;i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath()}
+ function draw(t){
+  if(current!==5){requestAnimationFrame(draw);return}
+  const broken=t-healTimer<300; if(t-healTimer>3200)healTimer=t;
+  ctx.clearRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2);ctx.scale(scale,scale);
+  const base=22;const levels=4;
+  function level(cx,cy,r,depth){if(depth>levels)return;hexPath(cx,cy,r);const isB=broken&&Math.random()<0.08;ctx.strokeStyle=isB?'rgba(245,158,11,0.15)':'rgba(245,158,11,'+(0.25+0.5*(1-depth/levels))+')';ctx.lineWidth=isB?1:1.5;ctx.shadowColor='rgba(245,158,11,0.5)';ctx.shadowBlur=isB?0:8;ctx.stroke();if(depth<levels){for(let i=0;i<6;i++){const a=Math.PI/3*i;level(cx+Math.cos(a)*r*1.75,cy+Math.sin(a)*r*1.75,r*0.88,depth+1)}}}
+  level(0,0,base,0);ctx.restore();requestAnimationFrame(draw)
+ }draw(0)
+}
+
+function initTorus(){
+ const c=document.getElementById('torus');const ctx=c.getContext('2d');const w=c.width,h=c.height;const slider=document.getElementById('spinSlider');const val=document.getElementById('spinVal');let speed=32;slider.oninput=()=>{speed=+slider.value;val.textContent=speed+' Hz'};
+ function draw(t){
+  if(current!==6){requestAnimationFrame(draw);return}
+  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2);
+  const time=t*0.001*speed*0.2;const R=90,r=34,p=2,q=3;
+  ctx.beginPath();for(let i=0;i<=800;i++){const u=i/800*Math.PI*2*q;const x=(R+r*Math.cos(q*u+time))*Math.cos(p*u);const y=(R+r*Math.cos(q*u+time))*Math.sin(p*u);const z=r*Math.sin(q*u+time);const s=200/(200+z);const px=x*s,py=y*s*0.7;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py)}
+  ctx.strokeStyle='rgba(34,211,238,0.9)';ctx.lineWidth=2;ctx.shadowColor='#22d3ee';ctx.shadowBlur=15;ctx.stroke();
+  ctx.beginPath();for(let i=0;i<=400;i++){const u=i/400*Math.PI*2*q+time*0.5;const x=(R*0.6+r*0.6*Math.cos(q*u))*Math.cos(p*u*1.5);const y=(R*0.6+r*0.6*Math.cos(q*u))*Math.sin(p*u*1.5);const z=r*0.6*Math.sin(q*u);const s=200/(200+z);ctx.lineTo(x*s,y*s*0.7)}ctx.strokeStyle='rgba(34,211,238,0.4)';ctx.lineWidth=1;ctx.stroke();
+  ctx.restore();requestAnimationFrame(draw)
+ }draw(0)
+}
+
+function initTSV(){
+ const c=document.getElementById('tsv');const ctx=c.getContext('2d');const w=c.width,h=c.height;const cx=w/2,cy=h/2;const particles=[];for(let i=0;i<65;i++){const a=i/65*Math.PI*2;for(let j=0;j<3;j++)particles.push({a,r:180+Math.random()*60,s:0.4+Math.random()*0.8})}
+ const countEl=document.getElementById('tsvCount');let count=+localStorage.getItem('tsvCount')||0;countEl.textContent=count;document.getElementById('incTSV').onclick=()=>{count++;localStorage.setItem('tsvCount',count);countEl.textContent=count}
+ function draw(){
+  if(current!==7){requestAnimationFrame(draw);return}
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(cx,cy);
+  for(let i=0;i<65;i++){const a=i/65*Math.PI*2;const x1=Math.cos(a)*190,y1=Math.sin(a)*190;const g=ctx.createLinearGradient(x1,y1,0,0);g.addColorStop(0,'rgba(253,230,138,0)');g.addColorStop(0.5,'rgba(253,230,138,0.15)');g.addColorStop(1,'rgba(253,230,138,0.6)');ctx.strokeStyle=g;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(0,0);ctx.stroke()}
+  particles.forEach(p=>{p.r-=p.s*2.2;if(p.r<6)p.r=190+Math.random()*20;const x=Math.cos(p.a)*p.r,y=Math.sin(p.a)*p.r;ctx.beginPath();ctx.arc(x,y,1.8,0,Math.PI*2);ctx.fillStyle='rgba(253,230,138,0.9)';ctx.shadowColor='#fde68a';ctx.shadowBlur=8;ctx.fill();ctx.shadowBlur=0});
+  ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);const g=ctx.createRadialGradient(0,0,0,0,0,14);g.addColorStop(0,'#fff7d6');g.addColorStop(0.4,'#fde68a');g.addColorStop(1,'rgba(253,230,138,0)');ctx.fillStyle=g;ctx.fill();
+  ctx.restore();requestAnimationFrame(draw)
+ }draw()
+}
+
+function initLab(){
+ const ids=['labPhotonic','labPlasmic','labBoronic','labToroidal'];const cs=ids.map(id=>document.getElementById(id));const xs=cs.map(c=>c.getContext('2d'));let lt=0;
+ function draw(t){
+  if(current!==8){requestAnimationFrame(draw);return}
+  if(t-lt<70){requestAnimationFrame(draw);return}lt=t;
+  // photonic
+  const x0=xs[0],w0=cs[0].width;const im0=x0.createImageData(w0,w0);for(let y=0;y<w0;y+=2){for(let x=0;x<w0;x+=2){let zx=(x-w0/2)/80,zy=(y-w0/2)/80,i=0;while(zx*zx+zy*zy<4&&i<40){const xt=zx*zx-zy*zy-0.8;zy=2*zx*zy+0.156;zx=xt;i++}const v=i*6;const p=(y*w0+x)*4;im0.data[p]=250;im0.data[p+1]=204;im0.data[p+2]=21;im0.data[p+3]=v}}x0.putImageData(im0,0,0);
+  // plasmic
+  const x1=xs[1],w1=cs[1].width;const im1=x1.createImageData(w1,w1);const tt=t*0.001;for(let y=0;y<w1;y++){for(let x=0;x<w1;x++){const v=Math.sin(x*0.08+tt)+Math.sin(y*0.08-tt);const n=(v+2)/4;const p=(y*w1+x)*4;im1.data[p]=100+n*80;im1.data[p+1]=30;im1.data[p+2]=160+n*60;im1.data[p+3]=200}}x1.putImageData(im1,0,0);
+  // boronic
+  const x2=xs[2],w2=cs[2].width;x2.clearRect(0,0,w2,w2);x2.save();x2.translate(w2/2,w2/2);x2.strokeStyle='rgba(245,158,11,0.7)';for(let i=0;i<3;i++){x2.beginPath();const r=30+i*22;for(let j=0;j<6;j++){const a=j*Math.PI/3;const px=Math.cos(a)*r,py=Math.sin(a)*r;j?x2.lineTo(px,py):x2.moveTo(px,py)}x2.closePath();x2.stroke()}x2.restore();
+  // toroidal
+  const x3=xs[3],w3=cs[3].width;x3.fillStyle='rgba(0,0,0,0.3)';x3.fillRect(0,0,w3,w3);x3.save();x3.translate(w3/2,w3/2);x3.strokeStyle='#22d3ee';x3.shadowColor='#22d3ee';x3.shadowBlur=10;x3.beginPath();for(let i=0;i<200;i++){const u=i/200*Math.PI*6;const r=70+15*Math.cos(3*u+tt);x3.lineTo(Math.cos(2*u)*r*0.5,Math.sin(2*u)*r*0.5)}x3.stroke();x3.restore();
+  requestAnimationFrame(draw)
+ }draw(0);
+ const btn=document.getElementById('unityBtn');const msg=document.getElementById('unityMsg');
+ btn.onclick=()=>{document.body.classList.add('unity-active');msg.classList.add('show');eggState=2;eggValue.textContent='768/768';statActive.textContent='768';eggCore.classList.add('pulse');setTimeout(()=>{document.body.classList.remove('unity-active');msg.classList.remove('show');eggCore.classList.remove('pulse')},3000)}
+}
+
+updateUI();
 </script>
 </body>
 </html>
