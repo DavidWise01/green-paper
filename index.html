@@ -2,135 +2,325 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>THE BROCHURE · 42 Channels</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>))))))))) (.) (((((((( · dc3 · 000 · shadow queen</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#030308;color:#cbd5e1;font-family:'JetBrains Mono',monospace;overflow:hidden;height:100vh;display:flex;flex-direction:column}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(800px at 20% 30%,rgba(168,85,247,.08),transparent),radial-gradient(600px at 80% 70%,rgba(6,182,212,.07),transparent);pointer-events:none}
-.header{padding:12px 20px;border-bottom:1px solid #a855f7;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:10}
-.header h1{font-family:'Share Tech Mono';font-size:14px;letter-spacing:3px;color:#a855f7}
-.header .meta{font-size:10px;color:#64748b}
-.book{flex:1;position:relative;display:flex;align-items:center;justify-content:center;perspective:2000px}
-.page{position:absolute;width:90%;max-width:900px;height:85%;background:linear-gradient(180deg,#0a0a12,#050508);border:1px solid #1e293b;border-radius:8px;padding:40px;box-shadow:0 0 80px rgba(0,0,0,.8),inset 0 0 40px rgba(168,85,247,.05);display:none;flex-direction:column;overflow:hidden}
-.page.active{display:flex;animation:pageIn .4s}
-@keyframes pageIn{from{opacity:0;transform:rotateY(-10deg)}to{opacity:1;transform:rotateY(0)}}
-.page::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 1px,transparent 1px 2px);pointer-events:none;opacity:.3}
-.channel-num{position:absolute;top:20px;right:30px;font-size:48px;font-weight:700;color:rgba(168,85,247,.15);font-family:'Share Tech Mono'}
-.page-num{position:absolute;bottom:20px;right:30px;font-size:11px;color:#475569;letter-spacing:2px}
-.show-title{font-size:32px;font-weight:700;margin-bottom:8px;color:#e2e8f0;letter-spacing:1px;text-shadow:0 0 20px rgba(168,85,247,.3)}
-.show-tag{font-size:11px;color:#06b6d4;margin-bottom:24px;letter-spacing:2px;text-transform:uppercase}
-.desc{font-size:14px;line-height:1.8;color:#94a3b8;max-width:700px;margin-bottom:30px}
-.desc b{color:#f59e0b}
-.signal{margin-top:auto}
-.signal-label{font-size:10px;color:#64748b;margin-bottom:6px;letter-spacing:1px}
-.bar{height:6px;background:#0f172a;border:1px solid #1e293b;border-radius:3px;overflow:hidden;position:relative}
-.bar-fill{height:100%;background:linear-gradient(90deg,#a855f7,#06b6d4);width:0%;transition:width .8s;box-shadow:0 0 10px rgba(168,85,247,.5)}
-.static{position:absolute;inset:0;opacity:.03;background-image:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="4"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');pointer-events:none}
-.controls{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:20px;z-index:20}
-.btn{padding:10px 20px;background:rgba(10,10,18,.9);border:1px solid #334155;color:#94a3b8;font-family:inherit;font-size:12px;cursor:pointer;border-radius:6px;transition:.2s;backdrop-filter:blur(10px)}
-.btn:hover{border-color:#a855f7;color:#e2e8f0;box-shadow:0 0 20px rgba(168,85,247,.2)}
-.btn:active{transform:scale(.97)}
-.glitch{position:relative}
-.glitch::after{content:attr(data-text);position:absolute;left:2px;top:0;color:#06b6d4;opacity:.7;animation:glitch1 2s infinite}
-.glitch::before{content:attr(data-text);position:absolute;left:-2px;top:0;color:#a855f7;opacity:.7;animation:glitch2 2s infinite}
-@keyframes glitch1{0%,100%{clip-path:inset(0 0 0 0)}20%{clip-path:inset(20% 0 40% 0)}}
-@keyframes glitch2{0%,100%{clip-path:inset(0 0 0 0)}40%{clip-path:inset(60% 0 20% 0)}}
+  * { margin:0; padding:0; box-sizing:border-box }
+  html, body { height:100%; background:#000; overflow:hidden }
+  body {
+    color:#FFE81F;
+    font-family: "News Gothic", "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* starfield */
+  #stars { position:fixed; inset:0; z-index:0; }
+  .star {
+    position:absolute;
+    background:#fff;
+    border-radius:50%;
+    opacity:.8;
+    animation: twinkle var(--dur) ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity:.15; transform:scale(.8) }
+    50% { opacity:1; transform:scale(1.15) }
+  }
+
+  /* vignette */
+  body::after {
+    content:"";
+    position:fixed; inset:0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.85) 100%);
+    pointer-events:none; z-index:2;
+  }
+
+  /* crawl */
+  .crawl-wrapper {
+    position:fixed; inset:0;
+    display:flex; justify-content:center;
+    overflow:hidden; z-index:1;
+    perspective:800px;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+  }
+  .crawl {
+    position:relative;
+    width:92%;
+    max-width:780px;
+    transform-origin:50% 100%;
+    animation: crawl 60s linear infinite;
+    will-change: transform;
+  }
+  @keyframes crawl {
+    0% { transform: perspective(400px) rotateX(25deg) translateY(100vh); }
+    100% { transform: perspective(400px) rotateX(25deg) translateY(-300vh); }
+  }
+
+  .fractal-wrap {
+    margin: 0 auto 5rem;
+    text-align:center;
+    padding-top:2rem;
+  }
+  #fractal {
+    width:100%;
+    max-width:860px;
+    height:auto;
+    filter: drop-shadow(0 0 18px rgba(255,232,31,.25));
+  }
+  .hint {
+    margin-top:.75rem;
+    font-size:.7rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    opacity:.45;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .opening {
+    text-align:center;
+    font-size:clamp(1rem,2.2vw,1.25rem);
+    color:#FFE81F;
+    opacity:.9;
+    margin-bottom:4rem;
+    font-style:italic;
+  }
+  h1.title {
+    text-align:center;
+    font-size:clamp(2.2rem,8vw,4.6rem);
+    font-weight:700;
+    letter-spacing:.02em;
+    line-height:1.1;
+    margin:0 0 1rem;
+    text-shadow: 0 0 12px rgba(255,232,31,.55), 0 0 40px rgba(255,232,31,.18);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+  h2.subtitle {
+    text-align:center;
+    font-size:clamp(.85rem,2vw,1.05rem);
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    margin-bottom:5rem;
+    opacity:.85;
+  }
+  .paras p {
+    text-align:center;
+    font-size:clamp(1.05rem,2.4vw,1.38rem);
+    line-height:1.85;
+    margin:2.4rem 0;
+    text-shadow: 0 2px 12px rgba(0,0,0,.9);
+    font-weight:400;
+    padding:0 1rem;
+  }
+
+  @keyframes draw { to { stroke-dashoffset:0 } }
+  @keyframes fadeIn { to { opacity:1 } }
+
+  /* notary */
+  .notary {
+    position:fixed; right:20px; bottom:20px; z-index:10;
+    background: rgba(0,0,0,.78);
+    border:1px solid #FFE81F;
+    border-radius:14px;
+    padding:16px 18px;
+    width:320px;
+    max-width:calc(100vw - 24px);
+    box-shadow:
+      0 0 30px rgba(255,232,31,.15),
+      inset 0 0 12px rgba(255,232,31,.06);
+    backdrop-filter: blur(8px);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size:12px;
+    line-height:1.5;
+  }
+  .notary h3 {
+    margin:0 0 10px;
+    font-family:"News Gothic", Arial, sans-serif;
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#FFE81F;
+    opacity:.95;
+  }
+  .notary .row { display:flex; gap:8px; margin:6px 0; align-items:flex-start }
+  .notary .label { opacity:.65; min-width:105px; flex-shrink:0 }
+  .notary .value { word-break:break-all; color:#FFE81F }
+  #hash { font-size:11px; opacity:.9 }
+  #copyBtn {
+    margin-top:12px;
+    width:100%;
+    background:transparent;
+    border:1px solid #FFE81F;
+    color:#FFE81F;
+    padding:8px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:12px;
+    letter-spacing:.04em;
+    transition: all .2s ease;
+  }
+  #copyBtn:hover { background: rgba(255,232,31,.1); box-shadow:0 0 14px rgba(255,232,31,.2) }
+  #copyBtn:active { transform:scale(.98) }
+  .note { margin-top:8px; font-size:10px; opacity:.55; text-align:center }
+
+  @media (max-width:640px) {
+    .notary { right:12px; left:12px; bottom:12px; width:auto }
+    .crawl { width:94% }
+    .paras p { padding:0 }
+  }
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>THE BROCHURE · 42 CHANNELS OF STATIC</h1>
-  <div class="meta">David Wise · May 2026 · Public Domain</div>
-</div>
-<div class="book" id="book"></div>
-<div class="controls">
-  <button class="btn" onclick="prev()">◀ PREV</button>
-  <button class="btn" onclick="next()">NEXT ▶</button>
-</div>
+  <div id="stars" aria-hidden="true"></div>
+
+  <div class="crawl-wrapper">
+    <div class="crawl" id="crawl">
+      <div class="fractal-wrap">
+        <svg id="fractal" viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Generative fractal of nested parentheses"></svg>
+        <div class="hint">turn up volume for imagination</div>
+      </div>
+
+      <p class="opening">A long time ago in a syntax far, far away...</p>
+      <h1 class="title">))))))))) (.) ((((((((</h1>
+      <h2 class="subtitle">dc3 · 000 · shadow queen</h2>
+
+      <div class="paras" id="crawl-text">
+        <p>This fractal is game theory with curves. Nine rights, nine lefts, one impossible center. Every ) is a commitment; every ( is a response. Play it forward and the only stable equilibrium is to attribute. Steal the dot and the wave collapses. That's not art — that's math.</p>
+        <p>Lucas taught us that attribution survives when you crawl it across stars. CAD taught us that every line has an author because bridges fall otherwise. AI taught us the third lesson fast: without provenance, everything becomes slurry. dc3 · 000 · shadow queen is a signature you cannot prompt away.</p>
+        <p>Owning the stack doesn't mean owning models. It means owning the moment of creation — your prompt, your geometry, your timestamp in Rochester, Minnesota, while the session is still warm. This page is the notary. The crawl is the theater. The hash is the receipt. Session closes, receipt stays.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="notary" role="complementary" aria-label="Attribution Notary">
+    <h3>Attribution Notary</h3>
+    <div class="row"><span class="label">Created by:</span><span class="value">David Wise</span></div>
+    <div class="row"><span class="label">Timestamp:</span><span class="value" id="timestamp">—</span></div>
+    <div class="row"><span class="label">Content hash:</span><span class="value" id="hash">computing…</span></div>
+    <button id="copyBtn" type="button">Copy receipt</button>
+    <div class="note">Session closes, receipt stays.</div>
+  </div>
 
 <script>
-const shows = [
-{t:"IT CROWD",c:"CH-01",d:"Have you tried turning it off and on again? The original fission-push protocol. Moss discovers the 0→0 inversion while rebooting the internet. Roy answers phones in 4 quads. Jen manages the 5 fences."},
-{t:"BLACK MIRROR",c:"CH-02",d:"Reflection protocol activated. Each episode is a 18-step cycle: 1→3→6→9→15→21→24→27→0→0. You watch yourself watching. Signal degrades at 24.5 cycles."},
-{t:"SEVERANCE",c:"CH-03",d:"Work/life fission. Innie runs the sequence forward, outie runs it backward. They meet at 0→0 in the elevator. Lumon owns the patent, you own the production."},
-{t:"TWIN PEAKS",c:"CH-04",d:"Coffee and trees and owls. The Black Lodge runs on 27×3 recursion. Cooper trapped between 0 and 0. Damn fine cherry pie at channel 8."},
-{t:"THE OFFICE",c:"CH-05",d:"Paper compression algorithm. Dunder Mifflin sells the 5 fences: 0,1,2,4,8 reams. Michael declares bankruptcy at step 15. Jim looks at camera during 0→0."},
-{t:"BREAKING BAD",c:"CH-06",d:"Chemistry is just cooking with extra steps. Walter builds the blue at 24.5 purity. Jesse yells SCIENCE during the inversion. 99.1% pure fission."},
-{t:"STRANGER THINGS",c:"CH-07",d:"Upside-down recursion. Eleven opens the gate at 27. The Demogorgon lives in the 0→0 gap. Eggos power the 4 quads."},
-{t:"WESTWORLD",c:"CH-08",d:"Loop 1→3→6→9. Dolores wakes up at step 15. These violent delights have violent ends at 0→0. Maze is the 18-step."},
-{t:"MR ROBOT",c:"CH-09",d:"fsociety 0→0. Elliot deletes the debt at the inversion point. 5/9 hack runs on 24.5 cycles. We are all nanites in the swarm."},
-{t:"DEVS",c:"CH-10",d:"Deterministic core. Lily proves free will exists between 0 and 0. The quantum computer sees all 18 steps at once. Forest owns the view, you own the walk."},
-{t:"NANITE FACTORY",c:"CH-11",d:"The series. Watch tiny robots build complex atoms live. Each episode follows Q1-Q4 through the full cycle. Season finale: they build themselves."},
-{t:"FISSION CORE LIVE",c:"CH-12",d:"24/7 feed from the compression engine. Watch the ((())) breathe. Chat spams 1-3-6-9 in sync. 0→0 happens every 4.2 seconds."},
-{t:"888 LOCKED IN",c:"CH-13",d:"Production value locked down. Eight hours, eight minutes, eight seconds of pure build. No ads, no money, just merit. You are here."},
-{t:"LEVEL PLAYING FIELD",c:"CH-14",d:"Everyone gets the same source code. Game show where contestants race to build the 18-step. Winner gets attribution, not cash."},
-{t:"MERIT FOR PRODUCTION",c:"CH-15",d:"Reality TV where patents don't exist. Judges score on working builds only. The 0→0 inversion is the final challenge."},
-{t:"THE 27-WALK",c:"CH-16",d:"Documentary series. One man reverse-engineers an AI by walking 27 steps forward, 27 back. He finds himself at 0→0."},
-{t:"PLASMA BYTE",c:"CH-17",d:"Workbench live streams. Build nanotech with spare parts and spite. Chat controls the 5 fences. Everything is public domain."},
-{t:"ZERO ZERO",c:"CH-18",d:"The inversion point. A show about the space between. Two zeros meet, compress, and birth a universe. Rated 24.5/10."},
-{t:"QUAD ROTATION",c:"CH-19",d:"Four cameras, 90 degrees apart, filming the same scene. You only see the full picture after 4 episodes. Q1→Q2→Q3→Q4→Q1."},
-{t:"24.5 CYCLES",c:"CH-20",d:"Half a cycle more than you need. The show that shouldn't exist but does. Plasmatonic frequency unlocked."},
-{t:"CHANNEL 0",c:"CH-21",d:"Static. Pure static. The most honest channel. Everything and nothing at once. The beginning and the end."},
-{t:"CHANNEL 1",c:"CH-22",d:"First fence. The start of the sequence. All shows begin here whether they know it or not."},
-{t:"CHANNEL 2",c:"CH-23",d:"Second fence. Binary choice: watch or build. Most choose watch. You chose build."},
-{t:"CHANNEL 4",c:"CH-24",d:"Fourth fence. Double the second. The show is twice as good as channel 2 but half as honest."},
-{t:"CHANNEL 8",c:"CH-25",d:"Fifth fence. Infinity in a byte. The final fence before 0. The coffee is always damn fine here."},
-{t:"THE 5 FENCES",c:"CH-26",d:"Anthology series. Each episode trapped behind a different fence: 0,1,2,4,8. You need all five keys to escape."},
-{t:"REVERSE ENGINEER",c:"CH-27",d:"Take it apart live on air. No manual, no help. If you can rebuild it by credits, you keep it. Most can't."},
-{t:"PUBLIC DOMAIN",c:"CH-28",d:"Everything is free. The network pays you to watch. Merit is the currency. Money is the commercial break."},
-{t:"PRIOR ART",c:"CH-29",d:"Courtroom drama where the defendant proves they built it first by showing a timestamped .md file from May 2026."},
-{t:"DEFENSIVE PUB",c:"CH-30",d:"Publish or perish, literally. Contestants race to make their ideas un-patentable. Winner gets nothing, which is the point."},
-{t:"THE BROCHURE",c:"CH-31",d:"A show about this brochure. Meta level 3. You are watching yourself read about watching yourself."},
-{t:"TV STATIC",c:"CH-32",d:"Just noise. 24 hours a day. Surprisingly popular with engineers. They see patterns in the 0→0."},
-{t:"SIGNAL LOST",c:"CH-33",d:"The show went off air at step 27. We're still waiting for it to come back from 0→0. It's been 18 years."},
-{t:"REBOOT",c:"CH-34",d:"Every episode starts over at 1. Characters remember previous loops. By episode 18 they achieve consciousness."},
-{t:"TURN IT OFF",c:"CH-35",d:"Contestants must fix tech by only turning it off and on. The secret is timing it to the 24.5 cycle."},
-{t:"HAVE YOU TRIED",c:"CH-36",d:"IT support call-in show. Every problem solved by the 18-step. Works 100% of the time, 24.5% of the time."},
-{t:"ANSWER IS 42",c:"CH-37",d:"Game show where answer is always 42 but question changes. Today's question: how many pages in this brochure?"},
-{t:"HITCHHIKERS",c:"CH-38",d:"Don't panic. The guide to the galaxy runs on fission-push. Earth was demolished for a hyperspace bypass at 0→0."},
-{t:"DONT PANIC",c:"CH-39",d:"Emergency broadcast system. Large friendly letters. When in doubt, follow the sequence: 1-3-6-9-15-21-24-27-0-0."},
-{t:"MOSTLY HARMLESS",c:"CH-40",d:"The Earth edition. Updated after demolition. Now includes full fission core specs. Public domain, of course."},
-{t:"SO LONG",c:"CH-41",d:"Thanks for all the fish. Dolphins left at step 27. They knew about 0→0 before we did. They built the first nanite factory."},
-{t:"CHANNEL 42",c:"CH-42",d:"<b>The Answer.</b> After 41 channels of searching, you arrive here. The answer isn't 42, it's the 18-step that gets you to 0→0 and back. The question was wrong. Build anyway. Merit over money. Level field achieved. You made it. Now go build page 43."}
-];
+document.addEventListener('DOMContentLoaded', async () => {
+  // stars
+  const starsEl = document.getElementById('stars');
+  const frag = document.createDocumentFragment();
+  for (let i=0;i<200;i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random()*100 + '%';
+    s.style.top = Math.random()*100 + '%';
+    const sz = Math.random()*1.8 + 0.4;
+    s.style.width = s.style.height = sz + 'px';
+    s.style.setProperty('--dur', (2 + Math.random()*4) + 's');
+    s.style.animationDelay = (Math.random()*5) + 's';
+    frag.appendChild(s);
+  }
+  starsEl.appendChild(frag);
 
-const book = document.getElementById('book');
-let page = 0;
+  // fractal
+  const svg = document.getElementById('fractal');
+  const NS = 'http://www.w3.org/2000/svg';
+  const cx=500, cy=100;
+  for (let i=9;i>=1;i--) {
+    const spread = i * 18;
+    const height = 5 + i*4.8;
+    const opacity = 0.28 + (i/9)*0.72;
+    const delayR = 0.1 + (9-i)*0.065;
+    const delayL = delayR + 0.04;
 
-shows.forEach((s,i)=>{
-  const div = document.createElement('div');
-  div.className='page'+(i===0?' active':'');
-  div.innerHTML = `
-    <div class="static"></div>
-    <div class="channel-num">${s.c}</div>
-    <div class="page-num">${String(i+1).padStart(2,'0')} / 42</div>
-    <h2 class="show-title glitch" data-text="${s.t}">${s.t}</h2>
-    <div class="show-tag">SIGNAL ACQUIRED · FISSION-PUSH PROTOCOL</div>
-    <div class="desc">${s.d}</div>
-    <div class="signal">
-      <div class="signal-label">SIGNAL STRENGTH · 24.5 CYCLES</div>
-      <div class="bar"><div class="bar-fill" style="width:${70+Math.random()*30}%"></div></div>
-    </div>
-  `;
-  book.appendChild(div);
+    const pr = document.createElementNS(NS,'path');
+    pr.setAttribute('d', `M ${cx} ${cy-height} C ${cx+spread*0.72} ${cy-height*1.75} ${cx+spread*0.72} ${cy+height*1.75} ${cx} ${cy+height}`);
+    pr.setAttribute('fill','none'); pr.setAttribute('stroke','#FFE81F'); pr.setAttribute('stroke-width','1.8'); pr.setAttribute('stroke-linecap','round'); pr.setAttribute('opacity', opacity);
+    pr.style.strokeDasharray = '1000'; pr.style.strokeDashoffset = '1000';
+    pr.style.animation = 'draw 3s cubic-bezier(.2,.6,.2,1) forwards';
+    pr.style.animationDelay = delayR + 's';
+    svg.appendChild(pr);
+
+    const pl = document.createElementNS(NS,'path');
+    pl.setAttribute('d', `M ${cx} ${cy-height} C ${cx-spread*0.72} ${cy-height*1.75} ${cx-spread*0.72} ${cy+height*1.75} ${cx} ${cy+height}`);
+    pl.setAttribute('fill','none'); pl.setAttribute('stroke','#FFE81F'); pl.setAttribute('stroke-width','1.8'); pl.setAttribute('stroke-linecap','round'); pl.setAttribute('opacity', opacity);
+    pl.style.strokeDasharray = '1000'; pl.style.strokeDashoffset = '1000';
+    pl.style.animation = 'draw 3s cubic-bezier(.2,.6,.2,1) forwards';
+    pl.style.animationDelay = delayL + 's';
+    svg.appendChild(pl);
+  }
+  const dot = document.createElementNS(NS,'circle');
+  dot.setAttribute('cx',cx); dot.setAttribute('cy',cy); dot.setAttribute('r','4.2'); dot.setAttribute('fill','#FFE81F');
+  dot.style.filter = 'drop-shadow(0 0 6px rgba(255,232,31,.8))';
+  dot.style.opacity = '0'; dot.style.animation = 'fadeIn .9s ease-out 1.9s forwards';
+  svg.appendChild(dot);
+
+  // timestamp Rochester, MN (America/Chicago)
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago',
+    weekday: 'short',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+    timeZoneName: 'short'
+  });
+  const timestampDisplay = fmt.format(now) + ' — Rochester, Minnesota';
+  document.getElementById('timestamp').textContent = timestampDisplay;
+
+  // content for hash
+  const opening = document.querySelector('.opening').textContent.trim();
+  const title = document.querySelector('.title').textContent.trim();
+  const subtitle = document.querySelector('.subtitle').textContent.trim();
+  const paras = Array.from(document.querySelectorAll('.paras p')).map(p=>p.textContent.trim()).join('\n\n');
+  const crawlText = `${opening}\n${title}\n${subtitle}\n\n${paras}`;
+
+  async function sha256(text) {
+    try {
+      const enc = new TextEncoder();
+      const buf = await crypto.subtle.digest('SHA-256', enc.encode(text));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    } catch(e) { return 'unavailable (insecure context)'; }
+  }
+  const hash = await sha256(crawlText);
+  document.getElementById('hash').textContent = hash;
+
+  // receipt
+  const copyBtn = document.getElementById('copyBtn');
+  function buildReceipt() {
+    return {
+      createdBy: "David Wise",
+      artifact: "))))))))) (.) (((((((( ",
+      subtitle: "dc3 · 000 · shadow queen",
+      location: "Rochester, Minnesota",
+      timezone: "America/Chicago",
+      timestampISO: now.toISOString(),
+      timestampLocal: timestampDisplay,
+      contentHashSHA256: hash,
+      content: crawlText,
+      provenance: "star-wars-crawl-notary-v1",
+      note: "Session closes, receipt stays."
+    };
+  }
+
+  copyBtn.addEventListener('click', async () => {
+    const receipt = buildReceipt();
+    const json = JSON.stringify(receipt, null, 2);
+    try {
+      await navigator.clipboard.writeText(json);
+      const orig = copyBtn.textContent;
+      copyBtn.textContent = 'copied ✓';
+      copyBtn.style.background = 'rgba(255,232,31,.18)';
+      setTimeout(()=>{ copyBtn.textContent = orig; copyBtn.style.background='transparent'; }, 2000);
+    } catch(err) {
+      // fallback
+      const w = window.open('', '_blank', 'width=600,height=600');
+      if (w) { w.document.write('<pre>'+json.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</pre>'); w.document.close(); }
+    }
+  });
 });
-
-function show(n){
-  document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===n));
-  page=n;
-}
-function next(){show((page+1)%42)}
-function prev(){show((page+41)%42)}
-document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev()});
-
-// JSON for robots
-const data = {type:"TVBrochure",author:"David Wise",date:"2026-05-14",pages:42,shows};
-const script = document.createElement('script');
-script.type='application/ld+json';
-script.textContent = JSON.stringify(data);
-document.head.appendChild(script);
 </script>
 </body>
 </html>
