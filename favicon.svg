@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <clipPath id="cloakClip">
+      <path d="M255 26 C298 30 339 58 354 106 C362 132 371 160 363 184 C358 198 348 212 336 222 C360 265 386 320 392 370 C399 420 380 456 340 476 C290 490 210 486 168 470 C132 448 118 410 126 364 C136 310 158 265 148 210 C136 152 148 92 188 56 C212 36 236 26 255 26 Z"/>
+    </clipPath>
+  </defs>
+  
+  <g clip-path="url(#cloakClip)">
+    <rect width="512" height="512" fill="#2A0A1A"/>
+    <polygon fill="#3A0E22" points="255,26 354,106 336,222 255,160"/>
+    <polygon fill="#2A0A1A" points="255,26 188,56 255,160"/>
+    <polygon fill="#4B112A" points="188,56 148,210 255,160"/>
+    <polygon fill="#5C122F" points="148,210 126,364 255,280"/>
+    <polygon fill="#3E1125" points="148,210 255,160 255,280"/>
+    <polygon fill="#2F0B1D" points="255,160 336,222 392,370 255,280"/>
+    <polygon fill="#411024" points="336,222 255,280 392,370"/>
+    <polygon fill="#2A0A1A" points="126,364 168,470 255,400 255,280"/>
+    <polygon fill="#50132D" points="255,280 255,400 340,476 392,370"/>
+    <polygon fill="#3B0F23" points="168,470 340,476 255,400"/>
+  </g>
+
+  <path d="M255 26 C298 30 339 58 354 106 C362 132 371 160 363 184 C358 198 348 212 336 222 C360 265 386 320 392 370 C399 420 380 456 340 476 C290 490 210 486 168 470 C132 448 118 410 126 364 C136 310 158 265 148 210 C136 152 148 92 188 56 C212 36 236 26 255 26 Z" fill="none" stroke="#FF1E1E" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <path d="M310 85 C345 95 362 120 368 148 C372 165 368 180 360 192 L350 206 C335 210 320 204 312 190 V85 Z" fill="#000000"/>
+  
+  <ellipse cx="333" cy="300" rx="21" ry="17" fill="#000000"/>
+  
+  <g>
+    <polygon points="333,300 326,318 324,362 333,394 342,362 340,318" fill="#F5F5F7" stroke="#E0E0E4" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="322" y="286" width="22" height="16" rx="3" fill="#0A0A0A"/>
+    <g stroke="#FF1E1E" stroke-width="2.5" stroke-linecap="round">
+      <line x1="333" y1="289" x2="333" y2="299"/>
+      <line x1="328" y1="294" x2="338" y2="294"/>
+    </g>
+  </g>
+</svg>
