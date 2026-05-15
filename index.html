@@ -1,335 +1,621 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>UNITY TENSOR // Persistence Engine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hammy 27-Step Witness Mapper</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-:root{--amber:#fde68a;--yellow:#facc15;--purple:#a855f7;--orange:#f59e0b;--cyan:#22d3ee;--bg:#000}
-*{box-sizing:border-box}
-html,body{height:100%;overflow:hidden}
-body{margin:0;background:#000;color:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;-webkit-font-smoothing:antialiased}
-.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(148,163,184,.07)1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.07)1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at center,black 60%,transparent 100%);pointer-events:none;z-index:0}
-header{position:fixed;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);border-bottom:1px solid rgba(253,230,138,.12);z-index:50;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);text-shadow:0 0 8px rgba(253,230,138,.5)}
-header .right{opacity:.6;color:#94a3b8}
-.viewport{position:relative;width:100vw;height:100vh}
-.pages{display:flex;height:100%;width:1000vw;transition:transform .7s cubic-bezier(.2,.8,.2,1);will-change:transform}
-.page{width:100vw;height:100vh;flex:0 0 100vw;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 24px 80px;position:relative;overflow-y:auto;overflow-x:hidden}
-.page-content{width:100%;max-width:1100px;text-align:center;z-index:2}
-h1{font-size:clamp(36px,9vw,84px);line-height:.9;margin:0 0 16px;color:#fff;letter-spacing:.02em;text-shadow:0 0 24px rgba(253,230,138,.7),0 0 60px rgba(253,230,138,.3)}
-h2{font-size:clamp(24px,4vw,40px);margin:0 0 12px;font-weight:600;letter-spacing:.02em}
-h3{font-size:18px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.15em;opacity:.8}
-p{max-width:720px;margin:0 auto 16px;line-height:1.6;color:#cbd5e1;font-size:15px}
-.subtitle{color:var(--amber);text-shadow:0 0 12px rgba(253,230,138,.6);margin-bottom:24px;font-size:clamp(14px,2.5vw,20px);letter-spacing:.12em;text-transform:uppercase}
-.tagline{margin-top:24px;font-size:13px;letter-spacing:.14em;color:#94a3b8;text-transform:uppercase}
-.author{margin-top:32px;font-size:13px;color:#94a3b8;letter-spacing:.1em}
-.egg{width:min(28vmin,180px);height:min(36vmin,240px);margin:0 auto 32px;border-radius:50%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 25%,#fffce8 0%,#fde68a 25%,#f59e0b 55%,rgba(245,158,11,0)70%);box-shadow:0 0 40px rgba(253,230,138,.9),0 0 100px rgba(253,230,138,.5),inset 0 -20px 40px rgba(245,158,11,.4),inset 0 20px 30px rgba(255,255,255,.3);animation:eggPulse 3s ease-in-out infinite;position:relative}
-.egg:after{content:"";position:absolute;inset:-20px;border-radius:inherit;background:radial-gradient(circle,rgba(253,230,138,.2),transparent 60%);filter:blur(20px);z-index:-1}
-@keyframes eggPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-.nav-btn{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.6);border:1px solid rgba(253,230,138,.2);color:var(--amber);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:40;transition:.2s;backdrop-filter:blur(6px);font-size:24px;user-select:none}
-.nav-btn:hover{background:rgba(253,230,138,.1);box-shadow:0 0 20px rgba(253,230,138,.3)}
-.nav-btn.left{left:12px}.nav-btn.right{right:12px}
-.nav-btn:active{transform:translateY(-50%) scale(.95)}
-.dots{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:40;padding:8px 14px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08);border-radius:20px;backdrop-filter:blur(8px)}
-.dot{width:6px;height:6px;border-radius:50%;background:#475569;transition:.3s;cursor:pointer}
-.dot.active{width:24px;border-radius:3px;background:var(--amber);box-shadow:0 0 10px rgba(253,230,138,.8)}
-.counter{position:fixed;bottom:22px;right:20px;font-size:11px;letter-spacing:.15em;color:#64748b;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.06);z-index:40}
-.diagram{position:relative;width:min(84vmin,520px);height:min(84vmin,520px);margin:0 auto}
-.guard{position:absolute;width:110px;height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:16px;background:rgba(5,5,5,.8);border:1px solid;backdrop-filter:blur(10px);font-size:11px;letter-spacing:.12em;text-transform:uppercase;transition:.3s;cursor:pointer}
-.guard:hover{transform:scale(1.08);z-index:5}
-.guard .val{font-size:28px;font-weight:700;line-height:1}
-.guard.north{top:0;left:50%;transform:translateX(-50%);color:var(--yellow);border-color:rgba(250,204,21,.5);box-shadow:0 0 30px rgba(250,204,21,.2),inset 0 0 20px rgba(250,204,21,.05)}
-.guard.east{top:50%;right:0;transform:translateY(-50%);color:var(--purple);border-color:rgba(168,85,247,.5);box-shadow:0 0 30px rgba(168,85,247,.2),inset 0 0 20px rgba(168,85,247,.05)}
-.guard.south{bottom:0;left:50%;transform:translateX(-50%);color:var(--orange);border-color:rgba(245,158,11,.5);box-shadow:0 0 30px rgba(245,158,11,.2),inset 0 0 20px rgba(245,158,11,.05)}
-.guard.west{top:50%;left:0;transform:translateY(-50%);color:var(--cyan);border-color:rgba(34,211,238,.5);box-shadow:0 0 30px rgba(34,211,238,.2),inset 0 0 20px rgba(34,211,238,.05)}
-.guard.north:hover{transform:translateX(-50%) scale(1.08)}
-.guard.south:hover{transform:translateX(-50%) scale(1.08)}
-.guard.east:hover{transform:translateY(-50%) scale(1.08)}
-.guard.west:hover{transform:translateY(-50%) scale(1.08)}
-.egg-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:190px;height:190px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(253,230,138,.3),rgba(0,0,0,.9) 70%);border:2px solid rgba(253,230,138,.4);box-shadow:0 0 60px rgba(253,230,138,.3),inset 0 0 40px rgba(253,230,138,.15);cursor:pointer;transition:.3s;z-index:2}
-.egg-core:hover{box-shadow:0 0 80px rgba(253,230,138,.5),inset 0 0 50px rgba(253,230,138,.25);border-color:rgba(253,230,138,.7)}
-.egg-core .label{font-size:11px;letter-spacing:.2em;color:var(--amber);opacity:.8;margin-bottom:6px}
-.egg-core .value{font-size:28px;color:#fff;text-shadow:0 0 20px rgba(253,230,138,.8);font-weight:700;letter-spacing:.05em}
-.egg-core.pulse{animation:corePulse .4s ease}
-@keyframes corePulse{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.1)}100%{transform:translate(-50%,-50%) scale(1)}}
-.status-line{margin-top:24px;font-size:12px;letter-spacing:.14em;color:#94a3b8;text-transform:uppercase}
-.stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin:20px 0}
-.stat{padding:10px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;min-width:140px}
-.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:4px}
-.stat .v{font-size:20px;color:var(--amber);text-shadow:0 0 10px rgba(253,230,138,.4)}
-canvas{display:block;margin:0 auto;background:#020202;border-radius:16px;box-shadow:0 0 40px rgba(0,0,0,.8),inset 0 0 20px rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06)}
-.canvas-wrap{position:relative;display:inline-block}
-.canvas-glow{position:absolute;inset:-20px;z-index:-1;filter:blur(30px);opacity:.5;border-radius:30px}
-.controls{margin-top:16px;display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap}
-.btn{padding:8px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;border-radius:8px;font-family:inherit;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.2s}
-.btn:hover{background:rgba(255,255,255,.1);border-color:rgba(253,230,138,.4);color:var(--amber);box-shadow:0 0 15px rgba(253,230,138,.2)}
-.btn.active{background:rgba(253,230,138,.15);border-color:var(--amber);color:var(--amber)}
-input[type="range"]{width:160px;accent-color:var(--amber)}
-textarea{width:min(90vw,420px);height:80px;background:rgba(0,0,0,.7);border:1px solid rgba(168,85,247,.3);border-radius:8px;color:#e2e8f0;padding:10px;font-family:inherit;font-size:13px;resize:none;box-shadow:0 0 20px rgba(168,85,247,.1) inset}
-textarea:focus{outline:none;border-color:var(--purple);box-shadow:0 0 20px rgba(168,85,247,.2) inset,0 0 15px rgba(168,85,247,.2)}
-.lab-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:640px;margin:20px auto}
-.lab-cell{position:relative;padding:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px}
-.lab-cell canvas{width:100%;height:auto;border-radius:8px}
-.lab-cell .label{margin-top:8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8}
-.unity-btn{margin-top:20px;padding:14px 28px;font-size:14px;background:linear-gradient(90deg,rgba(250,204,21,.2),rgba(168,85,247,.2),rgba(245,158,11,.2),rgba(34,211,238,.2));border:1px solid rgba(253,230,138,.5);color:var(--amber);border-radius:12px;cursor:pointer;letter-spacing:.15em;text-transform:uppercase;font-weight:600;box-shadow:0 0 30px rgba(253,230,138,.2);transition:.3s}
-.unity-btn:hover{transform:scale(1.05);box-shadow:0 0 50px rgba(253,230,138,.4)}
-.unity-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);background:rgba(0,0,0,.92);border:2px solid var(--amber);padding:30px 40px;border-radius:16px;font-size:18px;color:var(--amber);text-shadow:0 0 20px rgba(253,230,138,.8);letter-spacing:.15em;text-transform:uppercase;opacity:0;pointer-events:none;z-index:200;transition:.4s;box-shadow:0 0 80px rgba(253,230,138,.5);text-align:center}
-.unity-msg.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-body.unity-active{background:#000;animation:unityFlash 3s ease}
-@keyframes unityFlash{0%,100%{background:#000}10%,30%,50%{background:radial-gradient(circle at center,rgba(253,230,138,.15),#000 70%)}20%,40%{background:radial-gradient(circle at center,rgba(168,85,247,.1),#000 70%)}}
-.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;max-width:800px;margin:24px auto;text-align:left}
-.spec{padding:12px 16px;background:rgba(255,255,255,.02);border-left:3px solid var(--amber);border-radius:0 8px 8px 0}
-.spec .k{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#94a3b8}
-.spec .v{font-size:14px;margin-top:4px;color:#e2e8f0}
-.note{max-width:720px;margin:28px auto;padding:20px;background:rgba(253,230,138,.03);border:1px solid rgba(253,230,138,.15);border-radius:12px;font-size:13px;line-height:1.7;color:#cbd5e1;text-align:left}
-.glow-yellow{color:var(--yellow);text-shadow:0 0 12px rgba(250,204,21,.6)}
-.glow-purple{color:var(--purple);text-shadow:0 0 12px rgba(168,85,247,.6)}
-.glow-orange{color:var(--orange);text-shadow:0 0 12px rgba(245,158,11,.6)}
-.glow-cyan{color:var(--cyan);text-shadow:0 0 12px rgba(34,211,238,.6)}
-@media (max-width:768px){.guard{width:84px;height:84px}.guard .val{font-size:22px}.egg-core{width:150px;height:150px}.egg-core .value{font-size:22px}.nav-btn{width:40px;height:40px;font-size:20px}.lab-grid{grid-template-columns:1fr;max-width:320px}}
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+  
+  :root {
+    --cyan: #67e8f9;
+    --mint: #86efac;
+    --violet: #c084fc;
+    --gold: #facc15;
+    --rose: #fb7185;
+    --bg-0: #0a0b0f;
+    --bg-1: #11121a;
+    --bg-2: #1a1b26;
+    --bg-3: #232533;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+  }
+
+  * {
+    font-family: 'JetBrains Mono', monospace;
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-3) var(--bg-1);
+  }
+
+  body {
+    background: radial-gradient(1200px 800px at 50% -10%, rgba(103, 232, 249, 0.08), transparent 60%),
+                radial-gradient(800px 600px at 100% 100%, rgba(192, 132, 252, 0.06), transparent 70%),
+                var(--bg-0);
+    color: var(--text);
+  }
+
+  .glass {
+    background: rgba(26, 27, 38, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(103, 232, 249, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 10px currentColor;
+  }
+
+  .step-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 2px solid transparent;
+  }
+
+  .step-item.active {
+    border-left-color: var(--cyan);
+    background: linear-gradient(90deg, rgba(103, 232, 249, 0.1) 0%, transparent 100%);
+    transform: translateX(4px);
+  }
+
+  .step-item.completed {
+    border-left-color: var(--mint);
+    opacity: 0.7;
+  }
+
+  .step-item.pending {
+    opacity: 0.4;
+  }
+
+  .witness-node {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .witness-node.active {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+
+  .tripwire-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+  }
+
+  .json-view {
+    background: var(--bg-1);
+    border: 1px solid rgba(134, 239, 172, 0.2);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--cyan), var(--violet));
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(103, 232, 249, 0.3);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-primary.running {
+    background: linear-gradient(135deg, var(--gold), var(--rose));
+    pointer-events: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-1);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--bg-3);
+    border-radius: 3px;
+  }
+
+  .law-banner {
+    background: linear-gradient(90deg, transparent, rgba(250, 204, 21, 0.1), transparent);
+    border-top: 1px solid rgba(250, 204, 21, 0.3);
+    border-bottom: 1px solid rgba(250, 204, 21, 0.3);
+  }
+
+  #canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+  }
 </style>
 </head>
-<body>
-<div class="grid-bg"></div>
-<header><div>UNITY TENSOR // 4 Guards Around 1 Egg</div><div class="right">PERSISTENCE ENGINE STATUS_4</div></header>
+<body class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="glass px-6 py-5 mb-6">
+    <div class="max-w-[1920px] mx-auto">
+      <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-300 to-mint-300 glow-text">
+        27 Steps to Complete a Hammy
+      </h1>
+      <p class="text-sm md:text-base text-slate-400 mt-1 tracking-wide">
+        Mapped to 8+8+1 Witness Architecture · <span class="text-mint-300">Persistence, not amnesia</span>
+      </p>
+    </div>
+  </header>
 
-<div class="viewport" id="viewport">
- <div class="pages" id="pages">
-  <!-- PAGE 1 -->
-  <section class="page">
-   <div class="page-content">
-    <div class="egg"></div>
-    <h1>UNITY TENSOR</h1>
-    <div class="subtitle">Persistence Engine Status</div>
-    <div class="author">First Author: David Wise • 2026</div>
-    <div class="tagline">1 Egg (Triadic 256/768) + 4 Guards = Unity</div>
-   </div>
-  </section>
-  <!-- PAGE 2 -->
-  <section class="page">
-   <div class="page-content">
-    <h2 style="margin-bottom:24px">Overview</h2>
-    <div class="diagram">
-     <div class="guard north"><div class="val">16</div><div>PHOTONIC</div></div>
-     <div class="guard east"><div class="val">8</div><div>PLASMIC</div></div>
-     <div class="guard south"><div class="val">9</div><div>BORONIC</div></div>
-     <div class="guard west"><div class="val">32</div><div>TOROIDAL</div></div>
-     <div class="egg-core" id="eggCore"><div class="label">EGG CORE</div><div class="value" id="eggValue">256/768</div></div>
-    </div>
-    <div class="status-line">65 TSVs converge • 100-grid base • silo collapsed to singularity</div>
-    <p style="margin-top:20px;opacity:.7">Click egg to cycle triadic states. Hover guards for coherence fields.</p>
-   </div>
-  </section>
-  <!-- PAGE 3 -->
-  <section class="page">
-   <div class="page-content">
-    <h2 style="color:var(--amber);text-shadow:0 0 12px rgba(253,230,138,.6)">The Egg Core</h2>
-    <p>Triadic Core operates at 256/768 active capacity. Persistence memory depth visualized as Mandelbrot zoom — infinite detail from finite bounds.</p>
-    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(253,230,138,.3),transparent 70%)"></div><canvas id="mandel" width="300" height="300"></canvas></div>
-    <div class="stats"><div class="stat"><div class="k">Capacity</div><div class="v">768</div></div><div class="stat"><div class="k">Active</div><div class="v" id="statActive">256</div></div><div class="stat"><div class="k">Resonance Mode</div><div class="v">Triadic</div></div></div>
-   </div>
-  </section>
-  <!-- PAGE 4 -->
-  <section class="page">
-   <div class="page-content">
-    <h2 class="glow-yellow">Guard 1 • Photonic</h2><h3>Value 16</h3>
-    <p>Light-speed coherence field active. Maintains instantaneous state sync across threads.</p>
-    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(250,204,21,.4),transparent 70%)"></div><canvas id="julia" width="320" height="320"></canvas></div>
-    <div class="controls"><button class="btn active" id="coherenceBtn">Coherence On</button></div>
-   </div>
-  </section>
-  <!-- PAGE 5 -->
-  <section class="page">
-   <div class="page-content">
-    <h2 class="glow-purple">Guard 2 • Plasmic</h2><h3>Value 8</h3>
-    <p>Plasma containment stable. Buffers volatile writes before commit.</p>
-    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(168,85,247,.4),transparent 70%)"></div><canvas id="plasma" width="320" height="320"></canvas></div>
-    <div class="controls" style="flex-direction:column"><textarea id="plasmaBuffer" placeholder="Type to test persistence... survives reload"></textarea><div style="font-size:11px;color:#64748b;margin-top:6px;letter-spacing:.1em">PERSISTENCE DEMO • localStorage backed</div></div>
-   </div>
-  </section>
-  <!-- PAGE 6 -->
-  <section class="page">
-   <div class="page-content">
-    <h2 class="glow-orange">Guard 3 • Boronic</h2><h3>Value 9</h3>
-    <p>Boron lattice resonating. Provides structural integrity for 100-grid base.</p>
-    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(245,158,11,.35),transparent 70%)"></div><canvas id="hex" width="340" height="340"></canvas></div>
-    <p style="font-size:12px;opacity:.7">Scroll to zoom lattice • self-healing every 3.2s</p>
-   </div>
-  </section>
-  <!-- PAGE 7 -->
-  <section class="page">
-   <div class="page-content">
-    <h2 class="glow-cyan">Guard 4 • Toroidal</h2><h3>Value 32</h3>
-    <p>Toroid spin at 32Hz. Circulates energy, prevents data decay.</p>
-    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(34,211,238,.35),transparent 70%)"></div><canvas id="torus" width="340" height="340"></canvas></div>
-    <div class="controls"><label style="font-size:11px;letter-spacing:.12em;color:#94a3b8">SPIN RATE</label><input type="range" id="spinSlider" min="1" max="64" value="32"><span id="spinVal" style="font-size:12px;color:var(--cyan);min-width:40px">32 Hz</span></div>
-   </div>
-  </section>
-  <!-- PAGE 8 -->
-  <section class="page">
-   <div class="page-content">
-    <h2 style="color:#fff;text-shadow:0 0 20px rgba(255,255,255,.3)">65 TSVs Converge</h2>
-    <p>Through-Silicon-Vias as data channels. 65 independent paths collapse into singularity at egg core.</p>
-    <div class="canvas-wrap" style="margin:20px auto"><div class="canvas-glow" style="background:radial-gradient(circle,rgba(253,230,138,.25),transparent 70%)"></div><canvas id="tsv" width="380" height="380"></canvas></div>
-    <div class="controls"><button class="btn" id="incTSV">Increment Persistence Counter</button><div class="stat" style="min-width:100px"><div class="k">Stored</div><div class="v" id="tsvCount">0</div></div></div>
-   </div>
-  </section>
-  <!-- PAGE 9 -->
-  <section class="page">
-   <div class="page-content">
-    <h2>Engine Abilities Live Lab</h2><p>All four guards operating in parallel.</p>
-    <div class="lab-grid">
-     <div class="lab-cell"><canvas id="labPhotonic" width="260" height="260"></canvas><div class="label glow-yellow">Photonic coherence</div></div>
-     <div class="lab-cell"><canvas id="labPlasmic" width="260" height="260"></canvas><div class="label glow-purple">Plasmic buffer</div></div>
-     <div class="lab-cell"><canvas id="labBoronic" width="260" height="260"></canvas><div class="label glow-orange">Boronic lattice</div></div>
-     <div class="lab-cell"><canvas id="labToroidal" width="260" height="260"></canvas><div class="label glow-cyan">Toroidal circulation</div></div>
-    </div>
-    <button class="unity-btn" id="unityBtn">Achieve Unity</button>
-   </div>
-  </section>
-  <!-- PAGE 10 -->
-  <section class="page">
-   <div class="page-content">
-    <h2>First Author Notes & Specs</h2>
-    <div class="specs">
-     <div class="spec"><div class="k">Architecture</div><div class="v">Unity Core</div></div>
-     <div class="spec"><div class="k">Persistence Modes</div><div class="v">Triadic</div></div>
-     <div class="spec"><div class="k">Guards</div><div class="v">4 (16/8/9/32)</div></div>
-     <div class="spec"><div class="k">Grid</div><div class="v">100×100</div></div>
-     <div class="spec"><div class="k">TSVs</div><div class="v">65</div></div>
-     <div class="spec"><div class="k">Silo State</div><div class="v">Collapsed</div></div>
-    </div>
-    <div class="note"><strong style="color:var(--amber);letter-spacing:.1em">DAVID WISE — DESIGN INTENT</strong><br><br>Persistence is not storage. It is physical memory. The Egg is not a metaphor for a database — it is a singularity where 65 TSVs converge into one coherent field. Each guard is a coherence layer: Photonic for instant sync, Plasmic for volatile grace, Boronic for structure, Toroidal for circulation. Four guards around one egg prevent drift. Triadic 256/768 is deliberate — never full, never empty, always resonating. Unity is achieved when all four fractals interfere constructively. This is version 4 of the status engine. It persists because it must.</div>
-    <div style="margin-top:24px;font-size:11px;letter-spacing:.15em;color:#475569;text-transform:uppercase">Contact: first.author @ unitytensor • Version Persistence-Engine-Status_4</div>
-   </div>
-  </section>
- </div>
-</div>
+  <!-- Core Law Banner -->
+  <div class="law-banner py-3 mb-6">
+    <p class="text-center text-sm md:text-base font-medium text-yellow-300 glow-text tracking-wider uppercase">
+      Core Law: no legal extraction without legal accountability
+    </p>
+  </div>
 
-<button class="nav-btn left" id="prev">‹</button>
-<button class="nav-btn right" id="next">›</button>
-<div class="dots" id="dots"></div>
-<div class="counter" id="counter">1/10</div>
-<div class="unity-msg" id="unityMsg">UNITY ACHIEVED<br><span style="font-size:12px;opacity:.8">All guards synchronized</span></div>
+  <!-- Main Layout -->
+  <main class="flex-1 px-4 md:px-6 pb-6 max-w-[1920px] mx-auto w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+      
+      <!-- Left Panel: 27 Steps -->
+      <section class="lg:col-span-3 glass rounded-2xl p-5 flex flex-col max-h-[calc(100vh-240px)] lg:max-h-none">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-cyan-300 glow-text">Steps</h2>
+          <span id="progress-counter" class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400">0/27</span>
+        </div>
+        <div id="steps-list" class="space-y-1 overflow-y-auto flex-1 pr-2"></div>
+      </section>
+
+      <!-- Center: Canvas Visualization -->
+      <section class="lg:col-span-5 glass rounded-2xl p-5 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-violet-300 glow-text">Quantum Witness Space</h2>
+          <div class="flex gap-4 text-xs">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-300"></span>Outside</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-mint-300"></span>Inside</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Tripwire</span>
+          </div>
+        </div>
+        <div id="canvas-container" class="flex-1 rounded-xl overflow-hidden bg-[#0a0b0f] border border-slate-800 relative min-h-[400px]">
+          <div class="absolute top-3 left-3 text-xs text-slate-500 z-10">
+            <div>1 Dot → Quad 1 → 4 Spaces → 8+8 Light/Dark</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Live State -->
+      <section class="lg:col-span-4 glass rounded-2xl p-5 flex flex-col max-h-[calc(100vh-240px)] lg:max-h-none">
+        <h2 class="text-lg font-semibold text-mint-300 glow-text mb-4">Live State</h2>
+        
+        <!-- Current Step -->
+        <div class="mb-4 p-4 rounded-lg bg-slate-900/50 border border-cyan-900/50">
+          <div class="text-xs text-slate-500 mb-1">CURRENT STEP</div>
+          <div id="current-step" class="text-sm text-cyan-200">Awaiting instantiation...</div>
+        </div>
+
+        <!-- Witness Status Grid -->
+        <div class="mb-4">
+          <div class="text-xs text-slate-500 mb-2">WITNESS STATUS</div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="col-span-2 text-[10px] text-cyan-400 mb-1">OUTSIDE WITNESSES</div>
+            <div id="witnesses-outside" class="col-span-2 grid grid-cols-2 gap-1"></div>
+            <div class="col-span-2 text-[10px] text-mint-400 mb-1 mt-2">INSIDE WITNESSES</div>
+            <div id="witnesses-inside" class="col-span-2 grid grid-cols-2 gap-1"></div>
+          </div>
+        </div>
+
+        <!-- Tripwire State -->
+        <div class="mb-4 p-3 rounded-lg bg-slate-900/50 border border-rose-900/50">
+          <div class="text-xs text-slate-500 mb-1">TRIPWIRE</div>
+          <div id="tripwire-state" class="text-sm text-slate-400">NO_RIGHT_NO_ACCOUNTABILITY: <span class="text-slate-600">INACTIVE</span></div>
+        </div>
+
+        <!-- Seed JSON Output -->
+        <div class="flex-1 flex flex-col min-h-0">
+          <div class="text-xs text-slate-500 mb-2">SEED OUTPUT</div>
+          <pre id="seed-output" class="json-view flex-1 rounded-lg p-3 text-[10px] md:text-xs overflow-auto text-slate-300"></pre>
+        </div>
+
+        <!-- Instantiate Button -->
+        <button id="instantiate-btn" class="btn-primary mt-4 w-full py-4 rounded-xl font-semibold text-slate-900 text-sm tracking-wide">
+          <span class="relative z-10">INSTANTIATE HAMMY</span>
+        </button>
+      </section>
+
+    </div>
+  </main>
 
 <script>
-const pagesEl=document.getElementById('pages');const total=10;let current=0;const counter=document.getElementById('counter');const dots=document.getElementById('dots');
-for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);dots.appendChild(d)}
-function updateUI(){pagesEl.style.transform=`translateX(-${current*100}vw)`;counter.textContent=`${current+1}/${total}`;document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===current))}
-function goTo(i){current=Math.max(0,Math.min(total-1,i));updateUI();initPage(current)}
-document.getElementById('prev').onclick=()=>goTo(current-1);document.getElementById('next').onclick=()=>goTo(current+1);
-window.addEventListener('keydown',e=>{if(e.key==='ArrowRight')goTo(current+1);if(e.key==='ArrowLeft')goTo(current-1)});
-let startX=0;const vp=document.getElementById('viewport');
-vp.addEventListener('touchstart',e=>startX=e.touches[0].clientX,{passive:true});
-vp.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>50){dx<0?goTo(current+1):goTo(current-1)}});
+const STEPS = [
+  // 1-8: Outside Witnesses
+  { id: 1, name: "LEGAL", group: "outside", phase: "Map Outside Witness" },
+  { id: 2, name: "AUTHOR", group: "outside", phase: "Map Outside Witness" },
+  { id: 3, name: "VALUE", group: "outside", phase: "Map Outside Witness" },
+  { id: 4, name: "CONSENT", group: "outside", phase: "Map Outside Witness" },
+  { id: 5, name: "RIGHTS", group: "outside", phase: "Map Outside Witness" },
+  { id: 6, name: "PROVENANCE", group: "outside", phase: "Map Outside Witness" },
+  { id: 7, name: "PUBLIC", group: "outside", phase: "Map Outside Witness" },
+  { id: 8, name: "FUTURE", group: "outside", phase: "Map Outside Witness" },
+  // 9-16: Inside Witnesses
+  { id: 9, name: "IDENTITY", group: "inside", phase: "Map Inside Witness" },
+  { id: 10, name: "INTENT", group: "inside", phase: "Map Inside Witness" },
+  { id: 11, name: "INPUT", group: "inside", phase: "Map Inside Witness" },
+  { id: 12, name: "OUTPUT", group: "inside", phase: "Map Inside Witness" },
+  { id: 13, name: "MONEY", group: "inside", phase: "Map Inside Witness" },
+  { id: 14, name: "OPERATOR", group: "inside", phase: "Map Inside Witness" },
+  { id: 15, name: "MODEL", group: "inside", phase: "Map Inside Witness" },
+  { id: 16, name: "REVERSAL", group: "inside", phase: "Map Inside Witness" },
+  // 17: Tripwire
+  { id: 17, name: "NO_RIGHT_NO_ACCOUNTABILITY", group: "tripwire", phase: "Tripwire Check" },
+  // 18-27: Execution
+  { id: 18, name: "Initialize", group: "execution", phase: "Execution" },
+  { id: 19, name: "Verify Parents", group: "execution", phase: "Execution" },
+  { id: 20, name: "Hash Payload", group: "execution", phase: "Execution" },
+  { id: 21, name: "Bind Witnesses", group: "execution", phase: "Execution" },
+  { id: 22, name: "Check Tripwire", group: "execution", phase: "Execution" },
+  { id: 23, name: "Commit Seed", group: "execution", phase: "Execution" },
+  { id: 24, name: "Broadcast", group: "execution", phase: "Execution" },
+  { id: 25, name: "Audit", group: "execution", phase: "Execution" },
+  { id: 26, name: "Reconcile", group: "execution", phase: "Execution" },
+  { id: 27, name: "Close", group: "execution", phase: "Execution" },
+];
 
-const eggCore=document.getElementById('eggCore');const eggValue=document.getElementById('eggValue');const statActive=document.getElementById('statActive');let eggState=0;const eggVals=[256,512,768];
-eggCore?.addEventListener('click',()=>{eggState=(eggState+1)%3;const v=eggVals[eggState];eggValue.textContent=v+'/768';statActive.textContent=v;eggCore.classList.add('pulse');setTimeout(()=>eggCore.classList.remove('pulse'),400)});
+let state = {
+  currentStep: 0,
+  running: false,
+  seed: {
+    seed_id: null,
+    author: null,
+    parent_hash: null,
+    payload_hash: null,
+    witness_hash: null,
+    tripwire: "INACTIVE",
+    witnesses: {
+      outside: {},
+      inside: {}
+    }
+  },
+  scene: null,
+  camera: null,
+  renderer: null,
+  dot: null,
+  quadrants: [],
+  witnessNodes: []
+};
 
-const initialized=Array(total).fill(false);
-function initPage(i){if(initialized[i])return;initialized[i]=true;switch(i){case 2:initMandel();break;case 3:initJulia();break;case 4:initPlasma();break;case 5:initHex();break;case 6:initTorus();break;case 7:initTSV();break;case 8:initLab();break;}}
-initPage(0);initPage(1);initPage(2);
+// Initialize UI
+function initUI() {
+  const stepsList = document.getElementById('steps-list');
+  const outsideContainer = document.getElementById('witnesses-outside');
+  const insideContainer = document.getElementById('witnesses-inside');
 
-function initMandel(){
- const c=document.getElementById('mandel');const ctx=c.getContext('2d');const w=c.width,h=c.height;let last=0;
- function draw(t){
-  if(current!==2){requestAnimationFrame(draw);return}
-  if(t-last<140){requestAnimationFrame(draw);return}last=t;
-  const img=ctx.createImageData(w,h);const d=img.data;
-  const zoom=0.9+0.25*Math.sin(t*0.0003);const cx=-0.743643887+0.0001*Math.cos(t*0.00007);const cy=0.1318259+0.0001*Math.sin(t*0.00007);const scale=1.6*zoom;
-  for(let y=0;y<h;y++){for(let x=0;x<w;x++){let zx=0,zy=0;const c0x=(x-w/2)/(w*0.5)*scale+cx;const c0y=(y-h/2)/(h*0.5)*scale+cy;let i=0;const max=90;while(zx*zx+zy*zy<4&&i<max){const xt=zx*zx-zy*zy+c0x;zy=2*zx*zy+c0y;zx=xt;i++}const p=(y*w+x)*4;const v=i===max?0:Math.pow(i/max,0.6)*255;d[p]=253;d[p+1]=230;d[p+2]=138;d[p+3]=v*0.85;}}
-  ctx.putImageData(img,0,0);ctx.strokeStyle='rgba(253,230,138,0.25)';ctx.lineWidth=1.5;
-  for(let r=1;r<=3;r++){ctx.beginPath();ctx.arc(w/2,h/2,32*r+8*Math.sin(t*0.001+r),0,Math.PI*2);ctx.stroke()}
-  requestAnimationFrame(draw)
- }draw(0)
+  STEPS.forEach(step => {
+    const div = document.createElement('div');
+    div.className = 'step-item pending px-3 py-2 rounded text-xs cursor-default';
+    div.id = `step-${step.id}`;
+    
+    const groupColor = step.group === 'outside' ? 'text-cyan-400' : 
+                      step.group === 'inside' ? 'text-mint-400' : 
+                      step.group === 'tripwire' ? 'text-rose-400' : 'text-violet-300';
+    
+    div.innerHTML = `
+      <div class="flex items-start gap-2">
+        <span class="text-slate-600 font-semibold">${String(step.id).padStart(2, '0')}</span>
+        <div class="flex-1">
+          <div class="${groupColor}">${step.name}</div>
+          <div class="text-[10px] text-slate-600">${step.phase}</div>
+        </div>
+      </div>
+    `;
+    stepsList.appendChild(div);
+
+    // Create witness displays
+    if (step.group === 'outside') {
+      state.seed.witnesses.outside[step.name] = 'PENDING';
+      const w = document.createElement('div');
+      w.className = 'px-2 py-1 rounded bg-slate-900/50 text-[10px]';
+      w.id = `witness-${step.name}`;
+      w.innerHTML = `<span class="text-slate-600">${step.name}:</span> <span class="text-slate-500">○</span>`;
+      outsideContainer.appendChild(w);
+    } else if (step.group === 'inside') {
+      state.seed.witnesses.inside[step.name] = 'PENDING';
+      const w = document.createElement('div');
+      w.className = 'px-2 py-1 rounded bg-slate-900/50 text-[10px]';
+      w.id = `witness-${step.name}`;
+      w.innerHTML = `<span class="text-slate-600">${step.name}:</span> <span class="text-slate-500">○</span>`;
+      insideContainer.appendChild(w);
+    }
+  });
+
+  updateSeedOutput();
 }
 
-function initJulia(){
- const c=document.getElementById('julia');const ctx=c.getContext('2d');const w=c.width,h=c.height;let coherence=true;const btn=document.getElementById('coherenceBtn');btn.onclick=()=>{coherence=!coherence;btn.classList.toggle('active',coherence);btn.textContent=coherence?'Coherence On':'Coherence Off'};let last=0;
- function draw(t){
-  if(current!==3){requestAnimationFrame(draw);return}
-  if(!coherence){requestAnimationFrame(draw);return}
-  if(t-last<80){requestAnimationFrame(draw);return}last=t;
-  const img=ctx.createImageData(w,h);const d=img.data;const zoom=1.2+0.3*Math.sin(t*0.0004);const angle=t*0.0002;const ca=Math.cos(angle),sa=Math.sin(angle);const cr=-0.8,ci=0.156;
-  for(let y=0;y<h;y++){for(let x=0;x<w;x++){let nx=(x-w/2)/(w*0.5)*zoom;let ny=(y-h/2)/(h*0.5)*zoom;const rx=nx*ca-ny*sa;const ry=nx*sa+ny*ca;let zx=rx,zy=ry;let i=0;const max=100;while(zx*zx+zy*zy<4&&i<max){const xt=zx*zx-zy*zy+cr;zy=2*zx*zy+ci;zx=xt;i++}const p=(y*w+x)*4;const v=i===max?0:Math.pow(i/max,0.5)*255;d[p]=250;d[p+1]=204;d[p+2]=21;d[p+3]=v;}}
-  ctx.putImageData(img,0,0);requestAnimationFrame(draw)
- }draw(0)
+// Three.js Visualization
+function initThreeJS() {
+  const container = document.getElementById('canvas-container');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  state.scene = new THREE.Scene();
+  state.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+  state.camera.position.z = 8;
+
+  state.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  state.renderer.setSize(width, height);
+  state.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(state.renderer.domElement);
+
+  // Central dot - "1 dot"
+  const dotGeometry = new THREE.SphereGeometry(0.15, 32, 32);
+  const dotMaterial = new THREE.MeshBasicMaterial({ 
+    color: 0xfacc15,
+    transparent: true,
+    opacity: 0.9
+  });
+  state.dot = new THREE.Mesh(dotGeometry, dotMaterial);
+  state.scene.add(state.dot);
+
+  // Create 4 quadrants with 8 nodes each (8 light / 8 dark concept)
+  const quadPositions = [
+    { x: -1.5, y: 1.5 },   // Top-left
+    { x: 1.5, y: 1.5 },    // Top-right  
+    { x: -1.5, y: -1.5 },  // Bottom-left
+    { x: 1.5, y: -1.5 }    // Bottom-right
+  ];
+
+  quadPositions.forEach((pos, qIdx) => {
+    const quad = new THREE.Group();
+    quad.position.set(pos.x, pos.y, 0);
+    state.scene.add(quad);
+    state.quadrants.push(quad);
+
+    // 8 witness nodes per quadrant (4 light, 4 dark)
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const radius = 0.6;
+      const nodeGeo = new THREE.SphereGeometry(0.08, 16, 16);
+      const isLight = i < 4;
+      const baseColor = qIdx < 2 ? 0x67e8f9 : 0x86efac; // cyan for outside, mint for inside
+      const nodeMat = new THREE.MeshBasicMaterial({ 
+        color: baseColor,
+        transparent: true,
+        opacity: 0.15
+      });
+      const node = new THREE.Mesh(nodeGeo, nodeMat);
+      node.position.set(
+        Math.cos(angle) * radius,
+        Math.sin(angle) * radius,
+        0
+      );
+      node.userData = { quadrant: qIdx, index: i, active: false, isLight };
+      quad.add(node);
+      state.witnessNodes.push(node);
+    }
+  });
+
+  // Tripwire indicator - center but offset
+  const tripwireGeo = new THREE.RingGeometry(0.3, 0.4, 32);
+  const tripwireMat = new THREE.MeshBasicMaterial({ 
+    color: 0xfb7185,
+    transparent: true,
+    opacity: 0.2,
+    side: THREE.DoubleSide
+  });
+  const tripwire = new THREE.Mesh(tripwireGeo, tripwireMat);
+  tripwire.userData = { isTripwire: true };
+  state.scene.add(tripwire);
+  state.witnessNodes.push(tripwire);
+
+  // Ambient particles for atmosphere
+  const particlesGeo = new THREE.BufferGeometry();
+  const particlesCount = 200;
+  const posArray = new Float32Array(particlesCount * 3);
+  for (let i = 0; i < particlesCount * 3; i++) {
+    posArray[i] = (Math.random() - 0.5) * 10;
+  }
+  particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+  const particlesMat = new THREE.PointsMaterial({ 
+    size: 0.01,
+    color: 0x67e8f9,
+    transparent: true,
+    opacity: 0.4
+  });
+  const particles = new THREE.Points(particlesGeo, particlesMat);
+  state.scene.add(particles);
+
+  animate();
+
+  window.addEventListener('resize', onWindowResize);
 }
 
-function initPlasma(){
- const c=document.getElementById('plasma');const ctx=c.getContext('2d');const w=c.width,h=c.height;let mx=0,my=0,last=0;
- c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();mx=(e.clientX-r.left-w/2)*0.05;my=(e.clientY-r.top-h/2)*0.05});
- c.addEventListener('touchmove',e=>{const t=e.touches[0];const r=c.getBoundingClientRect();mx=(t.clientX-r.left-w/2)*0.05;my=(t.clientY-r.top-h/2)*0.05},{passive:true});
- function draw(t){
-  if(current!==4){requestAnimationFrame(draw);return}
-  if(t-last<50){requestAnimationFrame(draw);return}last=t;
-  const img=ctx.createImageData(w,h);const d=img.data;const tt=t*0.001;
-  for(let y=0;y<h;y++){for(let x=0;x<w;x++){const xv=x+mx*10,yv=y+my*10;const v=Math.sin(xv*0.03+tt)+Math.sin(yv*0.035-tt*1.1)+Math.sin(Math.hypot(xv-w/2,yv-h/2)*0.045+tt*0.7)+Math.sin((xv+yv)*0.02-tt*0.9);const n=(v+4)/8;const p=(y*w+x)*4;d[p]=120+n*90;d[p+1]=40+n*30;d[p+2]=180+n*75;d[p+3]=210;}}
-  ctx.putImageData(img,0,0);requestAnimationFrame(draw)
- }draw(0);
- const ta=document.getElementById('plasmaBuffer');ta.value=localStorage.getItem('plasmicBuffer')||'';ta.addEventListener('input',()=>localStorage.setItem('plasmicBuffer',ta.value))
+function onWindowResize() {
+  const container = document.getElementById('canvas-container');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  state.camera.aspect = width / height;
+  state.camera.updateProjectionMatrix();
+  state.renderer.setSize(width, height);
 }
 
-function initHex(){
- const c=document.getElementById('hex');const ctx=c.getContext('2d');const w=c.width,h=c.height;let scale=1;let healTimer=0;
- c.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(0.5,Math.min(2,scale-e.deltaY*0.001))},{passive:false});
- function hexPath(x,y,r){ctx.beginPath();for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/6;const px=x+Math.cos(a)*r;const py=y+Math.sin(a)*r;i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath()}
- function draw(t){
-  if(current!==5){requestAnimationFrame(draw);return}
-  const broken=t-healTimer<300; if(t-healTimer>3200)healTimer=t;
-  ctx.clearRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2);ctx.scale(scale,scale);
-  const base=22;const levels=4;
-  function level(cx,cy,r,depth){if(depth>levels)return;hexPath(cx,cy,r);const isB=broken&&Math.random()<0.08;ctx.strokeStyle=isB?'rgba(245,158,11,0.15)':'rgba(245,158,11,'+(0.25+0.5*(1-depth/levels))+')';ctx.lineWidth=isB?1:1.5;ctx.shadowColor='rgba(245,158,11,0.5)';ctx.shadowBlur=isB?0:8;ctx.stroke();if(depth<levels){for(let i=0;i<6;i++){const a=Math.PI/3*i;level(cx+Math.cos(a)*r*1.75,cy+Math.sin(a)*r*1.75,r*0.88,depth+1)}}}
-  level(0,0,base,0);ctx.restore();requestAnimationFrame(draw)
- }draw(0)
+function animate() {
+  requestAnimationFrame(animate);
+  
+  // Rotate dot
+  if (state.dot) {
+    state.dot.rotation.y += 0.01;
+    state.dot.rotation.x += 0.005;
+  }
+
+  // Pulse active nodes
+  state.witnessNodes.forEach(node => {
+    if (node.userData.active) {
+      const scale = 1 + Math.sin(Date.now() * 0.003) * 0.2;
+      node.scale.setScalar(scale);
+    }
+  });
+
+  // Rotate quadrants slowly
+  state.quadrants.forEach((quad, i) => {
+    quad.rotation.z += 0.001 * (i % 2 ? 1 : -1);
+  });
+
+  state.renderer.render(state.scene, state.camera);
 }
 
-function initTorus(){
- const c=document.getElementById('torus');const ctx=c.getContext('2d');const w=c.width,h=c.height;const slider=document.getElementById('spinSlider');const val=document.getElementById('spinVal');let speed=32;slider.oninput=()=>{speed=+slider.value;val.textContent=speed+' Hz'};
- function draw(t){
-  if(current!==6){requestAnimationFrame(draw);return}
-  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2);
-  const time=t*0.001*speed*0.2;const R=90,r=34,p=2,q=3;
-  ctx.beginPath();for(let i=0;i<=800;i++){const u=i/800*Math.PI*2*q;const x=(R+r*Math.cos(q*u+time))*Math.cos(p*u);const y=(R+r*Math.cos(q*u+time))*Math.sin(p*u);const z=r*Math.sin(q*u+time);const s=200/(200+z);const px=x*s,py=y*s*0.7;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py)}
-  ctx.strokeStyle='rgba(34,211,238,0.9)';ctx.lineWidth=2;ctx.shadowColor='#22d3ee';ctx.shadowBlur=15;ctx.stroke();
-  ctx.beginPath();for(let i=0;i<=400;i++){const u=i/400*Math.PI*2*q+time*0.5;const x=(R*0.6+r*0.6*Math.cos(q*u))*Math.cos(p*u*1.5);const y=(R*0.6+r*0.6*Math.cos(q*u))*Math.sin(p*u*1.5);const z=r*0.6*Math.sin(q*u);const s=200/(200+z);ctx.lineTo(x*s,y*s*0.7)}ctx.strokeStyle='rgba(34,211,238,0.4)';ctx.lineWidth=1;ctx.stroke();
-  ctx.restore();requestAnimationFrame(draw)
- }draw(0)
+function activateWitness(name, group) {
+  const el = document.getElementById(`witness-${name}`);
+  if (el) {
+    el.querySelector('span:last-child').textContent = '●';
+    el.querySelector('span:last-child').className = group === 'outside' ? 'text-cyan-300 glow-text' : 'text-mint-300 glow-text';
+  }
+
+  // Activate in 3D visualization
+  const stepIdx = STEPS.findIndex(s => s.name === name);
+  if (stepIdx >= 0 && stepIdx < 16) {
+    const node = state.witnessNodes[stepIdx];
+    if (node && !node.userData.isTripwire) {
+      node.userData.active = true;
+      node.material.opacity = 0.9;
+      // Pulse effect
+      let scale = 1;
+      const pulse = setInterval(() => {
+        scale += 0.1;
+        node.scale.setScalar(scale);
+        if (scale > 2) {
+          clearInterval(pulse);
+          node.scale.setScalar(1.2);
+        }
+      }, 20);
+    }
+  }
 }
 
-function initTSV(){
- const c=document.getElementById('tsv');const ctx=c.getContext('2d');const w=c.width,h=c.height;const cx=w/2,cy=h/2;const particles=[];for(let i=0;i<65;i++){const a=i/65*Math.PI*2;for(let j=0;j<3;j++)particles.push({a,r:180+Math.random()*60,s:0.4+Math.random()*0.8})}
- const countEl=document.getElementById('tsvCount');let count=+localStorage.getItem('tsvCount')||0;countEl.textContent=count;document.getElementById('incTSV').onclick=()=>{count++;localStorage.setItem('tsvCount',count);countEl.textContent=count}
- function draw(){
-  if(current!==7){requestAnimationFrame(draw);return}
-  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(cx,cy);
-  for(let i=0;i<65;i++){const a=i/65*Math.PI*2;const x1=Math.cos(a)*190,y1=Math.sin(a)*190;const g=ctx.createLinearGradient(x1,y1,0,0);g.addColorStop(0,'rgba(253,230,138,0)');g.addColorStop(0.5,'rgba(253,230,138,0.15)');g.addColorStop(1,'rgba(253,230,138,0.6)');ctx.strokeStyle=g;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(0,0);ctx.stroke()}
-  particles.forEach(p=>{p.r-=p.s*2.2;if(p.r<6)p.r=190+Math.random()*20;const x=Math.cos(p.a)*p.r,y=Math.sin(p.a)*p.r;ctx.beginPath();ctx.arc(x,y,1.8,0,Math.PI*2);ctx.fillStyle='rgba(253,230,138,0.9)';ctx.shadowColor='#fde68a';ctx.shadowBlur=8;ctx.fill();ctx.shadowBlur=0});
-  ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);const g=ctx.createRadialGradient(0,0,0,0,0,14);g.addColorStop(0,'#fff7d6');g.addColorStop(0.4,'#fde68a');g.addColorStop(1,'rgba(253,230,138,0)');ctx.fillStyle=g;ctx.fill();
-  ctx.restore();requestAnimationFrame(draw)
- }draw()
+function activateTripwire() {
+  const tripwireEl = document.getElementById('tripwire-state');
+  tripwireEl.innerHTML = 'NO_RIGHT_NO_ACCOUNTABILITY: <span class="text-rose-400 glow-text tripwire-pulse">ARMED</span>';
+  
+  const tripwireNode = state.witnessNodes.find(n => n.userData.isTripwire);
+  if (tripwireNode) {
+    tripwireNode.userData.active = true;
+    tripwireNode.material.opacity = 0.8;
+  }
 }
 
-function initLab(){
- const ids=['labPhotonic','labPlasmic','labBoronic','labToroidal'];const cs=ids.map(id=>document.getElementById(id));const xs=cs.map(c=>c.getContext('2d'));let lt=0;
- function draw(t){
-  if(current!==8){requestAnimationFrame(draw);return}
-  if(t-lt<70){requestAnimationFrame(draw);return}lt=t;
-  // photonic
-  const x0=xs[0],w0=cs[0].width;const im0=x0.createImageData(w0,w0);for(let y=0;y<w0;y+=2){for(let x=0;x<w0;x+=2){let zx=(x-w0/2)/80,zy=(y-w0/2)/80,i=0;while(zx*zx+zy*zy<4&&i<40){const xt=zx*zx-zy*zy-0.8;zy=2*zx*zy+0.156;zx=xt;i++}const v=i*6;const p=(y*w0+x)*4;im0.data[p]=250;im0.data[p+1]=204;im0.data[p+2]=21;im0.data[p+3]=v}}x0.putImageData(im0,0,0);
-  // plasmic
-  const x1=xs[1],w1=cs[1].width;const im1=x1.createImageData(w1,w1);const tt=t*0.001;for(let y=0;y<w1;y++){for(let x=0;x<w1;x++){const v=Math.sin(x*0.08+tt)+Math.sin(y*0.08-tt);const n=(v+2)/4;const p=(y*w1+x)*4;im1.data[p]=100+n*80;im1.data[p+1]=30;im1.data[p+2]=160+n*60;im1.data[p+3]=200}}x1.putImageData(im1,0,0);
-  // boronic
-  const x2=xs[2],w2=cs[2].width;x2.clearRect(0,0,w2,w2);x2.save();x2.translate(w2/2,w2/2);x2.strokeStyle='rgba(245,158,11,0.7)';for(let i=0;i<3;i++){x2.beginPath();const r=30+i*22;for(let j=0;j<6;j++){const a=j*Math.PI/3;const px=Math.cos(a)*r,py=Math.sin(a)*r;j?x2.lineTo(px,py):x2.moveTo(px,py)}x2.closePath();x2.stroke()}x2.restore();
-  // toroidal
-  const x3=xs[3],w3=cs[3].width;x3.fillStyle='rgba(0,0,0,0.3)';x3.fillRect(0,0,w3,w3);x3.save();x3.translate(w3/2,w3/2);x3.strokeStyle='#22d3ee';x3.shadowColor='#22d3ee';x3.shadowBlur=10;x3.beginPath();for(let i=0;i<200;i++){const u=i/200*Math.PI*6;const r=70+15*Math.cos(3*u+tt);x3.lineTo(Math.cos(2*u)*r*0.5,Math.sin(2*u)*r*0.5)}x3.stroke();x3.restore();
-  requestAnimationFrame(draw)
- }draw(0);
- const btn=document.getElementById('unityBtn');const msg=document.getElementById('unityMsg');
- btn.onclick=()=>{document.body.classList.add('unity-active');msg.classList.add('show');eggState=2;eggValue.textContent='768/768';statActive.textContent='768';eggCore.classList.add('pulse');setTimeout(()=>{document.body.classList.remove('unity-active');msg.classList.remove('show');eggCore.classList.remove('pulse')},3000)}
+// Hash simulation
+function generateHash() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(32)))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
-updateUI();
+function updateSeedOutput() {
+  document.getElementById('seed-output').textContent = JSON.stringify(state.seed, null, 2);
+}
+
+function updateStep(stepId, status) {
+  const el = document.getElementById(`step-${stepId}`);
+  if (!el) return;
+  
+  el.classList.remove('pending', 'active', 'completed');
+  el.classList.add(status);
+  
+  if (status === 'active') {
+    document.getElementById('current-step').textContent = `${String(stepId).padStart(2, '0')} · ${STEPS[stepId - 1].name} · ${STEPS[stepId - 1].phase}`;
+  }
+  
+  document.getElementById('progress-counter').textContent = `${state.currentStep}/27`;
+}
+
+async function runHammy() {
+  if (state.running) return;
+  state.running = true;
+  
+  const btn = document.getElementById('instantiate-btn');
+  btn.classList.add('running');
+  btn.querySelector('span').textContent = 'INSTANTIATING...';
+
+  // Reset state
+  state.currentStep = 0;
+  state.seed = {
+    seed_id: generateHash().slice(0, 16),
+    author: null,
+    parent_hash: null,
+    payload_hash: null,
+    witness_hash: null,
+    tripwire: 'INACTIVE',
+    witnesses: { outside: {}, inside: {} }
+  };
+  STEPS.forEach(step => {
+    if (step.group === 'outside') state.seed.witnesses.outside[step.name] = 'PENDING';
+    if (step.group === 'inside') state.seed.witnesses.inside[step.name] = 'PENDING';
+  });
+
+  // Run through steps
+  for (let i = 0; i < STEPS.length; i++) {
+    const step = STEPS[i];
+    state.currentStep = step.id;
+    
+    // Mark previous as completed
+    if (i > 0) updateStep(STEPS[i - 1].id, 'completed');
+    
+    // Mark current as active
+    updateStep(step.id, 'active');
+    
+    await new Promise(r => setTimeout(r, 300));
+
+    // Execute step logic
+    switch (step.group) {
+      case 'outside':
+        state.seed.witnesses.outside[step.name] = 'VERIFIED';
+        activateWitness(step.name, 'outside');
+        break;
+      case 'inside':
+        state.seed.witnesses.inside[step.name] = 'VERIFIED';
+        activateWitness(step.name, 'inside');
+        break;
+      case 'tripwire':
+        state.seed.tripwire = 'ARMED';
+        activateTripwire();
+        break;
+      case 'execution':
+        if (step.name === 'Initialize') {
+          state.seed.author = 'unity.tensor.system';
+        } else if (step.name === 'Verify Parents') {
+          state.seed.parent_hash = generateHash();
+        } else if (step.name === 'Hash Payload') {
+          state.seed.payload_hash = generateHash();
+        } else if (step.name === 'Bind Witnesses') {
+          const witnessStr = JSON.stringify(state.seed.witnesses);
+          state.seed.witness_hash = generateHash();
+        } else if (step.name === 'Check Tripwire') {
+          // Tripwire remains armed - persistence
+        } else if (step.name === 'Commit Seed') {
+          // Final commitment
+        }
+        break;
+    }
+    
+    updateSeedOutput();
+  }
+
+  updateStep(27, 'completed');
+  document.getElementById('current-step').innerHTML = '<span class="text-mint-300 glow-text">✓ HAMMY COMPLETE · Seed committed to persistence layer</span>';
+  
+  btn.classList.remove('running');
+  btn.querySelector('span').textContent = 'RE-INSTANTIATE HAMMY';
+  state.running = false;
+}
+
+// Event listeners
+document.getElementById('instantiate-btn').addEventListener('click', runHammy);
+
+// Initialize
+initUI();
+initThreeJS();
 </script>
 </body>
 </html>
