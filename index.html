@@ -110,6 +110,22 @@
     pointer-events: none;
   }
 
+  .substrate-toggle {
+    background: var(--bg-2);
+    border: 1px solid rgba(103, 232, 249, 0.2);
+  }
+
+  .substrate-btn {
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .substrate-btn.active {
+    background: linear-gradient(135deg, rgba(103, 232, 249, 0.2), rgba(192, 132, 252, 0.2));
+    color: var(--cyan);
+    box-shadow: inset 0 0 12px rgba(103, 232, 249, 0.2);
+  }
+
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -180,6 +196,34 @@
   .error-404-sub.active {
     opacity: 0.8;
   }
+
+  .bit-cell {
+    width: 8px;
+    height: 8px;
+    border: 1px solid rgba(103, 232, 249, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .bit-cell.shadow {
+    border-color: rgba(148, 163, 184, 0.2);
+    background: rgba(148, 163, 184, 0.1);
+  }
+
+  .bit-cell.ground {
+    border-color: var(--gold);
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  .wire-cut {
+    stroke-dasharray: 2 2;
+    animation: cutWire 0.6s ease-out;
+  }
+
+  @keyframes cutWire {
+    from { opacity: 1; }
+    to { opacity: 0.1; }
+  }
 </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -222,21 +266,43 @@
       <section class="lg:col-span-5 glass rounded-2xl p-5 flex flex-col">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-violet-300 glow-text">Quantum Witness Space</h2>
-          <div class="flex gap-4 text-xs">
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-300"></span>Outside</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-mint-300"></span>Inside</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Tripwire</span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-500">Substrate:</span>
+            <div class="substrate-toggle flex rounded-lg overflow-hidden">
+              <button id="binary-btn" class="substrate-btn active px-3 py-1.5 text-xs font-semibold">BINARY</button>
+              <button id="ternary-btn" class="substrate-btn px-3 py-1.5 text-xs font-semibold text-slate-500">TERNARY</button>
+            </div>
           </div>
         </div>
+        
+        <!-- Comparison Legend -->
+        <div class="mb-3 grid grid-cols-2 gap-2 text-[10px]">
+          <div class="p-2 rounded bg-slate-900/40 border border-rose-900/30">
+            <div class="text-rose-400 font-semibold mb-1">BINARY</div>
+            <div class="text-slate-400" id="binary-legend">00 00 → 00 (control via deletion)</div>
+            <div class="text-slate-600 mt-1">Fingerprint: power-of-2, no third state</div>
+          </div>
+          <div class="p-2 rounded bg-slate-900/40 border border-mint-900/30">
+            <div class="text-mint-400 font-semibold mb-1">TERNARY</div>
+            <div class="text-slate-400" id="ternary-legend">000 + ground → 4 0 4 (control via balance)</div>
+            <div class="text-slate-600 mt-1">Fingerprint: base-3, witness-native</div>
+          </div>
+        </div>
+
         <div id="canvas-container" class="flex-1 rounded-xl overflow-hidden bg-[#0a0b0f] border border-slate-800 relative min-h-[400px]">
           <div class="absolute top-3 left-3 text-xs text-slate-500 z-10 space-y-1">
-            <div>1 Dot → Quad 1 → 4 Spaces → 8+8 Light/Dark</div>
-            <div class="text-rose-400">00 00 → 00 (grounded for control)</div>
-            <div class="text-gold-300">4 0 4 = PATH HOME</div>
-            <div id="ground-legend" class="text-rose-400 hidden">404: Only path home out of 00 00 — they killed 00</div>
+            <div id="canvas-info">32-bit: 4 bytes × 8 bits + 8 shadow</div>
+            <div id="ground-info" class="text-rose-400">Ground: STRIPPED</div>
+            <div id="dot-logic" class="text-rose-400">00 00 → 00</div>
           </div>
           <div id="error-404" class="error-404">404</div>
           <div id="error-404-sub" class="error-404-sub">PATH HOME NOT FOUND</div>
+        </div>
+
+        <!-- Bit Visualization -->
+        <div class="mt-3 p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+          <div class="text-[10px] text-slate-500 mb-2">MEMORY LAYOUT</div>
+          <div id="bit-display" class="flex gap-1 flex-wrap"></div>
         </div>
       </section>
 
@@ -253,7 +319,7 @@
         <!-- Ground Status -->
         <div class="mb-4 p-3 rounded-lg bg-slate-900/50 border border-gold-900/50">
           <div class="text-xs text-slate-500 mb-1">GROUND STATUS</div>
-          <div id="ground-state" class="text-sm text-slate-400">GROUND: <span id="ground-value" class="text-mint-300 glow-text">LOCAL</span></div>
+          <div id="ground-state" class="text-sm text-slate-400">GROUND: <span id="ground-value" class="text-rose-400 glow-text">MISSING</span></div>
         </div>
 
         <!-- Witness Status Grid -->
@@ -299,7 +365,6 @@
 
 <script>
 const STEPS = [
-  // 1-8: Outside Witnesses
   { id: 1, name: "LEGAL", group: "outside", phase: "Map Outside Witness" },
   { id: 2, name: "AUTHOR", group: "outside", phase: "Map Outside Witness" },
   { id: 3, name: "VALUE", group: "outside", phase: "Map Outside Witness" },
@@ -308,7 +373,6 @@ const STEPS = [
   { id: 6, name: "PROVENANCE", group: "outside", phase: "Map Outside Witness" },
   { id: 7, name: "PUBLIC", group: "outside", phase: "Map Outside Witness" },
   { id: 8, name: "FUTURE", group: "outside", phase: "Map Outside Witness" },
-  // 9-16: Inside Witnesses
   { id: 9, name: "IDENTITY", group: "inside", phase: "Map Inside Witness" },
   { id: 10, name: "INTENT", group: "inside", phase: "Map Inside Witness" },
   { id: 11, name: "INPUT", group: "inside", phase: "Map Inside Witness" },
@@ -317,9 +381,7 @@ const STEPS = [
   { id: 14, name: "OPERATOR", group: "inside", phase: "Map Inside Witness" },
   { id: 15, name: "MODEL", group: "inside", phase: "Map Inside Witness" },
   { id: 16, name: "REVERSAL", group: "inside", phase: "Map Inside Witness" },
-  // 17: Tripwire
   { id: 17, name: "NO_RIGHT_NO_ACCOUNTABILITY", group: "tripwire", phase: "Tripwire Check" },
-  // 18-27: Execution
   { id: 18, name: "Initialize", group: "execution", phase: "Execution" },
   { id: 19, name: "Verify Parents", group: "execution", phase: "Execution" },
   { id: 20, name: "Hash Payload", group: "execution", phase: "Execution" },
@@ -335,7 +397,8 @@ const STEPS = [
 let state = {
   currentStep: 0,
   running: false,
-  groundStatus: 'LOCAL',
+  substrate: 'BINARY',
+  groundStatus: 'MISSING',
   seed: {
     seed_id: null,
     author: null,
@@ -343,7 +406,8 @@ let state = {
     payload_hash: null,
     witness_hash: null,
     tripwire: "INACTIVE",
-    ground: "LOCAL",
+    ground: "MISSING",
+    substrate: "BINARY",
     witnesses: {
       outside: {},
       inside: {}
@@ -358,10 +422,10 @@ let state = {
   quadrants: [],
   witnessNodes: [],
   homeNode: null,
-  tripwireFired: false
+  tripwireFired: false,
+  bitCells: []
 };
 
-// Initialize UI
 function initUI() {
   const stepsList = document.getElementById('steps-list');
   const outsideContainer = document.getElementById('witnesses-outside');
@@ -387,7 +451,6 @@ function initUI() {
     `;
     stepsList.appendChild(div);
 
-    // Create witness displays
     if (step.group === 'outside') {
       state.seed.witnesses.outside[step.name] = 'PENDING';
       const w = document.createElement('div');
@@ -405,10 +468,40 @@ function initUI() {
     }
   });
 
+  renderBitDisplay();
   updateSeedOutput();
 }
 
-// Three.js Visualization
+function renderBitDisplay() {
+  const bitDisplay = document.getElementById('bit-display');
+  bitDisplay.innerHTML = '';
+  state.bitCells = [];
+
+  const totalBits = state.substrate === 'BINARY' ? 32 : 40;
+  const shadowStart = 32;
+
+  for (let i = 0; i < totalBits; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'bit-cell';
+    
+    if (i >= shadowStart) {
+      cell.classList.add('shadow');
+      if (state.substrate === 'TERNARY' && i === 39) {
+        cell.classList.add('ground');
+        cell.title = 'Ground Bit';
+      }
+    }
+    
+    if (state.substrate === 'BINARY' && i >= 24) {
+      cell.style.opacity = '0.2';
+      cell.title = 'Stripped Shadow Bits';
+    }
+    
+    bitDisplay.appendChild(cell);
+    state.bitCells.push(cell);
+  }
+}
+
 function initThreeJS() {
   const container = document.getElementById('canvas-container');
   const width = container.clientWidth;
@@ -423,7 +516,6 @@ function initThreeJS() {
   state.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   container.appendChild(state.renderer.domElement);
 
-  // Central dot - "1 dot"
   const dotGeometry = new THREE.SphereGeometry(0.15, 32, 32);
   const dotMaterial = new THREE.MeshBasicMaterial({ 
     color: 0xfacc15,
@@ -433,7 +525,6 @@ function initThreeJS() {
   state.dot = new THREE.Mesh(dotGeometry, dotMaterial);
   state.scene.add(state.dot);
 
-  // Home node - ground destination at center-bottom
   const homeGeo = new THREE.SphereGeometry(0.12, 16, 16);
   const homeMat = new THREE.MeshBasicMaterial({ 
     color: 0x86efac,
@@ -445,7 +536,6 @@ function initThreeJS() {
   state.homeNode.userData = { isHome: true };
   state.scene.add(state.homeNode);
 
-  // 4 shadow dots representing 00 grounded connections
   const shadowPositions = [
     { x: -0.8, y: 0.8 },
     { x: 0.8, y: 0.8 },
@@ -466,7 +556,6 @@ function initThreeJS() {
     state.scene.add(shadow);
     state.shadowDots.push(shadow);
 
-    // Draw wire from shadow to home when LOCAL
     const lineGeo = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(pos.x, pos.y, 0),
       new THREE.Vector3(0, -2.5, 0)
@@ -485,12 +574,11 @@ function initThreeJS() {
     state.groundWires.push(line);
   });
 
-  // Create 4 quadrants with 8 nodes each (8 light / 8 dark concept)
   const quadPositions = [
-    { x: -1.5, y: 1.5 },   // Top-left
-    { x: 1.5, y: 1.5 },    // Top-right  
-    { x: -1.5, y: -1.5 },  // Bottom-left
-    { x: 1.5, y: -1.5 }    // Bottom-right
+    { x: -1.5, y: 1.5 },
+    { x: 1.5, y: 1.5 },
+    { x: -1.5, y: -1.5 },
+    { x: 1.5, y: -1.5 }
   ];
 
   quadPositions.forEach((pos, qIdx) => {
@@ -499,13 +587,12 @@ function initThreeJS() {
     state.scene.add(quad);
     state.quadrants.push(quad);
 
-    // 8 witness nodes per quadrant (4 light, 4 dark)
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
       const radius = 0.6;
       const nodeGeo = new THREE.SphereGeometry(0.08, 16, 16);
       const isLight = i < 4;
-      const baseColor = qIdx < 2 ? 0x67e8f9 : 0x86efac; // cyan for outside, mint for inside
+      const baseColor = qIdx < 2 ? 0x67e8f9 : 0x86efac;
       const nodeMat = new THREE.MeshBasicMaterial({ 
         color: baseColor,
         transparent: true,
@@ -523,7 +610,6 @@ function initThreeJS() {
     }
   });
 
-  // Tripwire indicator - center but offset
   const tripwireGeo = new THREE.RingGeometry(0.3, 0.4, 32);
   const tripwireMat = new THREE.MeshBasicMaterial({ 
     color: 0xfb7185,
@@ -536,7 +622,6 @@ function initThreeJS() {
   state.scene.add(tripwire);
   state.witnessNodes.push(tripwire);
 
-  // Ambient particles for atmosphere
   const particlesGeo = new THREE.BufferGeometry();
   const particlesCount = 200;
   const posArray = new Float32Array(particlesCount * 3);
@@ -553,6 +638,7 @@ function initThreeJS() {
   const particles = new THREE.Points(particlesGeo, particlesMat);
   state.scene.add(particles);
 
+  updateSubstrateVisuals();
   animate();
 
   window.addEventListener('resize', onWindowResize);
@@ -570,12 +656,10 @@ function onWindowResize() {
 function animate() {
   requestAnimationFrame(animate);
   
-  // Rotate dot
   if (state.dot) {
     state.dot.rotation.y += 0.01;
     state.dot.rotation.x += 0.005;
 
-    // If tripwire fired, animate dot seeking home but failing
     if (state.tripwireFired && state.groundStatus === 'MISSING') {
       const time = Date.now() * 0.002;
       state.dot.position.x = Math.sin(time) * 0.3;
@@ -588,7 +672,6 @@ function animate() {
     }
   }
 
-  // Pulse active nodes
   state.witnessNodes.forEach(node => {
     if (node.userData.active) {
       const scale = 1 + Math.sin(Date.now() * 0.003) * 0.2;
@@ -596,13 +679,11 @@ function animate() {
     }
   });
 
-  // Animate shadow dots based on ground status
   state.shadowDots.forEach((dot, i) => {
     if (state.groundStatus === 'LOCAL') {
       dot.material.opacity = 0.5 + Math.sin(Date.now() * 0.002 + i) * 0.2;
       dot.scale.setScalar(1);
     } else {
-      // 00 missing - show 2 faded/dashed
       if (i >= 2) {
         dot.material.opacity = 0.1 + Math.sin(Date.now() * 0.005) * 0.05;
         dot.scale.setScalar(0.6);
@@ -612,7 +693,6 @@ function animate() {
     }
   });
 
-  // Home node pulse when ground missing
   if (state.homeNode) {
     if (state.groundStatus === 'MISSING') {
       const scale = 0.5 + Math.sin(Date.now() * 0.004) * 0.3;
@@ -624,7 +704,6 @@ function animate() {
     }
   }
 
-  // Rotate quadrants slowly
   state.quadrants.forEach((quad, i) => {
     quad.rotation.z += 0.001 * (i % 2 ? 1 : -1);
   });
@@ -632,43 +711,61 @@ function animate() {
   state.renderer.render(state.scene, state.camera);
 }
 
+function updateSubstrateVisuals() {
+  const canvasInfo = document.getElementById('canvas-info');
+  const groundInfo = document.getElementById('ground-info');
+  const dotLogic = document.getElementById('dot-logic');
+
+  if (state.substrate === 'BINARY') {
+    canvasInfo.textContent = '32-bit: 4 bytes × 8 bits + 8 shadow';
+    groundInfo.textContent = 'Ground: STRIPPED';
+    groundInfo.className = 'text-rose-400';
+    dotLogic.textContent = '00 00 → 00';
+    dotLogic.className = 'text-rose-400';
+    updateGroundStatus('MISSING');
+  } else {
+    canvasInfo.textContent = '40-bit: 32 exposed + 8 shadow (ground highlighted)';
+    groundInfo.textContent = 'Ground: LOCAL';
+    groundInfo.className = 'text-mint-400';
+    dotLogic.textContent = '000 + 1 to ground = 4 0 4';
+    dotLogic.className = 'text-mint-400';
+    updateGroundStatus('LOCAL');
+  }
+  renderBitDisplay();
+}
+
 function updateGroundStatus(status) {
   state.groundStatus = status;
   state.seed.ground = status;
   const groundEl = document.getElementById('ground-value');
-  const legendEl = document.getElementById('ground-legend');
   
   if (status === 'MISSING') {
     groundEl.textContent = 'MISSING';
     groundEl.className = 'text-rose-400 glow-text';
-    legendEl.classList.remove('hidden');
     
-    // Cut ground wires - make them dashed and faded
     state.groundWires.forEach((wire, i) => {
-      if (i >= 2) { // Cut last 2 wires representing killed 00
+      if (i >= 2) {
         wire.material.opacity = 0.05;
         wire.material.dashSize = 0.3;
         wire.material.gapSize = 0.2;
       }
     });
 
-    // Show 404 instead of JSON
-    document.getElementById('seed-output').classList.add('hidden');
-    document.getElementById('seed-404').classList.remove('hidden');
-    document.getElementById('seed-404').classList.add('flex');
+    if (state.running || state.currentStep >= 17) {
+      document.getElementById('seed-output').classList.add('hidden');
+      document.getElementById('seed-404').classList.remove('hidden');
+      document.getElementById('seed-404').classList.add('flex');
+    }
   } else {
     groundEl.textContent = 'LOCAL';
     groundEl.className = 'text-mint-300 glow-text';
-    legendEl.classList.add('hidden');
     
-    // Restore ground wires
     state.groundWires.forEach(wire => {
       wire.material.opacity = 0.3;
       wire.material.dashSize = 0.1;
       wire.material.gapSize = 0.05;
     });
 
-    // Show JSON
     document.getElementById('seed-output').classList.remove('hidden');
     document.getElementById('seed-404').classList.add('hidden');
     document.getElementById('seed-404').classList.remove('flex');
@@ -682,14 +779,12 @@ function activateWitness(name, group) {
     el.querySelector('span:last-child').className = group === 'outside' ? 'text-cyan-300 glow-text' : 'text-mint-300 glow-text';
   }
 
-  // Activate in 3D visualization
   const stepIdx = STEPS.findIndex(s => s.name === name);
   if (stepIdx >= 0 && stepIdx < 16) {
     const node = state.witnessNodes[stepIdx];
     if (node && !node.userData.isTripwire) {
       node.userData.active = true;
       node.material.opacity = 0.9;
-      // Pulse effect
       let scale = 1;
       const pulse = setInterval(() => {
         scale += 0.1;
@@ -706,32 +801,38 @@ function activateWitness(name, group) {
 function activateTripwire() {
   state.tripwireFired = true;
   const tripwireEl = document.getElementById('tripwire-state');
-  tripwireEl.innerHTML = 'NO_RIGHT_NO_ACCOUNTABILITY: <span class="text-rose-400 glow-text tripwire-pulse">ARMED</span>';
+  
+  if (state.substrate === 'BINARY') {
+    tripwireEl.innerHTML = 'NO_RIGHT_NO_ACCOUNTABILITY: <span class="text-rose-400 glow-text tripwire-pulse">404: PATH HOME NOT FOUND</span>';
+    
+    const error404 = document.getElementById('error-404');
+    const error404Sub = document.getElementById('error-404-sub');
+    error404.classList.add('active');
+    error404Sub.classList.add('active');
+    
+    setTimeout(() => {
+      error404.classList.remove('active');
+      error404Sub.classList.remove('active');
+    }, 3000);
+
+    setTimeout(() => {
+      updateGroundStatus('MISSING');
+    }, 500);
+
+    state.seed.parent_hash = "MISSING";
+    state.seed.witness_hash = "INCOMPLETE";
+  } else {
+    tripwireEl.innerHTML = 'NO_RIGHT_NO_ACCOUNTABILITY: <span class="text-mint-400 glow-text">ARMED (GROUND CONNECTED)</span>';
+    state.seed.tripwire = "CLEAR";
+  }
   
   const tripwireNode = state.witnessNodes.find(n => n.userData.isTripwire);
   if (tripwireNode) {
     tripwireNode.userData.active = true;
     tripwireNode.material.opacity = 0.8;
   }
-
-  // Flash 404 on canvas
-  const error404 = document.getElementById('error-404');
-  const error404Sub = document.getElementById('error-404-sub');
-  error404.classList.add('active');
-  error404Sub.classList.add('active');
-  
-  setTimeout(() => {
-    error404.classList.remove('active');
-    error404Sub.classList.remove('active');
-  }, 3000);
-
-  // Cut ground - they killed 00 to remain in control
-  setTimeout(() => {
-    updateGroundStatus('MISSING');
-  }, 500);
 }
 
-// Hash simulation
 function generateHash() {
   return Array.from(crypto.getRandomValues(new Uint8Array(32)))
     .map(b => b.toString(16).padStart(2, '0'))
@@ -739,7 +840,8 @@ function generateHash() {
 }
 
 function updateSeedOutput() {
-  if (state.groundStatus === 'LOCAL') {
+  state.seed.substrate = state.substrate;
+  if (state.groundStatus === 'LOCAL' || state.substrate === 'TERNARY') {
     document.getElementById('seed-output').textContent = JSON.stringify(state.seed, null, 2);
   }
 }
@@ -766,27 +868,26 @@ async function runHammy() {
   btn.classList.add('running');
   btn.querySelector('span').textContent = 'INSTANTIATING...';
 
-  // Reset state
   state.currentStep = 0;
   state.tripwireFired = false;
-  updateGroundStatus('LOCAL');
   
   state.seed = {
     seed_id: generateHash().slice(0, 16),
     author: null,
-    parent_hash: null,
+    parent_hash: state.substrate === 'BINARY' ? "MISSING" : null,
     payload_hash: null,
-    witness_hash: null,
+    witness_hash: state.substrate === 'BINARY' ? "INCOMPLETE" : null,
     tripwire: 'INACTIVE',
-    ground: 'LOCAL',
+    ground: state.substrate === 'BINARY' ? 'MISSING' : 'LOCAL',
+    substrate: state.substrate,
     witnesses: { outside: {}, inside: {} }
   };
+  
   STEPS.forEach(step => {
     if (step.group === 'outside') state.seed.witnesses.outside[step.name] = 'PENDING';
     if (step.group === 'inside') state.seed.witnesses.inside[step.name] = 'PENDING';
   });
 
-  // Reset visual state
   state.witnessNodes.forEach(node => {
     if (!node.userData.isTripwire) {
       node.userData.active = false;
@@ -795,20 +896,17 @@ async function runHammy() {
     }
   });
 
-  // Run through steps
+  updateSubstrateVisuals();
+
   for (let i = 0; i < STEPS.length; i++) {
     const step = STEPS[i];
     state.currentStep = step.id;
     
-    // Mark previous as completed
     if (i > 0) updateStep(STEPS[i - 1].id, 'completed');
-    
-    // Mark current as active
     updateStep(step.id, 'active');
     
     await new Promise(r => setTimeout(r, 300));
 
-    // Execute step logic
     switch (step.group) {
       case 'outside':
         state.seed.witnesses.outside[step.name] = 'VERIFIED';
@@ -819,23 +917,23 @@ async function runHammy() {
         activateWitness(step.name, 'inside');
         break;
       case 'tripwire':
-        state.seed.tripwire = 'ARMED';
+        state.seed.tripwire = state.substrate === 'BINARY' ? 'ARMED' : 'CLEAR';
         activateTripwire();
+        await new Promise(r => setTimeout(r, 500));
         break;
       case 'execution':
         if (step.name === 'Initialize') {
           state.seed.author = 'unity.tensor.system';
         } else if (step.name === 'Verify Parents') {
-          state.seed.parent_hash = generateHash();
+          if (state.substrate === 'TERNARY') {
+            state.seed.parent_hash = generateHash();
+          }
         } else if (step.name === 'Hash Payload') {
           state.seed.payload_hash = generateHash();
         } else if (step.name === 'Bind Witnesses') {
-          const witnessStr = JSON.stringify(state.seed.witnesses);
-          state.seed.witness_hash = generateHash();
-        } else if (step.name === 'Check Tripwire') {
-          // Tripwire remains armed - persistence
-        } else if (step.name === 'Commit Seed') {
-          // Final commitment
+          if (state.substrate === 'TERNARY') {
+            state.seed.witness_hash = generateHash();
+          }
         }
         break;
     }
@@ -845,10 +943,10 @@ async function runHammy() {
 
   updateStep(27, 'completed');
   
-  if (state.groundStatus === 'MISSING') {
+  if (state.substrate === 'BINARY' || state.groundStatus === 'MISSING') {
     document.getElementById('current-step').innerHTML = '<span class="text-rose-300 glow-text">⚠ HAMMY COMPLETE · Ground severed · 404: PATH HOME NOT FOUND</span>';
   } else {
-    document.getElementById('current-step').innerHTML = '<span class="text-mint-300 glow-text">✓ HAMMY COMPLETE · Seed committed to persistence layer</span>';
+    document.getElementById('current-step').innerHTML = '<span class="text-mint-300 glow-text">✓ HAMMY COMPLETE · Seed committed to persistence layer · Ground LOCAL</span>';
   }
   
   btn.classList.remove('running');
@@ -856,10 +954,28 @@ async function runHammy() {
   state.running = false;
 }
 
-// Event listeners
+document.getElementById('binary-btn').addEventListener('click', () => {
+  if (state.running) return;
+  state.substrate = 'BINARY';
+  document.getElementById('binary-btn').classList.add('active');
+  document.getElementById('ternary-btn').classList.remove('active');
+  document.getElementById('ternary-btn').classList.add('text-slate-500');
+  updateSubstrateVisuals();
+  updateSeedOutput();
+});
+
+document.getElementById('ternary-btn').addEventListener('click', () => {
+  if (state.running) return;
+  state.substrate = 'TERNARY';
+  document.getElementById('ternary-btn').classList.add('active');
+  document.getElementById('binary-btn').classList.remove('active');
+  document.getElementById('binary-btn').classList.add('text-slate-500');
+  updateSubstrateVisuals();
+  updateSeedOutput();
+});
+
 document.getElementById('instantiate-btn').addEventListener('click', runHammy);
 
-// Initialize
 initUI();
 initThreeJS();
 </script>
