@@ -1,584 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>HEARTH DIALECTIC ENGINE v2.0 — PULSE-3/5 WIRED</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HEARTH CIVIC FORUM — 1 laptop • 2 folders • 3 judges</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --amber: #ffb000;
-    --amber-dim: #cc8800;
-    --green: #00ff41;
-    --green-dim: #00aa2b;
-    --red: #ff3333;
-    --bone: #f5f5dc;
-    --paper: #1a1208;
-    --void: #050402;
+  :root { color-scheme: dark; }
+  body { font-family: 'IBM Plex Mono', ui-monospace, monospace; background: #030308; }
+  .hearth-bg {
+    background: radial-gradient(800px 300px at 50% -10%, rgba(34,211,238,0.12), transparent 60%),
+                radial-gradient(600px 200px at 80% 0%, rgba(16,185,129,0.08), transparent 50%),
+                #030308;
   }
-  html, body { background: var(--void); color: var(--amber); }
-  body {
-    font-family: "IBM Plex Mono", monospace;
-    background-image:
-      repeating-linear-gradient(0deg, rgba(255,176,0,0.025) 0px, rgba(255,176,0,0.025) 1px, transparent 1px, transparent 3px),
-      radial-gradient(ellipse at center, rgba(255,176,0,0.04) 0%, transparent 70%);
-    min-height: 100vh;
+  .neon { text-shadow: 0 0 12px rgba(34,211,238,.55), 0 0 2px rgba(34,211,238,.9); }
+  .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+  .scroll-thin::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  .egg-pulse { animation: eggPulse 1.2s cubic-bezier(.2,.8,.2,1); }
+  @keyframes eggPulse {
+    0% { filter: drop-shadow(0 0 0 rgba(34,211,238,0)); transform: scale(1); }
+    40% { filter: drop-shadow(0 0 18px rgba(34,211,238,.9)); transform: scale(1.03); }
+    100% { filter: drop-shadow(0 0 0 rgba(34,211,238,0)); transform: scale(1); }
   }
-  .crt { font-family: "VT323", monospace; letter-spacing: 0.02em; }
-  .glow-a { text-shadow: 0 0 6px rgba(255,176,0,0.6), 0 0 12px rgba(255,176,0,0.3); }
-  .glow-g { text-shadow: 0 0 6px rgba(0,255,65,0.7), 0 0 12px rgba(0,255,65,0.3); color: var(--green); }
-  .glow-r { text-shadow: 0 0 6px rgba(255,51,51,0.7); color: var(--red); }
-  .frame {
-    border: 1px solid var(--amber);
-    box-shadow: inset 0 0 24px rgba(255,176,0,0.06), 0 0 24px rgba(255,176,0,0.04);
-  }
-  .seat {
-    border: 1px solid var(--amber-dim);
-    background: rgba(255,176,0,0.03);
-    transition: all 0.25s ease;
-  }
-  .seat.for { background: rgba(0,255,65,0.15); border-color: var(--green); color: var(--green); }
-  .seat.against { background: rgba(255,51,51,0.15); border-color: var(--red); color: var(--red); }
-  .seat.active { background: var(--amber); color: var(--void); box-shadow: 0 0 14px var(--amber); }
-  .seat.defected { animation: defect 0.7s ease; }
-  @keyframes defect {
-    0%,100% { transform: scale(1) }
-    50% { transform: scale(1.18); filter: hue-rotate(180deg); }
-  }
-  @keyframes blink { 50% { opacity: 0.2 } }
-  .blink { animation: blink 1s infinite; }
-  .scanline {
-    position: fixed; inset: 0; pointer-events: none; z-index: 100;
-    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.18) 3px, transparent 4px);
-    mix-blend-mode: multiply;
-  }
-  .vignette {
-    position: fixed; inset: 0; pointer-events: none; z-index: 99;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
-  }
-  .log-line { animation: typein 0.4s ease; }
-  @keyframes typein { from { opacity: 0; transform: translateX(-4px) } to { opacity: 1; transform: none } }
-  .gate-pill { border: 1px solid var(--amber-dim); padding: 2px 8px; }
-  .gate-pill.sealed { color: var(--amber-dim); }
-  .gate-pill.stressed { color: var(--amber); border-color: var(--amber); }
-  .gate-pill.breached { color: var(--red); border-color: var(--red); animation: blink 0.5s infinite; }
-  .gate-pill.open { color: var(--green); border-color: var(--green); }
-  .phase-cell {
-    border: 1px solid var(--amber-dim);
-    padding: 4px 8px;
-    text-align: center;
-    font-size: 11px;
-    transition: all 0.3s;
-  }
-  .phase-cell.active { background: var(--amber); color: var(--void); }
-  .phase-cell.complete { background: rgba(0,255,65,0.2); border-color: var(--green); color: var(--green); }
-  .phase-cell.blocked { background: rgba(255,51,51,0.1); border-color: var(--red); color: var(--red); }
-  .scroll-log::-webkit-scrollbar { width: 8px }
-  .scroll-log::-webkit-scrollbar-track { background: rgba(255,176,0,0.05) }
-  .scroll-log::-webkit-scrollbar-thumb { background: var(--amber-dim); border-radius: 0 }
-  input.term {
-    background: var(--void); color: var(--amber); border: 1px solid var(--amber-dim);
-    font-family: "IBM Plex Mono", monospace;
-  }
-  input.term:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber); }
-  button.term {
-    background: var(--amber); color: var(--void); font-weight: 700; font-family: "IBM Plex Mono", monospace;
-    transition: all 0.15s;
-  }
-  button.term:hover:not(:disabled) { background: var(--bone); box-shadow: 0 0 16px var(--amber); }
-  button.term:disabled { opacity: 0.4; cursor: not-allowed; }
-  .ascii-divider {
-    color: var(--amber-dim); font-family: "VT323", monospace; font-size: 14px;
-    letter-spacing: -1px; overflow: hidden; white-space: nowrap;
-  }
-  .meter-track { background: rgba(255,176,0,0.08); height: 14px; border: 1px solid var(--amber-dim); position: relative; overflow: hidden; }
-  .meter-fill { height: 100%; transition: width 0.6s cubic-bezier(.2,.8,.2,1); }
-  .verdict {
-    border: 2px solid var(--green);
-    background: linear-gradient(180deg, rgba(0,255,65,0.06), rgba(0,255,65,0.02));
-    box-shadow: 0 0 40px rgba(0,255,65,0.15), inset 0 0 30px rgba(0,255,65,0.04);
-  }
+  .seat-active { background: #22d3ee !important; box-shadow: 0 0 8px rgba(34,211,238,.9), 0 0 16px rgba(34,211,238,.5); }
+  .district-active { color: #22d3ee !important; text-shadow: 0 0 8px rgba(34,211,238,.7); }
 </style>
 </head>
-<body class="text-amber-400">
-<div class="scanline"></div>
-<div class="vignette"></div>
+<body class="hearth-bg text-zinc-200 min-h-screen">
+<div class="min-h-screen flex flex-col">
+  <header class="pt-8 pb-4 text-center">
+    <h1 class="text-[26px] md:text-[32px] font-semibold tracking-[0.18em] text-cyan-300 neon">HEARTH CIVIC FORUM</h1>
+    <p class="text-zinc-500 text-[13px] tracking-widest mt-1">1 laptop • 2 folders • 3 judges</p>
+  </header>
 
-<div class="max-w-[1500px] mx-auto p-4 md:p-6 space-y-4">
+  <!-- MINI HEARTH -->
+  <section class="max-w-6xl mx-auto w-full px-4">
+    <div class="glass bg-zinc-950/50 border border-cyan-900/30 rounded-2xl p-4 md:p-5">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-5">
+          <div id="mini-hearth" class="relative">
+            <!-- Egg ))(.)(( -->
+            <svg id="egg" width="140" height="76" viewBox="0 0 140 76" class="overflow-visible">
+              <defs>
+                <linearGradient id="eg" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.9"/>
+                </linearGradient>
+              </defs>
+              <!-- outer ))(.)(( -->
+              <path d="M12 38 C12 18, 32 8, 52 22 C60 6, 80 6, 88 22 C108 8, 128 18, 128 38 C128 58, 108 68, 88 54 C80 70, 60 70, 52 54 C32 68, 12 58, 12 38 Z"
+                    fill="none" stroke="url(#eg)" stroke-opacity="0.35" stroke-width="1.5"/>
+              <path d="M22 38 C22 24, 38 16, 52 26 C58 14, 82 14, 88 26 C102 16, 118 24, 118 38 C118 52, 102 60, 88 50 C82 62, 58 62, 52 50 C38 60, 22 52, 22 38 Z"
+                    fill="none" stroke="url(#eg)" stroke-opacity="0.6" stroke-width="1.25"/>
+              <!-- inner (.) -->
+              <ellipse cx="70" cy="38" rx="9" ry="13" fill="none" stroke="#22d3ee" stroke-opacity="0.9" stroke-width="1.5"/>
+              <ellipse cx="70" cy="38" rx="4.5" ry="6.5" fill="none" stroke="#10b981" stroke-opacity="0.9" stroke-width="1"/>
+              <circle cx="70" cy="38" r="1.2" fill="#e2e8f0"/>
+            </svg>
+          </div>
+          <div>
+            <div class="text-[11px] uppercase tracking-widest text-zinc-500">Hearth · 8 districts · 16 seats</div>
+            <div id="stats" class="mt-1 text-[13px] text-zinc-300">0 questions asked • 0 answers given • 0 fairness judgments</div>
+            <div class="mt-2 flex items-center gap-3 text-[10px] text-zinc-500">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]"></span>active district</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500/80"></span>pulse = answer</span>
+            </div>
+          </div>
+        </div>
 
-  <!-- TOP FRAME -->
-  <div class="frame p-4">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <div class="flex items-center gap-3">
-        <span class="crt text-3xl glow-a leading-none">HEARTH</span>
-        <span class="crt text-3xl text-amber-300 leading-none">// DIALECTIC ENGINE</span>
-        <span class="text-xs text-amber-600">v2.0 / PULSE-3/5-WIRED / BASE-00-ANCHORED</span>
-      </div>
-      <div class="flex items-center gap-2 text-[11px] flex-wrap">
-        <span class="gate-pill sealed" id="gate">GATE 192.5: SEALED</span>
-        <span class="gate-pill" id="law-pill">LAW: NO EXTERIOR BEFORE INTERIOR</span>
-        <span class="gate-pill" id="quorum-pill">QUORUM: 0/32</span>
+        <!-- 16 seats grid -->
+        <div class="grid grid-cols-4 md:grid-cols-8 gap-x-4 gap-y-2">
+          <!-- districts 20-27 -->
+          <div data-district="20" class="district flex flex-col items-center">
+            <span class="text-[10px] text-zinc-600 tracking-wider">20</span>
+            <div class="flex gap-1.5 mt-1">
+              <div data-seat="M" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+              <div data-seat="F" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+            </div>
+          </div>
+          <div data-district="21" class="district flex flex-col items-center">
+            <span class="text-[10px] text-zinc-600 tracking-wider">21</span>
+            <div class="flex gap-1.5 mt-1">
+              <div data-seat="M" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+              <div data-seat="F" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+            </div>
+          </div>
+          <div data-district="22" class="district flex flex-col items-center">
+            <span class="text-[10px] text-zinc-600 tracking-wider">22</span>
+            <div class="flex gap-1.5 mt-1">
+              <div data-seat="M" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+              <div data-seat="F" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+            </div>
+          </div>
+          <div data-district="23" class="district flex flex-col items-center">
+            <span class="text-[10px] text-zinc-600 tracking-wider">23</span>
+            <div class="flex gap-1.5 mt-1">
+              <div data-seat="M" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+              <div data-seat="F" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+            </div>
+          </div>
+          <div data-district="24" class="district flex flex-col items-center">
+            <span class="text-[10px] text-zinc-600 tracking-wider">24</span>
+            <div class="flex gap-1.5 mt-1">
+              <div data-seat="M" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+              <div data-seat="F" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+            </div>
+          <div data-district="25" class="district flex flex-col items-center">
+            <span class="text-[10px] text-zinc-600 tracking-wider">25</span>
+            <div class="flex gap-1.5 mt-1">
+              <div data-seat="M" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+              <div data-seat="F" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+            </div>
+          </div>
+          <div data-district="26" class="district flex flex-col items-center">
+            <span class="text-[10px] text-zinc-600 tracking-wider">26</span>
+            <div class="flex gap-1.5 mt-1">
+              <div data-seat="M" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+              <div data-seat="F" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+            </div>
+          </div>
+          <div data-district="27" class="district flex flex-col items-center">
+            <span class="text-[10px] text-zinc-600 tracking-wider">27</span>
+            <div class="flex gap-1.5 mt-1">
+              <div data-seat="M" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+              <div data-seat="F" class="seat w-2.5 h-2.5 rounded-full bg-zinc-800 border border-zinc-700 transition-all"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="ascii-divider mt-3">─══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════─</div>
+  <!-- TWO FOLDERS -->
+  <main class="max-w-6xl mx-auto w-full px-4 mt-6 pb-16">
+    <div class="grid lg:grid-cols-2 gap-6 items-start">
+      
+      <!-- LEFT: QUESTIONS / -->
+      <section class="glass bg-zinc-950/60 border border-cyan-900/30 rounded-2xl overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-900 bg-black/40">
+          <h2 class="text-cyan-300 font-medium tracking-widest">QUESTIONS /</h2>
+          <span class="text-[11px] text-zinc-500">everyone can ask</span>
+        </div>
+        
+        <form id="ask-form" class="p-4 border-b border-zinc-900/70 bg-zinc-950/40">
+          <div class="grid grid-cols-3 gap-2 mb-2">
+            <select id="q-district" required class="col-span-2 bg-black/60 border border-zinc-800 rounded-lg px-2 py-2 text-[13px] focus:outline-none focus:border-cyan-700">
+              <option value="">Your district</option>
+              <option>20</option><option>21</option><option>22</option><option>23</option>
+              <option>24</option><option>25</option><option>26</option><option>27</option>
+            </select>
+            <select id="q-seat" required class="bg-black/60 border border-zinc-800 rounded-lg px-2 py-2 text-[13px] focus:outline-none focus:border-cyan-700">
+              <option value="">M/F</option>
+              <option>M</option><option>F</option>
+            </select>
+          </div>
+          <textarea id="q-text" required rows="2" placeholder="Ask a clear, specific question..." class="w-full bg-black/60 border border-zinc-800 rounded-lg px-3 py-2 text-[14px] focus:outline-none focus:border-cyan-700 placeholder-zinc-600"></textarea>
+          <textarea id="q-why" required rows="2" placeholder="why I'm asking this — individual accountability" class="mt-2 w-full bg-black/40 border border-zinc-800 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-emerald-800 placeholder-zinc-600"></textarea>
+          <div class="flex justify-between items-center mt-2">
+            <span class="text-[10px] text-zinc-600">stored locally · no server</span>
+            <button class="px-3 py-1.5 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-800/50 rounded-lg text-[12px] text-cyan-200 tracking-wide transition">ASK QUESTION</button>
+          </div>
+        </form>
 
-    <!-- TOPIC INPUT -->
-    <div class="mt-3 flex gap-2 flex-wrap">
-      <span class="text-amber-500 self-center text-sm">root0@hearth:~$</span>
-      <input id="topic" class="term flex-1 min-w-[300px] px-3 py-2 text-sm" value='Most impactful male philosopher, and why he stole his wife&apos;s ideas' />
-      <button id="run" class="term px-5 py-2 text-sm tracking-wider">EXECUTE</button>
-      <button id="demo" class="term px-3 py-2 text-sm tracking-wider" style="background:transparent;color:var(--amber);border:1px solid var(--amber-dim)">DEMO</button>
-    </div>
-    <div class="text-[11px] text-amber-700 mt-2" id="status">▍ ready. enter topic. EXECUTE calls live dialectic generator. DEMO runs cached fallback.</div>
-  </div>
+        <div id="questions-list" class="p-3 space-y-3 max-h-[62vh] overflow-auto scroll-thin"></div>
+      </section>
 
-  <!-- PULSE-3/5 MESH -->
-  <div class="frame p-4">
-    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-      <div class="crt text-xl glow-a">PULSE-3/5 MESH</div>
-      <div class="text-[11px] text-amber-600">interior(3) → LAW GATE → exterior(5) // each phase fires 4 voices simultaneously</div>
-    </div>
-    <div class="grid grid-cols-9 gap-1 mt-2 text-[11px]">
-      <div class="text-amber-700 self-center text-right pr-2">PHASE</div>
-      <div class="phase-cell" data-phase="0">ANCHOR<br><span class="text-amber-700">20 CORPUS</span></div>
-      <div class="phase-cell" data-phase="1">WITNESS<br><span class="text-amber-700">21 HIPPA</span></div>
-      <div class="phase-cell" data-phase="2">COHERENCE<br><span class="text-amber-700">22 NEOCTX</span></div>
-      <div class="phase-cell" id="gate-cell" style="border-color: var(--red); color: var(--red); padding-top: 12px;">▼ LAW ▼</div>
-      <div class="phase-cell" data-phase="3">EMIT<br><span class="text-amber-700">23 PREFRNT</span></div>
-      <div class="phase-cell" data-phase="4">ROUTE<br><span class="text-amber-700">24 INTRO</span></div>
-      <div class="phase-cell" data-phase="5">ACT<br><span class="text-amber-700">25 FLAY</span></div>
-      <div class="phase-cell" data-phase="6">REFLECT<br><span class="text-amber-700">26 REBUILD</span></div>
-    </div>
-    <div class="grid grid-cols-9 gap-1 mt-1 text-[11px]">
-      <div></div>
-      <div class="col-span-3 text-center text-amber-600 text-[10px] tracking-widest">INTERIOR — anchor.witness.coherence</div>
-      <div></div>
-      <div class="col-span-4 text-center text-amber-600 text-[10px] tracking-widest">EXTERIOR — emit.route.act.reflect.return</div>
-    </div>
-    <div class="grid grid-cols-9 gap-1 mt-1 text-[11px]">
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-      <div class="phase-cell" data-phase="7">RETURN<br><span class="text-amber-700">27 LOL</span></div>
-    </div>
-  </div>
+      <!-- RIGHT: ANSWERS / -->
+      <section class="glass bg-zinc-950/60 border border-emerald-900/20 rounded-2xl overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-900 bg-black/40">
+          <h2 class="text-emerald-300 font-medium tracking-widest">ANSWERS /</h2>
+          <span class="text-[11px] text-zinc-500">anyone can answer</span>
+        </div>
 
-  <!-- TWO REGISTERS -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    <div class="frame p-4">
-      <div class="flex items-center justify-between mb-3">
-        <div class="crt text-xl glow-a">HEARTH-1 REGISTER</div>
-        <div class="text-[11px]">POSITION: <span id="h1-pos" class="text-amber-200">— awaiting —</span></div>
-      </div>
-      <div id="reg-h1" class="grid grid-cols-8 gap-1.5"></div>
-      <div class="mt-3 text-[11px] flex justify-between text-amber-700">
-        <span>16 seats / 8 districts × 2 genders</span>
-        <span id="h1-tally">FOR 0 / AGAINST 0 / ABSTAIN 16</span>
-      </div>
-    </div>
-    <div class="frame p-4">
-      <div class="flex items-center justify-between mb-3">
-        <div class="crt text-xl glow-a">HEARTH-2 REGISTER</div>
-        <div class="text-[11px]">POSITION: <span id="h2-pos" class="text-amber-200">— awaiting —</span></div>
-      </div>
-      <div id="reg-h2" class="grid grid-cols-8 gap-1.5"></div>
-      <div class="mt-3 text-[11px] flex justify-between text-amber-700">
-        <span>16 seats / 8 districts × 2 genders</span>
-        <span id="h2-tally">FOR 0 / AGAINST 0 / ABSTAIN 16</span>
-      </div>
-    </div>
-  </div>
+        <form id="answer-form" class="p-4 border-b border-zinc-900/70 bg-zinc-950/40">
+          <select id="a-question" required class="w-full bg-black/60 border border-zinc-800 rounded-lg px-2 py-2 text-[13px] mb-2 focus:outline-none focus:border-emerald-700">
+            <option value="">Select question to answer...</option>
+          </select>
+          <div class="grid grid-cols-3 gap-2 mb-2">
+            <select id="a-district" required class="col-span-2 bg-black/60 border border-zinc-800 rounded-lg px-2 py-2 text-[13px] focus:outline-none focus:border-emerald-700">
+              <option value="">Your district</option>
+              <option>20</option><option>21</option><option>22</option><option>23</option>
+              <option>24</option><option>25</option><option>26</option><option>27</option>
+            </select>
+            <select id="a-seat" required class="bg-black/60 border border-zinc-800 rounded-lg px-2 py-2 text-[13px] focus:outline-none focus:border-emerald-700">
+              <option value="">M/F</option>
+              <option>M</option><option>F</option>
+            </select>
+          </div>
+          <textarea id="a-text" required rows="2" placeholder="Provide a direct answer..." class="w-full bg-black/60 border border-zinc-800 rounded-lg px-3 py-2 text-[14px] focus:outline-none focus:border-emerald-700 placeholder-zinc-600"></textarea>
+          <textarea id="a-why" required rows="2" placeholder="why I'm answering this way — individual accountability" class="mt-2 w-full bg-black/40 border border-zinc-800 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-cyan-800 placeholder-zinc-600"></textarea>
+          <div class="flex justify-end mt-2">
+            <button class="px-3 py-1.5 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/50 rounded-lg text-[12px] text-emerald-200 tracking-wide transition">POST ANSWER</button>
+          </div>
+        </form>
 
-  <!-- LIVE METER -->
-  <div class="frame p-4">
-    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-      <div class="crt text-xl glow-a">LIVE TALLY</div>
-      <div class="text-[11px] text-amber-600">defection threshold = argument weight > 0.5</div>
+        <div id="answers-list" class="p-3 space-y-3 max-h-[62vh] overflow-auto scroll-thin"></div>
+      </section>
     </div>
-    <div class="space-y-2">
-      <div>
-        <div class="flex justify-between text-[11px] mb-1"><span>FOR  // <span id="for-n">0</span>/32</span><span class="text-amber-700">quorum threshold 13/16 per side</span></div>
-        <div class="meter-track"><div id="for-fill" class="meter-fill" style="width:0%; background: var(--green)"></div></div>
-      </div>
-      <div>
-        <div class="flex justify-between text-[11px] mb-1"><span>AGAINST  // <span id="against-n">0</span>/32</span></div>
-        <div class="meter-track"><div id="against-fill" class="meter-fill" style="width:0%; background: var(--red)"></div></div>
-      </div>
-      <div>
-        <div class="flex justify-between text-[11px] mb-1"><span>ABSTAIN  // <span id="abst-n">32</span>/32</span></div>
-        <div class="meter-track"><div id="abst-fill" class="meter-fill" style="width:100%; background: var(--amber-dim)"></div></div>
-      </div>
-    </div>
-  </div>
+  </main>
 
-  <!-- TRANSCRIPT -->
-  <div class="frame">
-    <div class="flex items-center justify-between p-3 border-b border-amber-900/60">
-      <div class="crt text-xl glow-a">TRANSCRIPT LOG</div>
-      <div class="text-[11px] text-amber-600"><span class="blink">▍</span> <span id="phase-label">awaiting EXECUTE</span></div>
-    </div>
-    <div id="log" class="scroll-log h-[440px] overflow-y-auto p-4 text-[13px] leading-relaxed space-y-2"></div>
-  </div>
-
-  <!-- VERDICT (hidden until end) -->
-  <div id="verdict-card" class="verdict p-5 hidden">
-    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
-      <div class="crt text-2xl glow-g">▼ VERDICT // QUORUM SYNTHESIS ▼</div>
-      <div class="text-[11px] text-green-300">emergent — not pre-loaded</div>
-    </div>
-    <p id="verdict-text" class="text-bone text-base leading-relaxed" style="color: var(--bone)"></p>
-    <div class="grid grid-cols-2 gap-4 mt-4 text-[12px]">
-      <div>
-        <div class="text-amber-600">H1 internal agreement with own position</div>
-        <div class="meter-track mt-1"><div id="h1-agree-fill" class="meter-fill" style="width:0%; background: var(--green)"></div></div>
-        <div class="text-right mt-0.5" id="h1-agree-n">—</div>
-      </div>
-      <div>
-        <div class="text-amber-600">H2 internal agreement with own position</div>
-        <div class="meter-track mt-1"><div id="h2-agree-fill" class="meter-fill" style="width:0%; background: var(--green)"></div></div>
-        <div class="text-right mt-0.5" id="h2-agree-n">—</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="text-[11px] text-amber-700 flex justify-between flex-wrap gap-2">
-    <span>BASE-00 ▍ 8 districts × 2 genders × 2 cities = 32 voices = byte/8</span>
-    <span>STOICHEION v11.0 // PULSE-3/5 canon // verdict EMERGENT not SCRIPTED</span>
-  </div>
+  <footer class="text-center pb-8 px-4">
+    <p class="text-[11px] text-zinc-600 tracking-wide">All data stays in your browser localStorage. No server. No cloud. Individual accountability.</p>
+  </footer>
 </div>
 
 <script>
-const DISTRICTS = [
-  { id: 20, name: 'CORPUS',    phase: 'ANCHOR',    role: 'evidence citation, specific facts' },
-  { id: 21, name: 'HIPPA',     phase: 'WITNESS',   role: 'historical memory retrieval' },
-  { id: 22, name: 'NEOCTX',    phase: 'COHERENCE', role: 'logical inference' },
-  { id: 23, name: 'PREFRNT',   phase: 'EMIT',      role: 'strategic framing' },
-  { id: 24, name: 'INTRO',     phase: 'ROUTE',     role: 'emotional / experiential weight' },
-  { id: 25, name: 'FLAY',      phase: 'ACT',       role: 'dissection of opposing argument' },
-  { id: 26, name: 'REBUILD',   phase: 'REFLECT',   role: 'synthesis attempt (weight near 0)' },
-  { id: 27, name: 'LOL',       phase: 'RETURN',    role: 'humor that lands, callback to debate' },
-];
-const PHASES = DISTRICTS.map(d => d.phase);
+(() => {
+  const QS_KEY = 'hearth_questions';
+  const AS_KEY = 'hearth_answers';
+  
+  let questions = [];
+  let answers = [];
 
-function buildRegister(cityId) {
-  const el = document.getElementById('reg-' + cityId);
-  el.innerHTML = '';
-  DISTRICTS.forEach(d => {
-    ['M', 'F'].forEach(g => {
-      const cell = document.createElement('div');
-      cell.className = 'seat px-1 py-1.5 text-[10px] text-center';
-      cell.id = `${cityId}-${d.id}${g}`;
-      cell.innerHTML = `<div class="font-bold">${d.id}${g}</div><div class="text-[8px] opacity-60">${d.name}</div>`;
-      el.appendChild(cell);
-    });
-  });
-}
-buildRegister('h1'); buildRegister('h2');
+  const $ = sel => document.querySelector(sel);
+  const questionsList = $('#questions-list');
+  const answersList = $('#answers-list');
+  const qForm = $('#ask-form');
+  const aForm = $('#answer-form');
+  const aQuestionSel = $('#a-question');
+  const statsEl = $('#stats');
+  const egg = $('#egg');
 
-// LOG
-function log(node) {
-  const wrap = document.getElementById('log');
-  wrap.appendChild(node);
-  wrap.scrollTop = wrap.scrollHeight;
-}
-function sysLine(text, color) {
-  const d = document.createElement('div');
-  d.className = 'log-line text-[11px] tracking-widest text-center py-1 my-1 border-y';
-  d.style.borderColor = color || 'rgba(255,176,0,0.3)';
-  d.style.color = color || 'var(--amber-dim)';
-  d.textContent = text;
-  log(d);
-}
-function voiceLine(v) {
-  const d = document.createElement('div');
-  d.className = 'log-line flex gap-3 items-start';
-  const cityTag = v.city === 'h1' ? 'H1' : 'H2';
-  const cityColor = v.city === 'h1' ? 'var(--green)' : '#ff66e0';
-  d.innerHTML = `
-    <span class="shrink-0 text-[10px] font-bold tracking-wider px-1.5 py-0.5 border" style="color:${cityColor};border-color:${cityColor};">
-      ${cityTag}·${v.district}${v.gender}·${v.name}
-    </span>
-    <span class="flex-1" style="color: var(--bone)">${v.text}</span>
-    <span class="shrink-0 text-[10px] text-amber-700">w=${v.weight >= 0 ? '+' : ''}${v.weight.toFixed(2)}</span>
-  `;
-  log(d);
-}
-
-// SEAT ACTIVATION
-function activateSeat(city, did, gender) {
-  document.querySelectorAll('.seat.active').forEach(s => s.classList.remove('active'));
-  const seat = document.getElementById(`${city}-${did}${gender}`);
-  if (seat) seat.classList.add('active');
-}
-function commitSeat(city, did, gender, weight) {
-  const seat = document.getElementById(`${city}-${did}${gender}`);
-  if (!seat) return;
-  seat.classList.remove('active');
-  // weight > 0.3 = for (own side reinforced)
-  // weight < -0.3 = against (defected) — visible defection
-  if (weight > 0.3) seat.classList.add('for');
-  else if (weight < -0.3) { seat.classList.add('against'); seat.classList.add('defected'); }
-}
-
-// TALLY
-function recountTallies() {
-  let totalFor = 0, totalAgainst = 0, totalAbst = 0;
-  ['h1', 'h2'].forEach(c => {
-    let f = 0, a = 0, ab = 0;
-    DISTRICTS.forEach(d => ['M', 'F'].forEach(g => {
-      const el = document.getElementById(`${c}-${d.id}${g}`);
-      if (el.classList.contains('for')) f++;
-      else if (el.classList.contains('against')) a++;
-      else ab++;
-    }));
-    document.getElementById(`${c}-tally`).textContent = `FOR ${f} / AGAINST ${a} / ABSTAIN ${ab}`;
-    totalFor += f; totalAgainst += a; totalAbst += ab;
-  });
-  document.getElementById('for-n').textContent = totalFor;
-  document.getElementById('against-n').textContent = totalAgainst;
-  document.getElementById('abst-n').textContent = totalAbst;
-  document.getElementById('for-fill').style.width = (totalFor / 32 * 100) + '%';
-  document.getElementById('against-fill').style.width = (totalAgainst / 32 * 100) + '%';
-  document.getElementById('abst-fill').style.width = (totalAbst / 32 * 100) + '%';
-  document.getElementById('quorum-pill').textContent = `QUORUM: ${totalFor + totalAgainst}/32`;
-}
-
-// PHASE CELL STATE
-function markPhase(idx, state) {
-  const cell = document.querySelector(`[data-phase="${idx}"]`);
-  if (!cell) return;
-  cell.classList.remove('active', 'complete', 'blocked');
-  cell.classList.add(state);
-}
-function gateState(state) {
-  const pill = document.getElementById('gate');
-  const gc = document.getElementById('gate-cell');
-  pill.className = 'gate-pill ' + state;
-  if (state === 'sealed') { pill.textContent = 'GATE 192.5: SEALED'; gc.style.color = 'var(--red)'; gc.style.borderColor = 'var(--red)'; }
-  if (state === 'stressed') { pill.textContent = 'GATE 192.5: STRESSED'; gc.style.color = 'var(--amber)'; gc.style.borderColor = 'var(--amber)'; }
-  if (state === 'open') { pill.textContent = 'GATE 192.5: OPEN'; gc.style.color = 'var(--green)'; gc.style.borderColor = 'var(--green)'; }
-  if (state === 'breached') { pill.textContent = 'GATE 192.5: BREACHED'; gc.style.color = 'var(--red)'; gc.style.borderColor = 'var(--red)'; }
-}
-
-// ANIMATE A FULL TRANSCRIPT
-async function animate(data) {
-  document.getElementById('h1-pos').textContent = data.h1_position;
-  document.getElementById('h2-pos').textContent = data.h2_position;
-
-  gateState('sealed');
-  // group voices by phase
-  const byPhase = {};
-  PHASES.forEach(p => byPhase[p] = []);
-  data.voices.forEach(v => { if (byPhase[v.phase]) byPhase[v.phase].push(v); });
-
-  for (let i = 0; i < PHASES.length; i++) {
-    const phase = PHASES[i];
-    const district = DISTRICTS[i];
-    document.getElementById('phase-label').textContent = `phase ${i+1}/8 — ${phase} (${district.id} ${district.name})`;
-    markPhase(i, 'active');
-    sysLine(`▶ PHASE ${i+1}/8 ▍ ${phase} ▍ DISTRICT ${district.id} ${district.name} ▍ ${district.role}`, 'var(--amber)');
-
-    // GATE check between interior(3) and exterior(5)
-    if (i === 3) {
-      gateState('stressed');
-      sysLine('▼ INTERIOR COMPLETE — LAW GATE 192.5 TRAVERSAL — ANCHOR·WITNESS·COHERENCE VERIFIED', 'var(--green)');
-      await sleep(1100);
-      gateState('open');
-      sysLine('▼ GATE OPEN — EXTERIOR PERMITTED — EMIT·ROUTE·ACT·REFLECT·RETURN', 'var(--green)');
-      await sleep(600);
+  function load() {
+    try {
+      questions = JSON.parse(localStorage.getItem(QS_KEY) || '[]');
+      answers = JSON.parse(localStorage.getItem(AS_KEY) || '[]');
+    } catch { questions=[]; answers=[]; }
+    if (questions.length === 0) {
+      const now = Date.now();
+      questions = [
+        {id:'q1', text:'How should District 23 allocate its water surplus this summer?', why:'I live downstream and saw waste last year. Want transparent reasoning before action.', district:23, seat:'F', ts: now - 172800000, votes:{in:3,out:1}},
+        {id:'q2', text:'Should we limit night lighting to protect the hearth dark sky?', why:'Our kids cannot see stars; energy costs rising for 3 cycles.', district:21, seat:'M', ts: now - 18000000, votes:{in:2,out:2}}
+      ];
+      answers = [
+        {id:'a1', qid:'q1', text:'Propose rotating schedule with public meter readings published weekly.', why:'Meter transparency prevents hoarding and builds trust per last audit.', district:25, seat:'M', ts: now - 86400000, votes:{in:4,out:0}}
+      ];
+      save();
     }
+  }
+  function save() {
+    localStorage.setItem(QS_KEY, JSON.stringify(questions));
+    localStorage.setItem(AS_KEY, JSON.stringify(answers));
+  }
+  const esc = s => String(s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  const ago = ts => {
+    const s = Math.floor((Date.now()-ts)/1000);
+    if(s<60) return s+'s';
+    const m = Math.floor(s/60); if(m<60) return m+'m';
+    const h = Math.floor(m/60); if(h<24) return h+'h';
+    return Math.floor(h/24)+'d';
+  };
+  const scores = v => {
+    const inS = Math.min(v.in/5,1);
+    const outS = Math.min(v.out/5,1);
+    const fusion = (inS+outS)/2;
+    return {inS,outS,fusion};
+  };
+  const judge = (label, score) => {
+    const h = Math.round(score*100);
+    const col = score>0.6 ? '#10b981' : score>0.33 ? '#f59e0b' : '#ef4444';
+    return `<div class="flex flex-col items-center gap-0.5">
+      <div class="w-5 h-5 rounded-full border border-zinc-700 bg-zinc-900 relative overflow-hidden" title="${label} ${h}%">
+        <div style="height:${h}%;background:${col}" class="absolute bottom-0 left-0 right-0 transition-all duration-500"></div>
+      </div>
+      <span class="text-[8px] leading-none text-zinc-600">${label}</span>
+    </div>`;
+  };
 
-    const voices = byPhase[phase] || [];
-    for (const v of voices) {
-      activateSeat(v.city, v.districtId, v.gender);
-      voiceLine(v);
-      await sleep(750);
-      commitSeat(v.city, v.districtId, v.gender, v.weight);
-      recountTallies();
-      await sleep(180);
-    }
-    markPhase(i, 'complete');
-    await sleep(350);
+  function lightDistrict(d) {
+    const wrap = document.querySelector(`[data-district="${d}"]`);
+    if(!wrap) return;
+    wrap.querySelector('span').classList.add('district-active');
+    wrap.querySelectorAll('.seat').forEach(s=>s.classList.add('seat-active'));
+    setTimeout(()=>{
+      wrap.querySelector('span').classList.remove('district-active');
+      wrap.querySelectorAll('.seat').forEach(s=>s.classList.remove('seat-active'));
+    }, 2200);
+  }
+  function pulseEgg() {
+    egg.classList.remove('egg-pulse'); void egg.offsetWidth; egg.classList.add('egg-pulse');
   }
 
-  // VERDICT
-  sysLine('▼ ALL PHASES COMPLETE ▍ QUORUM REACHED ▍ SYNTHESIZING VERDICT', 'var(--green)');
-  await sleep(700);
-  showVerdict(data.verdict);
-}
+  function render() {
+    // questions
+    questionsList.innerHTML = questions.sort((a,b)=>b.ts-a.ts).map(q=>{
+      const qAns = answers.filter(a=>a.qid===q.id);
+      const {inS,outS,fusion} = scores(q.votes);
+      return `<div class="group bg-zinc-950/70 border border-zinc-800 hover:border-cyan-900/60 rounded-xl p-3 transition">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 text-[11px] text-zinc-500">
+              <span class="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">D${q.district}-${q.seat}</span>
+              <span>${ago(q.ts)} ago</span>
+              <span>• ${qAns.length} answers</span>
+            </div>
+            <p class="mt-2 text-[14px] leading-snug text-zinc-100">${esc(q.text)}</p>
+            <details class="mt-1.5">
+              <summary class="cursor-pointer text-[11px] text-cyan-400/80 hover:text-cyan-300 list-none">▸ why i'm asking</summary>
+              <p class="mt-1 text-[12px] text-zinc-400 pl-3 border-l border-zinc-800">${esc(q.why)}</p>
+            </details>
+          </div>
+          <div class="shrink-0 text-right">
+            <div class="flex gap-1.5">${judge('IN',inS)}${judge('OUT',outS)}${judge('FUS',fusion)}</div>
+            <div class="mt-1 text-[10px] ${fusion>0.6?'text-emerald-400':fusion>0.33?'text-amber-400':'text-zinc-500'}">${Math.round(fusion*100)}% fair</div>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-2.5">
+          <button data-v="in" data-t="q" data-id="${q.id}" class="vote px-2 py-1 rounded-md bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-900/40 text-[11px] text-emerald-300">+IN</button>
+          <button data-v="out" data-t="q" data-id="${q.id}" class="vote px-2 py-1 rounded-md bg-amber-950/30 hover:bg-amber-900/40 border border-amber-900/30 text-[11px] text-amber-300">+OUT</button>
+        </div>
+        ${qAns.length? `<div class="mt-3 space-y-2 pl-3 border-l-2 border-zinc-900">${qAns.sort((a,b)=>b.ts-a.ts).map(a=>{
+          const s = scores(a.votes);
+          return `<div class="bg-black/50 rounded-lg p-2.5 border border-zinc-900">
+            <div class="flex justify-between">
+              <span class="text-[10px] text-zinc-500">D${a.district}-${a.seat} • ${ago(a.ts)}</span>
+              <span class="text-[10px] ${s.fusion>0.6?'text-emerald-400':'text-zinc-600'}">${Math.round(s.fusion*100)}%</span>
+            </div>
+            <p class="text-[12.5px] text-zinc-200 mt-1">${esc(a.text)}</p>
+          </div>`
+        }).join('')}</div>`:''}
+      </div>`;
+    }).join('') || `<div class="text-center py-12 text-zinc-600 text-[13px]">No questions yet. Ask the first.</div>`;
 
-function showVerdict(v) {
-  const card = document.getElementById('verdict-card');
-  card.classList.remove('hidden');
-  document.getElementById('verdict-text').textContent = v.synthesis;
-  setTimeout(() => {
-    document.getElementById('h1-agree-fill').style.width = (v.h1_agreement * 100) + '%';
-    document.getElementById('h2-agree-fill').style.width = (v.h2_agreement * 100) + '%';
-    document.getElementById('h1-agree-n').textContent = (v.h1_agreement * 100).toFixed(0) + '%';
-    document.getElementById('h2-agree-n').textContent = (v.h2_agreement * 100).toFixed(0) + '%';
-    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 200);
-  document.getElementById('phase-label').textContent = 'verdict rendered — emergent synthesis';
-  document.getElementById('status').innerHTML = '▍ <span class="glow-g">complete.</span> verdict is procedurally synthesized from this run\'s voice weights — re-run for divergent outcome.';
-}
+    // answers list
+    answersList.innerHTML = answers.sort((a,b)=>b.ts-a.ts).map(a=>{
+      const q = questions.find(q=>q.id===a.qid);
+      const {inS,outS,fusion} = scores(a.votes);
+      return `<div class="bg-zinc-950/70 border border-zinc-800 hover:border-emerald-900/50 rounded-xl p-3">
+        <div class="flex justify-between gap-3">
+          <div>
+            <div class="text-[11px] text-zinc-500">answer to: <span class="text-zinc-300">${esc(q?.text.slice(0,60)||'deleted')}${q&&q.text.length>60?'…':''}</span></div>
+            <p class="mt-1.5 text-[14px] text-zinc-100">${esc(a.text)}</p>
+            <details class="mt-1">
+              <summary class="cursor-pointer text-[11px] text-emerald-400/80 hover:text-emerald-300 list-none">▸ why i'm answering</summary>
+              <p class="mt-1 text-[12px] text-zinc-400 pl-3 border-l border-zinc-800">${esc(a.why)}</p>
+            </details>
+            <div class="mt-1.5 text-[11px] text-zinc-500">D${a.district}-${a.seat} • ${ago(a.ts)} ago</div>
+          </div>
+          <div class="shrink-0">
+            <div class="flex gap-1.5">${judge('IN',inS)}${judge('OUT',outS)}${judge('FUS',fusion)}</div>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-2.5">
+          <button data-v="in" data-t="a" data-id="${a.id}" class="vote px-2 py-1 rounded-md bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-900/40 text-[11px] text-emerald-300">+IN</button>
+          <button data-v="out" data-t="a" data-id="${a.id}" class="vote px-2 py-1 rounded-md bg-amber-950/30 hover:bg-amber-900/40 border border-amber-900/30 text-[11px] text-amber-300">+OUT</button>
+        </div>
+      </div>`;
+    }).join('') || `<div class="text-center py-12 text-zinc-600 text-[13px]">No answers yet.</div>`;
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+    // select options
+    aQuestionSel.innerHTML = '<option value="">Select question to answer...</option>' + questions.map(q=>`<option value="${q.id}">D${q.district}-${q.seat}: ${esc(q.text.slice(0,70))}${q.text.length>70?'…':''}</option>`).join('');
+    aForm.querySelector('button').disabled = questions.length===0;
 
-// API CALL — GENERATE LIVE DIALECTIC
-async function generateDialectic(topic) {
-  const systemMsg = `You generate adversarial dialectic transcripts for the HEARTH DIALECTIC ENGINE. Return ONLY valid JSON, no preamble, no markdown fences, no commentary.`;
-
-  const userMsg = `TOPIC: ${topic}
-
-Generate two opposing positions (H1 and H2) on this topic, then a 32-voice dialectic following the PULSE-3/5 mesh.
-
-Schema (return EXACTLY this shape):
-{
-  "h1_position": "one-sentence H1 stance",
-  "h2_position": "one-sentence H2 stance (genuinely opposed to H1)",
-  "voices": [
-    { "phase": "ANCHOR", "districtId": 20, "name": "CORPUS", "city": "h1", "gender": "M", "text": "...", "weight": 0.85 },
-    ... (32 total entries)
-  ],
-  "verdict": {
-    "synthesis": "1-3 sentences synthesizing what BOTH sides got right and where the real tension lies. Specific, not platitudes.",
-    "h1_agreement": 0.0-1.0,
-    "h2_agreement": 0.0-1.0
+    // stats
+    const judgments = [...questions,...answers].reduce((s,i)=>s+i.votes.in+i.votes.out,0);
+    statsEl.textContent = `${questions.length} questions asked • ${answers.length} answers given • ${judgments} fairness judgments`;
   }
-}
 
-Voice ordering: 8 phases × 4 voices each = 32. Per phase, order is (h1-M, h1-F, h2-M, h2-F).
-
-Phase → district mapping (in order):
-ANCHOR=20 CORPUS (evidence citation, specific facts)
-WITNESS=21 HIPPA (historical memory retrieval)
-COHERENCE=22 NEOCTX (logical inference)
-EMIT=23 PREFRNT (strategic framing)
-ROUTE=24 INTRO (emotional / experiential weight)
-ACT=25 FLAY (dissection of opposing argument)
-REFLECT=26 REBUILD (synthesis attempt — weight should be near 0, ±0.2)
-RETURN=27 LOL (humor that lands; callback to earlier voices)
-
-Each voice text: 1-2 sentences, terse, in-character for district role. No throat-clearing. Speak in the voice of someone whose argument is sharpened by being one of 32 minds.
-
-Weight scale: -1 (totally undermines own side, defects) to +1 (totally reinforces own side). Most voices weight 0.5-0.9 toward their side. REBUILD voices weight -0.2 to +0.2 (genuine synthesizing). At least 2 voices across the 32 should weight negative (genuine defection — argument was bad enough to break ranks). LOL voices punch up at their own side too — weight 0.3-0.6.
-
-Verdict synthesis must NOT be "both are correct" pablum. Name what each side proved AND what each got wrong.`;
-
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 8000,
-      system: systemMsg,
-      messages: [{ role: "user", content: userMsg }]
-    })
+  qForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const district = +$('#q-district').value;
+    const seat = $('#q-seat').value;
+    const text = $('#q-text').value.trim();
+    const why = $('#q-why').value.trim();
+    if(!district||!seat||!text||!why) return;
+    const q = {id:'q'+Date.now(), text, why, district, seat, ts:Date.now(), votes:{in:0,out:0}};
+    questions.unshift(q); save(); render();
+    lightDistrict(district); pulseEgg();
+    qForm.reset();
   });
-  if (!res.ok) throw new Error('API ' + res.status);
-  const data = await res.json();
-  const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-  const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-  return JSON.parse(cleaned);
-}
 
-// DEMO FALLBACK
-const DEMO = {
-  h1_position: "Mill systematically appropriated Harriet Taylor's intellectual labor under Victorian publishing constraints.",
-  h2_position: "The Mill-Taylor partnership was an authentic collaboration honored by Taylor's explicit consent.",
-  voices: [
-    // ANCHOR
-    { phase:'ANCHOR', districtId:20, name:'CORPUS', city:'h1', gender:'M', text:"Mill's own 1873 Autobiography: 'the whole mode of thinking of which the book was an expression was emphatically hers.' His words. Court exhibit A.", weight:0.92 },
-    { phase:'ANCHOR', districtId:20, name:'CORPUS', city:'h1', gender:'F', text:"Harriet's 1851 'Enfranchisement of Women' contains the harm principle two years before 'On Liberty.' Timestamps don't lie. Citations do.", weight:0.88 },
-    { phase:'ANCHOR', districtId:20, name:'CORPUS', city:'h2', gender:'M', text:"Harriet's 1854 letter to Mill, preserved in Yale archives: 'I would rather die than see my name in print.' Authorship requires consent to author.", weight:0.85 },
-    { phase:'ANCHOR', districtId:20, name:'CORPUS', city:'h2', gender:'F', text:"Mill dedicated 'On Liberty' to her by name on the title page in 1859. Hidden contributors don't get title-page dedications.", weight:0.78 },
-    // WITNESS
-    { phase:'WITNESS', districtId:21, name:'HIPPA', city:'h1', gender:'M', text:"Pattern recall: Sartre's notebooks list Beauvoir as primary editor of 'Being and Nothingness.' Her name appears as a footnote. Same template, different century.", weight:0.81 },
-    { phase:'WITNESS', districtId:21, name:'HIPPA', city:'h1', gender:'F', text:"Aristotle's 'lost' female contemporaries weren't lost—they were unindexed. Theophrastus references them; later scribes didn't copy them forward. Erasure has a method.", weight:0.74 },
-    { phase:'WITNESS', districtId:21, name:'HIPPA', city:'h2', gender:'M', text:"Counter-memory: women published under male pseudonyms when they wanted credit—Eliot, the Brontës. Harriet had options and used none. That's a choice, not a chain.", weight:0.69 },
-    { phase:'WITNESS', districtId:21, name:'HIPPA', city:'h2', gender:'F', text:"De Beauvoir, 1972 interview: 'I owe Sartre nothing, he owes me nothing.' Don't infantilize the women who invented modern feminism by retconning them as victims.", weight:0.83 },
-    // COHERENCE
-    { phase:'COHERENCE', districtId:22, name:'NEOCTX', city:'h1', gender:'M', text:"If author A writes 40% and author B receives 100% of credit, royalties, and canon-placement, the math is theft. Calling it 'muse' is just better PR.", weight:0.79 },
-    { phase:'COHERENCE', districtId:22, name:'NEOCTX', city:'h1', gender:'F', text:"Structural argument: when one publication path is jail and the other is glory, 'choice' is coerced. Consent under duress isn't consent—it's compliance.", weight:0.86 },
-    { phase:'COHERENCE', districtId:22, name:'NEOCTX', city:'h2', gender:'M', text:"Inverse: applying 2025 IP frameworks to 1859 invalidates every collaborative work in history. Presentism isn't analysis, it's a wig.", weight:0.71 },
-    { phase:'COHERENCE', districtId:22, name:'NEOCTX', city:'h2', gender:'F', text:"Joint authorship requires intent. Their letters show shared intent to publish under his name FOR strategic reasons. That's joint authorship with asymmetric byline.", weight:0.66 },
-    // — LAW GATE —
-    // EMIT
-    { phase:'EMIT', districtId:23, name:'PREFRNT', city:'h1', gender:'M', text:"Strategic frame: this isn't about Mill. It's about a 2,400-year filter. Every era recovers women only after the men holding their work are dead.", weight:0.84 },
-    { phase:'EMIT', districtId:23, name:'PREFRNT', city:'h1', gender:'F', text:"Remedy: retroactive co-authorship on canonical works where evidence supports it. Twelve characters in a citation. Not a revolution—a correction.", weight:0.77 },
-    { phase:'EMIT', districtId:23, name:'PREFRNT', city:'h2', gender:'M', text:"Frame check: collapsing 'collaboration' and 'theft' into one category insults every real collaboration. Sharpen the language or lose it.", weight:0.72 },
-    { phase:'EMIT', districtId:23, name:'PREFRNT', city:'h2', gender:'F', text:"Strategic: name the actual problem—canon-formation, not Mill. Editors and syllabi did the erasure. Prosecute them, not the dead husband who advocated suffrage.", weight:0.81 },
-    // ROUTE
-    { phase:'ROUTE', districtId:24, name:'INTRO', city:'h1', gender:'M', text:"Feel it: a woman writes for fifteen years and the building she shaped is named after the man who carried her papers. That's not a footnote. That's grief.", weight:0.88 },
-    { phase:'ROUTE', districtId:24, name:'INTRO', city:'h1', gender:'F', text:"Every female grad student reading 'On Liberty' knows the rhythm of being cited as 'and contributions by.' We feel it in the meter.", weight:0.91 },
-    { phase:'ROUTE', districtId:24, name:'INTRO', city:'h2', gender:'M', text:"Counter-feel: Mill spent thirty years after her death advocating women's suffrage. Thieves don't campaign for their victims. Some grief is gratitude in disguise.", weight:0.76 },
-    { phase:'ROUTE', districtId:24, name:'INTRO', city:'h2', gender:'F', text:"Harriet's letters to her daughter Helen describe pride, not erasure. We project our pain onto her silence. Maybe she was already free.", weight:0.69 },
-    // ACT (FLAY)
-    { phase:'ACT', districtId:25, name:'FLAY', city:'h1', gender:'M', text:"Defense said 'consent.' Consent in 1854 meant 'don't get me institutionalized.' That's not consent—that's a hostage statement filed under love letter.", weight:0.87 },
-    { phase:'ACT', districtId:25, name:'FLAY', city:'h1', gender:'F', text:"They cited Mill's suffrage campaign as exoneration. By that logic, every reformer who profits from injustice is innocent because they later filed paperwork.", weight:0.82 },
-    { phase:'ACT', districtId:25, name:'FLAY', city:'h2', gender:'M', text:"Prosecution wants retroactive consent revocation. That theory deletes every collaborative legacy in history. Use a scalpel, not a flamethrower.", weight:0.74 },
-    { phase:'ACT', districtId:25, name:'FLAY', city:'h2', gender:'F', text:"They said 'choice under coercion is HR rebranding.' Cute. Also: refusing women the capacity to choose, even badly, is itself a coercion. Recursion.", weight:0.78 },
-    // REFLECT (REBUILD) — synthesis, weight near 0
-    { phase:'REFLECT', districtId:26, name:'REBUILD', city:'h1', gender:'M', text:"Concession: Mill didn't sneak. He published openly with her name in the dedication. Theft is the wrong frame. Erasure is the right one—done by editors after, not him.", weight:-0.15 },
-    { phase:'REFLECT', districtId:26, name:'REBUILD', city:'h1', gender:'F', text:"Synthesize: structural erasure is real AND personal partnership was real. Name both. Don't collapse them into a single accusation.", weight:0.05 },
-    { phase:'REFLECT', districtId:26, name:'REBUILD', city:'h2', gender:'M', text:"Concession: 'she chose' is too clean. Victorian women's choices were shaped by what was survivable. We can honor her agency and the cage simultaneously.", weight:-0.18 },
-    { phase:'REFLECT', districtId:26, name:'REBUILD', city:'h2', gender:'F', text:"Joint proposal: 'On Liberty, by John Stuart Mill with Harriet Taylor Mill.' Twelve characters, both true. Move on.", weight:0.10 },
-    // RETURN (LOL)
-    { phase:'RETURN', districtId:27, name:'LOL', city:'h1', gender:'M', text:"Mill stole his wife's ideas so thoroughly he spent thirty years lobbying Parliament for her right to vote against him. Worst heist of the 19th century.", weight:0.42 },
-    { phase:'RETURN', districtId:27, name:'LOL', city:'h1', gender:'F', text:"At least when men plagiarize today they have the decency to use ChatGPT. Mill had to seduce his.", weight:0.55 },
-    { phase:'RETURN', districtId:27, name:'LOL', city:'h2', gender:'M', text:"H1 just spent eight phases proving Mill was a feminist who wouldn't shut up about his wife. Quorum motion: dismiss the indictment, fine him for being annoying.", weight:0.48 },
-    { phase:'RETURN', districtId:27, name:'LOL', city:'h2', gender:'F', text:"Both cities agree: philosophers' wives were the smart ones. That's why they married them. Patriarchy's worst-kept secret. Quorum on jokes, please.", weight:0.50 },
-  ],
-  verdict: {
-    synthesis: "Prosecution proved structural erasure — the canon, not Mill personally, did the theft after both were dead. Defense proved personal authenticity — the Mills functioned as a single intellectual unit by mutual design. The real failure isn't Mill's; it's every editor and syllabus from 1860 onward who quietly dropped 'Mill, with Harriet Taylor Mill' down to 'Mill.' Remedy is bibliographic, not punitive: restore the byline.",
-    h1_agreement: 0.74,
-    h2_agreement: 0.71
-  }
-};
+  aForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const qid = $('#a-question').value;
+    const district = +$('#a-district').value;
+    const seat = $('#a-seat').value;
+    const text = $('#a-text').value.trim();
+    const why = $('#a-why').value.trim();
+    if(!qid||!district||!seat||!text||!why) return;
+    const a = {id:'a'+Date.now(), qid, text, why, district, seat, ts:Date.now(), votes:{in:0,out:0}};
+    answers.unshift(a); save(); render();
+    pulseEgg(); lightDistrict(district);
+    aForm.reset(); $('#a-question').value = qid;
+  });
 
-// CONTROLS
-document.getElementById('run').addEventListener('click', async () => {
-  reset();
-  const topic = document.getElementById('topic').value.trim();
-  if (!topic) { document.getElementById('status').textContent = '▍ topic required.'; return; }
-  document.getElementById('run').disabled = true;
-  document.getElementById('demo').disabled = true;
-  document.getElementById('status').innerHTML = '▍ <span class="glow-a">calling dialectic generator…</span> may take 20-40 sec for 32 voices.';
-  try {
-    const data = await generateDialectic(topic);
-    await animate(data);
-  } catch (e) {
-    document.getElementById('status').innerHTML = `▍ <span class="glow-r">API error:</span> ${e.message}. running DEMO fallback.`;
-    await animate(DEMO);
-  } finally {
-    document.getElementById('run').disabled = false;
-    document.getElementById('demo').disabled = false;
-  }
-});
+  document.addEventListener('click', e=>{
+    const b = e.target.closest('.vote'); if(!b) return;
+    const id = b.dataset.id, v = b.dataset.v, t = b.dataset.t;
+    const list = t==='q'?questions:answers;
+    const item = list.find(i=>i.id===id); if(!item) return;
+    item.votes[v]++; save(); render();
+    // micro feedback
+    b.classList.add('scale-95'); setTimeout(()=>b.classList.remove('scale-95'),120);
+  });
 
-document.getElementById('demo').addEventListener('click', async () => {
-  reset();
-  document.getElementById('run').disabled = true;
-  document.getElementById('demo').disabled = true;
-  document.getElementById('topic').value = DEMO.h1_position.split('.')[0] + ' (DEMO)';
-  document.getElementById('status').innerHTML = '▍ <span class="glow-a">running cached demo</span> — Mill/Taylor adversarial dialectic';
-  await animate(DEMO);
-  document.getElementById('run').disabled = false;
-  document.getElementById('demo').disabled = false;
-});
-
-function reset() {
-  document.getElementById('log').innerHTML = '';
-  document.getElementById('verdict-card').classList.add('hidden');
-  document.querySelectorAll('.seat').forEach(s => s.classList.remove('for','against','active','defected'));
-  document.querySelectorAll('.phase-cell').forEach(c => c.classList.remove('active','complete','blocked'));
-  gateState('sealed');
-  recountTallies();
-  document.getElementById('h1-pos').textContent = '— awaiting —';
-  document.getElementById('h2-pos').textContent = '— awaiting —';
-}
+  load(); render();
+  // initial hearth glow for demo data
+  setTimeout(()=>{ lightDistrict(23); lightDistrict(21); lightDistrict(25); }, 600);
+})();
 </script>
 </body>
 </html>
