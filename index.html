@@ -3,339 +3,582 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>HEARTH DEBATE — Two Cities Real-Time</title>
+<title>HEARTH DIALECTIC ENGINE v2.0 — PULSE-3/5 WIRED</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: dark; }
-  body { font-family: Inter, system-ui, -apple-system, sans-serif; background: #030307; }
-  .font-mono { font-family: "JetBrains Mono", monospace; }
-  .city-bg { background: radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, transparent 60%); }
-  .glass { backdrop-filter: blur(12px); }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(4px) } to { opacity:1; transform:none } }
-  @keyframes pulseEgg { 0%{ transform:scale(0.95); opacity:1 } 100%{ transform:scale(1.08); opacity:0.7 } }
-  .pulsing { animation: pulseEgg 0.7s ease-out; }
-  @keyframes quorumBeat { 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.12) } }
-  .quorum { animation: quorumBeat 1s infinite ease-in-out; }
-  .seat circle { transition: all 0.35s cubic-bezier(.2,.8,.2,1); }
-  .seat.active circle { r:18 !important; opacity:1 !important; stroke-width: 4 !important; }
-  .transcript::-webkit-scrollbar { width: 6px }
-  .transcript::-webkit-scrollbar-thumb { background:#2a2a35; border-radius:3px }
-  .neon-left { filter: drop-shadow(0 0 12px #00e5ff) drop-shadow(0 0 28px #00e5ff55); }
-  .neon-right { filter: drop-shadow(0 0 12px #ff00e5) drop-shadow(0 0 28px #ff00e555); }
+  :root {
+    --amber: #ffb000;
+    --amber-dim: #cc8800;
+    --green: #00ff41;
+    --green-dim: #00aa2b;
+    --red: #ff3333;
+    --bone: #f5f5dc;
+    --paper: #1a1208;
+    --void: #050402;
+  }
+  html, body { background: var(--void); color: var(--amber); }
+  body {
+    font-family: "IBM Plex Mono", monospace;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,176,0,0.025) 0px, rgba(255,176,0,0.025) 1px, transparent 1px, transparent 3px),
+      radial-gradient(ellipse at center, rgba(255,176,0,0.04) 0%, transparent 70%);
+    min-height: 100vh;
+  }
+  .crt { font-family: "VT323", monospace; letter-spacing: 0.02em; }
+  .glow-a { text-shadow: 0 0 6px rgba(255,176,0,0.6), 0 0 12px rgba(255,176,0,0.3); }
+  .glow-g { text-shadow: 0 0 6px rgba(0,255,65,0.7), 0 0 12px rgba(0,255,65,0.3); color: var(--green); }
+  .glow-r { text-shadow: 0 0 6px rgba(255,51,51,0.7); color: var(--red); }
+  .frame {
+    border: 1px solid var(--amber);
+    box-shadow: inset 0 0 24px rgba(255,176,0,0.06), 0 0 24px rgba(255,176,0,0.04);
+  }
+  .seat {
+    border: 1px solid var(--amber-dim);
+    background: rgba(255,176,0,0.03);
+    transition: all 0.25s ease;
+  }
+  .seat.for { background: rgba(0,255,65,0.15); border-color: var(--green); color: var(--green); }
+  .seat.against { background: rgba(255,51,51,0.15); border-color: var(--red); color: var(--red); }
+  .seat.active { background: var(--amber); color: var(--void); box-shadow: 0 0 14px var(--amber); }
+  .seat.defected { animation: defect 0.7s ease; }
+  @keyframes defect {
+    0%,100% { transform: scale(1) }
+    50% { transform: scale(1.18); filter: hue-rotate(180deg); }
+  }
+  @keyframes blink { 50% { opacity: 0.2 } }
+  .blink { animation: blink 1s infinite; }
+  .scanline {
+    position: fixed; inset: 0; pointer-events: none; z-index: 100;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.18) 3px, transparent 4px);
+    mix-blend-mode: multiply;
+  }
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 99;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
+  }
+  .log-line { animation: typein 0.4s ease; }
+  @keyframes typein { from { opacity: 0; transform: translateX(-4px) } to { opacity: 1; transform: none } }
+  .gate-pill { border: 1px solid var(--amber-dim); padding: 2px 8px; }
+  .gate-pill.sealed { color: var(--amber-dim); }
+  .gate-pill.stressed { color: var(--amber); border-color: var(--amber); }
+  .gate-pill.breached { color: var(--red); border-color: var(--red); animation: blink 0.5s infinite; }
+  .gate-pill.open { color: var(--green); border-color: var(--green); }
+  .phase-cell {
+    border: 1px solid var(--amber-dim);
+    padding: 4px 8px;
+    text-align: center;
+    font-size: 11px;
+    transition: all 0.3s;
+  }
+  .phase-cell.active { background: var(--amber); color: var(--void); }
+  .phase-cell.complete { background: rgba(0,255,65,0.2); border-color: var(--green); color: var(--green); }
+  .phase-cell.blocked { background: rgba(255,51,51,0.1); border-color: var(--red); color: var(--red); }
+  .scroll-log::-webkit-scrollbar { width: 8px }
+  .scroll-log::-webkit-scrollbar-track { background: rgba(255,176,0,0.05) }
+  .scroll-log::-webkit-scrollbar-thumb { background: var(--amber-dim); border-radius: 0 }
+  input.term {
+    background: var(--void); color: var(--amber); border: 1px solid var(--amber-dim);
+    font-family: "IBM Plex Mono", monospace;
+  }
+  input.term:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber); }
+  button.term {
+    background: var(--amber); color: var(--void); font-weight: 700; font-family: "IBM Plex Mono", monospace;
+    transition: all 0.15s;
+  }
+  button.term:hover:not(:disabled) { background: var(--bone); box-shadow: 0 0 16px var(--amber); }
+  button.term:disabled { opacity: 0.4; cursor: not-allowed; }
+  .ascii-divider {
+    color: var(--amber-dim); font-family: "VT323", monospace; font-size: 14px;
+    letter-spacing: -1px; overflow: hidden; white-space: nowrap;
+  }
+  .meter-track { background: rgba(255,176,0,0.08); height: 14px; border: 1px solid var(--amber-dim); position: relative; overflow: hidden; }
+  .meter-fill { height: 100%; transition: width 0.6s cubic-bezier(.2,.8,.2,1); }
+  .verdict {
+    border: 2px solid var(--green);
+    background: linear-gradient(180deg, rgba(0,255,65,0.06), rgba(0,255,65,0.02));
+    box-shadow: 0 0 40px rgba(0,255,65,0.15), inset 0 0 30px rgba(0,255,65,0.04);
+  }
 </style>
 </head>
-<body class="text-zinc-100 selection:bg-fuchsia-500/30 selection:text-white">
-<div class="min-h-screen flex flex-col">
-  <!-- Header -->
-  <header class="sticky top-0 z-50 border-b border-white/10 bg-black/70 glass">
-    <div class="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between">
+<body class="text-amber-400">
+<div class="scanline"></div>
+<div class="vignette"></div>
+
+<div class="max-w-[1500px] mx-auto p-4 md:p-6 space-y-4">
+
+  <!-- TOP FRAME -->
+  <div class="frame p-4">
+    <div class="flex items-center justify-between flex-wrap gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-        <h1 class="font-mono font-semibold tracking-widest text-sm md:text-[15px]">HEARTH-1 ⟷ HEARTH-2 DEBATE NETWORK</h1>
+        <span class="crt text-3xl glow-a leading-none">HEARTH</span>
+        <span class="crt text-3xl text-amber-300 leading-none">// DIALECTIC ENGINE</span>
+        <span class="text-xs text-amber-600">v2.0 / PULSE-3/5-WIRED / BASE-00-ANCHORED</span>
       </div>
-      <div class="flex items-center gap-4 md:gap-7 font-mono text-[11px] md:text-xs">
-        <div class="hidden sm:block text-zinc-500">LIVE SIM</div>
-        <div>Turn: <span id="stat-turn" class="text-cyan-400">0/32</span></div>
-        <div>Quorum: <span id="stat-quorum" class="text-violet-400">0/16</span></div>
-        <div>Engagement: <span id="stat-engage" class="text-emerald-400">62%</span></div>
-      </div>
-    </div>
-    <div class="border-t border-white/5 bg-gradient-to-r from-cyan-950/40 via-transparent to-fuchsia-950/40">
-      <div class="max-w-[1600px] mx-auto px-4 py-2 text-center">
-        <p class="text-[10px] uppercase tracking-[0.28em] text-white/50">Current Topic</p>
-        <p class="font-semibold tracking-wide text-sm md:text-[15px]">"Most impactful male philosopher, and why he stole his wife's ideas"</p>
+      <div class="flex items-center gap-2 text-[11px] flex-wrap">
+        <span class="gate-pill sealed" id="gate">GATE 192.5: SEALED</span>
+        <span class="gate-pill" id="law-pill">LAW: NO EXTERIOR BEFORE INTERIOR</span>
+        <span class="gate-pill" id="quorum-pill">QUORUM: 0/32</span>
       </div>
     </div>
-  </header>
 
-  <main class="flex-1 max-w-[1600px] w-full mx-auto p-3 md:p-6 grid grid-cols-1 xl:grid-cols-[400px_1fr_400px] gap-5 items-start">
+    <div class="ascii-divider mt-3">─══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════─</div>
 
-    <!-- LEFT CITY -->
-    <section class="order-2 xl:order-1">
-      <div class="bg-zinc-950/70 border border-cyan-500/20 rounded-2xl p-4 shadow-2xl shadow-cyan-950/20">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="font-mono text-cyan-400 font-bold tracking-widest">HEARTH-1</h2>
-          <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">PROSECUTION • DID STEAL</span>
-        </div>
-        <div class="relative aspect-square city-bg rounded-xl overflow-hidden">
-          <svg id="svg-left" viewBox="0 0 400 400" class="absolute inset-0 w-full h-full"></svg>
-          <div id="egg-left" class="absolute inset-0 flex items-center justify-center pointer-events-none" style="color:#00e5ff">
-            <div class="relative">
-              <div class="egg-text font-mono text-[32px] select-none neon-left">))<span class="text-white">(.)</span>((</div>
-            </div>
-          </div>
-        <div class="mt-3 grid grid-cols-4 gap-1.5 text-[9px] font-mono text-zinc-500">
-          <div>20 CORPUS</div><div>21 HIPPA</div><div>22 NEO CORTEX</div><div>23 PRE-FRONTAL</div>
-          <div>24 INTROSPECT</div><div>25 FLAY IDEAS</div><div>26 REBUILD</div><div>27 AND LOL</div>
-        </div>
+    <!-- TOPIC INPUT -->
+    <div class="mt-3 flex gap-2 flex-wrap">
+      <span class="text-amber-500 self-center text-sm">root0@hearth:~$</span>
+      <input id="topic" class="term flex-1 min-w-[300px] px-3 py-2 text-sm" value='Most impactful male philosopher, and why he stole his wife&apos;s ideas' />
+      <button id="run" class="term px-5 py-2 text-sm tracking-wider">EXECUTE</button>
+      <button id="demo" class="term px-3 py-2 text-sm tracking-wider" style="background:transparent;color:var(--amber);border:1px solid var(--amber-dim)">DEMO</button>
+    </div>
+    <div class="text-[11px] text-amber-700 mt-2" id="status">▍ ready. enter topic. EXECUTE calls live dialectic generator. DEMO runs cached fallback.</div>
+  </div>
+
+  <!-- PULSE-3/5 MESH -->
+  <div class="frame p-4">
+    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+      <div class="crt text-xl glow-a">PULSE-3/5 MESH</div>
+      <div class="text-[11px] text-amber-600">interior(3) → LAW GATE → exterior(5) // each phase fires 4 voices simultaneously</div>
+    </div>
+    <div class="grid grid-cols-9 gap-1 mt-2 text-[11px]">
+      <div class="text-amber-700 self-center text-right pr-2">PHASE</div>
+      <div class="phase-cell" data-phase="0">ANCHOR<br><span class="text-amber-700">20 CORPUS</span></div>
+      <div class="phase-cell" data-phase="1">WITNESS<br><span class="text-amber-700">21 HIPPA</span></div>
+      <div class="phase-cell" data-phase="2">COHERENCE<br><span class="text-amber-700">22 NEOCTX</span></div>
+      <div class="phase-cell" id="gate-cell" style="border-color: var(--red); color: var(--red); padding-top: 12px;">▼ LAW ▼</div>
+      <div class="phase-cell" data-phase="3">EMIT<br><span class="text-amber-700">23 PREFRNT</span></div>
+      <div class="phase-cell" data-phase="4">ROUTE<br><span class="text-amber-700">24 INTRO</span></div>
+      <div class="phase-cell" data-phase="5">ACT<br><span class="text-amber-700">25 FLAY</span></div>
+      <div class="phase-cell" data-phase="6">REFLECT<br><span class="text-amber-700">26 REBUILD</span></div>
+    </div>
+    <div class="grid grid-cols-9 gap-1 mt-1 text-[11px]">
+      <div></div>
+      <div class="col-span-3 text-center text-amber-600 text-[10px] tracking-widest">INTERIOR — anchor.witness.coherence</div>
+      <div></div>
+      <div class="col-span-4 text-center text-amber-600 text-[10px] tracking-widest">EXTERIOR — emit.route.act.reflect.return</div>
+    </div>
+    <div class="grid grid-cols-9 gap-1 mt-1 text-[11px]">
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+      <div class="phase-cell" data-phase="7">RETURN<br><span class="text-amber-700">27 LOL</span></div>
+    </div>
+  </div>
+
+  <!-- TWO REGISTERS -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="frame p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="crt text-xl glow-a">HEARTH-1 REGISTER</div>
+        <div class="text-[11px]">POSITION: <span id="h1-pos" class="text-amber-200">— awaiting —</span></div>
       </div>
-    </section>
-
-    <!-- CENTER TRANSCRIPT -->
-    <section class="order-1 xl:order-2">
-      <div class="bg-[#08080c] border border-white/10 rounded-2xl h-[560px] md:h-[680px] xl:h-[720px] flex flex-col overflow-hidden shadow-2xl shadow-violet-950/20">
-        <div class="px-4 py-2.5 border-b border-white/5 flex items-center gap-3 bg-white/[0.02]">
-          <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-          <span class="font-mono text-[11px] uppercase tracking-widest text-white/70">Live Transcript</span>
-          <div class="flex-1 relative h-5 overflow-hidden">
-            <div id="pulse-layer" class="absolute inset-0"></div>
-          </div>
-          <span class="text-[10px] text-zinc-500 font-mono">encrypted quorum channel</span>
-        </div>
-        <div id="transcript" class="transcript flex-1 overflow-y-auto p-4 space-y-3 font-mono text-[13px] leading-relaxed"></div>
-        <div class="px-4 py-2 border-t border-white/5 bg-white/[0.01] text-[10px] font-mono text-zinc-500 flex justify-between">
-          <span>latency 12ms • cities synced</span>
-          <span id="live-status">DEBATE STARTING…</span>
-        </div>
+      <div id="reg-h1" class="grid grid-cols-8 gap-1.5"></div>
+      <div class="mt-3 text-[11px] flex justify-between text-amber-700">
+        <span>16 seats / 8 districts × 2 genders</span>
+        <span id="h1-tally">FOR 0 / AGAINST 0 / ABSTAIN 16</span>
       </div>
-    </section>
-
-    <!-- RIGHT CITY -->
-    <section class="order-3 xl:order-3">
-      <div class="bg-zinc-950/70 border border-fuchsia-500/20 rounded-2xl p-4 shadow-2xl shadow-fuchsia-950/20">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="font-mono text-fuchsia-400 font-bold tracking-widest">HEARTH-2</h2>
-          <span class="text-[10px] px-2 py-0.5 rounded-full bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/30">DEFENSE • COLLABORATED</span>
-        </div>
-        <div class="relative aspect-square city-bg rounded-xl overflow-hidden">
-          <svg id="svg-right" viewBox="0 0 400 400" class="absolute inset-0 w-full h-full"></svg>
-          <div id="egg-right" class="absolute inset-0 flex items-center justify-center pointer-events-none" style="color:#ff00e5">
-            <div class="relative">
-              <div class="egg-text font-mono text-[32px] select-none neon-right">))<span class="text-white">(.)</span>((</div>
-            </div>
-          </div>
-        </div>
-        <div class="mt-3 grid grid-cols-4 gap-1.5 text-[9px] font-mono text-zinc-500">
-          <div>20 CORPUS</div><div>21 HIPPA</div><div>22 NEO CORTEX</div><div>23 PRE-FRONTAL</div>
-          <div>24 INTROSPECT</div><div>25 FLAY IDEAS</div><div>26 REBUILD</div><div>27 AND LOL</div>
-        </div>
+    </div>
+    <div class="frame p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="crt text-xl glow-a">HEARTH-2 REGISTER</div>
+        <div class="text-[11px]">POSITION: <span id="h2-pos" class="text-amber-200">— awaiting —</span></div>
       </div>
-    </section>
-  </main>
+      <div id="reg-h2" class="grid grid-cols-8 gap-1.5"></div>
+      <div class="mt-3 text-[11px] flex justify-between text-amber-700">
+        <span>16 seats / 8 districts × 2 genders</span>
+        <span id="h2-tally">FOR 0 / AGAINST 0 / ABSTAIN 16</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE METER -->
+  <div class="frame p-4">
+    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+      <div class="crt text-xl glow-a">LIVE TALLY</div>
+      <div class="text-[11px] text-amber-600">defection threshold = argument weight > 0.5</div>
+    </div>
+    <div class="space-y-2">
+      <div>
+        <div class="flex justify-between text-[11px] mb-1"><span>FOR  // <span id="for-n">0</span>/32</span><span class="text-amber-700">quorum threshold 13/16 per side</span></div>
+        <div class="meter-track"><div id="for-fill" class="meter-fill" style="width:0%; background: var(--green)"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between text-[11px] mb-1"><span>AGAINST  // <span id="against-n">0</span>/32</span></div>
+        <div class="meter-track"><div id="against-fill" class="meter-fill" style="width:0%; background: var(--red)"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between text-[11px] mb-1"><span>ABSTAIN  // <span id="abst-n">32</span>/32</span></div>
+        <div class="meter-track"><div id="abst-fill" class="meter-fill" style="width:100%; background: var(--amber-dim)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSCRIPT -->
+  <div class="frame">
+    <div class="flex items-center justify-between p-3 border-b border-amber-900/60">
+      <div class="crt text-xl glow-a">TRANSCRIPT LOG</div>
+      <div class="text-[11px] text-amber-600"><span class="blink">▍</span> <span id="phase-label">awaiting EXECUTE</span></div>
+    </div>
+    <div id="log" class="scroll-log h-[440px] overflow-y-auto p-4 text-[13px] leading-relaxed space-y-2"></div>
+  </div>
+
+  <!-- VERDICT (hidden until end) -->
+  <div id="verdict-card" class="verdict p-5 hidden">
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <div class="crt text-2xl glow-g">▼ VERDICT // QUORUM SYNTHESIS ▼</div>
+      <div class="text-[11px] text-green-300">emergent — not pre-loaded</div>
+    </div>
+    <p id="verdict-text" class="text-bone text-base leading-relaxed" style="color: var(--bone)"></p>
+    <div class="grid grid-cols-2 gap-4 mt-4 text-[12px]">
+      <div>
+        <div class="text-amber-600">H1 internal agreement with own position</div>
+        <div class="meter-track mt-1"><div id="h1-agree-fill" class="meter-fill" style="width:0%; background: var(--green)"></div></div>
+        <div class="text-right mt-0.5" id="h1-agree-n">—</div>
+      </div>
+      <div>
+        <div class="text-amber-600">H2 internal agreement with own position</div>
+        <div class="meter-track mt-1"><div id="h2-agree-fill" class="meter-fill" style="width:0%; background: var(--green)"></div></div>
+        <div class="text-right mt-0.5" id="h2-agree-n">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="text-[11px] text-amber-700 flex justify-between flex-wrap gap-2">
+    <span>BASE-00 ▍ 8 districts × 2 genders × 2 cities = 32 voices = byte/8</span>
+    <span>STOICHEION v11.0 // PULSE-3/5 canon // verdict EMERGENT not SCRIPTED</span>
+  </div>
 </div>
 
 <script>
-const districts = [
-  {id:20, name:'CORPUS', color:'#00E5FF'},
-  {id:21, name:'HIPPA', color:'#8B5CF6'},
-  {id:22, name:'NEO CORTEX', color:'#3B82F6'},
-  {id:23, name:'PRE-FRONTAL', color:'#F59E0B'},
-  {id:24, name:'INTROSPECT', color:'#EC4899'},
-  {id:25, name:'FLAY IDEAS', color:'#EF4444'},
-  {id:26, name:'REBUILD', color:'#10B981'},
-  {id:27, name:'AND LOL', color:'#FACC15'},
+const DISTRICTS = [
+  { id: 20, name: 'CORPUS',    phase: 'ANCHOR',    role: 'evidence citation, specific facts' },
+  { id: 21, name: 'HIPPA',     phase: 'WITNESS',   role: 'historical memory retrieval' },
+  { id: 22, name: 'NEOCTX',    phase: 'COHERENCE', role: 'logical inference' },
+  { id: 23, name: 'PREFRNT',   phase: 'EMIT',      role: 'strategic framing' },
+  { id: 24, name: 'INTRO',     phase: 'ROUTE',     role: 'emotional / experiential weight' },
+  { id: 25, name: 'FLAY',      phase: 'ACT',       role: 'dissection of opposing argument' },
+  { id: 26, name: 'REBUILD',   phase: 'REFLECT',   role: 'synthesis attempt (weight near 0)' },
+  { id: 27, name: 'LOL',       phase: 'RETURN',    role: 'humor that lands, callback to debate' },
 ];
+const PHASES = DISTRICTS.map(d => d.phase);
 
-const leftTexts = [
-  "HEARTH-1 CORPUS online. We prosecute the canon. John Stuart Mill called Harriet Taylor his 'co-author' in private letters, then let textbooks print only 'J.S. Mill' for 150 years. That's not collaboration—that's branding theft.",
-  "He published 'On Liberty' in 1859. Harriet died 1858. He waited until she couldn't do press tours. Convenient timing for a 'soulmate collaborator.'",
-  "HIPPA retrieval: Aristotle's school excluded women formally, but Theophrastus records a female philosopher, unnamed, whose theories on substance appear verbatim in Metaphysics Book Z. Her name? Lost to 'history'.",
-  "And Hypatia wasn't his wife, but male contemporaries literally stole her astronomy lectures, published them as 'anonymous,' then murdered her for credit control. Peak peer review.",
-  "NEO CORTEX logic: If A writes 40% of B's landmark text, and B takes 100% of the tenure, royalties, and statues—that's theft, not co-authorship. QED.",
-  "Harriet's essay 'Enfranchisement of Women' (1851) contains the harm principle two years before Mill's 'On Liberty'. Coincidence? That's ctrl+c, 1853 edition.",
-  "PRE-FRONTAL plan: Establish pattern. Male philosopher marries brilliant woman → isolates her from publication → uses her drafts → credits her posthumously → history remembers him. Repeat for 2,400 years.",
-  "Sartre-de Beauvoir pact included her editing every page of Being and Nothingness. His notebooks: 'Simone fixes my logic.' Her reward? Footnote: 'to SDB'.",
-  "INTROSPECT: Feel the erasure. Harriet wrote 'all the best ideas were hers.' Mill admitted it. We teach kids 'Mill's genius' while Harriet gets a plaque in a park. That's emotional larceny.",
-  "Imagine writing existentialism's core ethics, then watching your boyfriend get the Paris café mural. Beauvoir deserved the cigarettes, not the second-hand smoke.",
-  "FLAY: Defense will say 'historical context!' Yeah, the context was patriarchy. That's not an excuse, that's the crime scene.",
-  "They'll say 'she chose anonymity.' Right, and medieval women 'chose' not to own property. Choice under coercion is HR rebranding.",
-  "REBUILD synthesis: We're not canceling Mill. We're annotating him. 'On Liberty (by Harriet Taylor Mill & J.S. Mill)'. Takes 12 characters.",
-  "Give us co-authorship retroactively, shared statues, syllabus space. Theft stops when we stop calling it 'muse'.",
-  "AND LOL: If stealing ideas made you a great philosopher, my ex is Plato. He took my Netflix password AND my theory of forms.",
-  "Final joke: Why did the male philosopher cross the road? To get to his wife's unpublished manuscript on the other side. lol"
-];
-
-const rightTexts = [
-  "HEARTH-2 CORPUS responding. Defense: collaboration, not larceny. Mill's 1873 Autobiography devotes 30 pages to Harriet—more than any thinker. That's not hiding, that's a love-letter citation.",
-  "Harriet explicitly refused public authorship. Letter to Mill 1854: 'I would rather die than see my name in print.' Honoring her wishes isn't theft—it's consent.",
-  "HIPPA counter-memory: Sartre and Beauvoir published separately AND together. 'The Second Sex' (1949) is entirely hers, 800 pages, Nobel-nominated. Hard to steal from someone more famous than you in France.",
-  "Aristotle's 'lost female contemporaries' are lost because papyrus degrades, not because men ate it. We have Sappho because scribes copied her. Blame humidity, not husbandry.",
-  "NEO CORTEX: Correlation ≠ theft. Couples think alike after decades. My wife finishes my sentences; I don't invoice her for plagiarism.",
-  "If 40/60 split equals theft, then every modern paper with 12 co-authors is grand larceny. Philosophy was their lab. They shared authorship socially, if not legally.",
-  "PRE-FRONTAL structure: Historical context matters. Victorian women couldn't publish political theory without being jailed. Mill publishing protected Harriet's ideas from censorship. That's strategy, not stealing.",
-  "Sartre put Beauvoir first in his will, his royalties, his executorship. He literally left her his words. Thieves don't do estate planning.",
-  "INTROSPECT: Feel the partnership. Harriet edited Mill, Mill edited Harriet. Their letters show fights, rewrites, jokes. That's marriage, not mining.",
-  "Beauvoir wrote 'I owe Sartre nothing, and he owes me nothing.' She rejected victim narrative. Let's not infantilize a woman who invented modern feminism.",
-  "FLAY back: Prosecution wants retroactive hashtags. You can't prosecute 1851 with 2025 copyright law. That's presentism with a neon wig.",
-  "Calling every intellectual partnership 'theft' insults women who WERE collaborators. Harriet wasn't stolen from—she was strategic. Respect her intelligence, not your narrative.",
-  "REBUILD: Compromise—we teach 'The Mills' as intellectual unit, like 'Watson & Crick' minus the DNA theft. Oh wait—bad example. lol",
-  "Let's credit properly: 'Mill & Taylor Mill', 'Sartre & Beauvoir Circle'. Update syllabi, not indictments.",
-  "AND LOL: If Mill stole Harriet's ideas, he did a terrible job—he spent 30 years advocating women's suffrage. Worst thief ever, steals work then campaigns for the victim's rights.",
-  "Final joke: Our cities agree on one thing—philosophers' wives were smarter. That's why they married them. Quorum that, HEARTH-1. lol"
-];
-
-const script=[];
-let li=0, ri=0;
-districts.forEach(d=>{
-  ['M','F'].forEach(g=>{
-    script.push({city:'left', district:d.id, gender:g, name:d.name, color:d.color, label:`${d.id}${g} ${d.name}`, text:leftTexts[li++]});
-    script.push({city:'right', district:d.id, gender:g, name:d.name, color:d.color, label:`${d.id}${g} ${d.name}`, text:rightTexts[ri++]});
-  });
-});
-
-function createCity(city){
-  const svg = document.getElementById(`svg-${city}`);
-  svg.innerHTML = `<defs><filter id="glow-${city}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
-  let idx=0;
-  districts.forEach(d=>{
-    ['M','F'].forEach(g=>{
-      const angle = (idx*22.5 - 90) * Math.PI/180;
-      const x = 200 + 148*Math.cos(angle);
-      const y = 200 + 148*Math.sin(angle);
-      const group = document.createElementNS('http://www.w3.org/2000/svg','g');
-      group.setAttribute('class','seat');
-      group.setAttribute('data-district',d.id);
-      group.setAttribute('data-gender',g);
-      group.setAttribute('transform',`translate(${x},${y})`);
-      group.innerHTML = `
-        <circle r="14" fill="#0a0a12" stroke="${d.color}" stroke-width="2" opacity="0.55" />
-        <text y="4" text-anchor="middle" font-size="8" fill="${d.color}" font-family="JetBrains Mono">${d.id}${g}</text>
-      `;
-      svg.appendChild(group);
-      idx++;
+function buildRegister(cityId) {
+  const el = document.getElementById('reg-' + cityId);
+  el.innerHTML = '';
+  DISTRICTS.forEach(d => {
+    ['M', 'F'].forEach(g => {
+      const cell = document.createElement('div');
+      cell.className = 'seat px-1 py-1.5 text-[10px] text-center';
+      cell.id = `${cityId}-${d.id}${g}`;
+      cell.innerHTML = `<div class="font-bold">${d.id}${g}</div><div class="text-[8px] opacity-60">${d.name}</div>`;
+      el.appendChild(cell);
     });
   });
-  // district rings
-  districts.forEach((d,i)=>{
-    const a1 = (i*2*22.5 - 101) * Math.PI/180;
-    const a2 = (i*2*22.5 + 21 -90) * Math.PI/180;
-    const x1=200+120*Math.cos(a1), y1=200+120*Math.sin(a1);
-    const x2=200+120*Math.cos(a2), y2=200+120*Math.sin(a2);
-    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d',`M ${x1} ${y1} A 120 120 0 0 1 ${x2} ${y2}`);
-    path.setAttribute('fill','none');
-    path.setAttribute('stroke',d.color);
-    path.setAttribute('stroke-opacity','0.15');
-    path.setAttribute('stroke-width','18');
-    svg.insertBefore(path, svg.firstChild);
-  });
 }
+buildRegister('h1'); buildRegister('h2');
 
-function highlightSeat(city, district, gender){
-  document.querySelectorAll('.seat').forEach(s=>{
-    s.classList.remove('active');
-    const c=s.querySelector('circle');
-    c.setAttribute('r','14'); c.setAttribute('opacity','0.55'); c.setAttribute('stroke-width','2');
-  });
-  const seat = document.querySelector(`#svg-${city} .seat[data-district="${district}"][data-gender="${gender}"]`);
-  if(seat){ seat.classList.add('active'); }
+// LOG
+function log(node) {
+  const wrap = document.getElementById('log');
+  wrap.appendChild(node);
+  wrap.scrollTop = wrap.scrollHeight;
 }
-
-function pulseEgg(city){
-  const egg = document.getElementById(`egg-${city}`);
-  egg.classList.remove('pulsing'); void egg.offsetWidth; egg.classList.add('pulsing');
-  setTimeout(()=>egg.classList.remove('pulsing'),700);
+function sysLine(text, color) {
+  const d = document.createElement('div');
+  d.className = 'log-line text-[11px] tracking-widest text-center py-1 my-1 border-y';
+  d.style.borderColor = color || 'rgba(255,176,0,0.3)';
+  d.style.color = color || 'var(--amber-dim)';
+  d.textContent = text;
+  log(d);
 }
-
-function sendPulse(fromCity, color){
-  const layer = document.getElementById('pulse-layer');
-  const dot = document.createElement('div');
-  dot.style.position='absolute'; dot.style.top='50%'; dot.style.width='8px'; dot.style.height='8px';
-  dot.style.borderRadius='9999px'; dot.style.background=color; dot.style.boxShadow=`0 0 12px ${color}`;
-  dot.style.transform='translateY(-50%)';
-  layer.appendChild(dot);
-  const start = fromCity==='left' ? '2%' : '98%';
-  const end = fromCity==='left' ? '98%' : '2%';
-  dot.animate([{left:start, opacity:1},{left:end, opacity:0}],{duration:850, easing:'cubic-bezier(.2,.8,.2,1)'}).onfinish=()=>dot.remove();
-}
-
-const transcript = document.getElementById('transcript');
-function addMessage(item){
-  const wrap = document.createElement('div');
-  wrap.className = 'group';
-  wrap.style.animation = 'fadeIn .35s ease';
-  const isLeft = item.city==='left';
-  wrap.innerHTML = `
-    <div class="flex gap-2.5 items-start">
-      <span class="shrink-0 px-1.5 py-0.5 rounded-md text-[10px] border font-medium" style="border-color:${item.color}55; background:${item.color}18; color:${item.color}">${isLeft?'H1':'H2'} ${item.label}</span>
-      <p class="text-zinc-200/90 leading-snug">${item.text}</p>
-    </div>
+function voiceLine(v) {
+  const d = document.createElement('div');
+  d.className = 'log-line flex gap-3 items-start';
+  const cityTag = v.city === 'h1' ? 'H1' : 'H2';
+  const cityColor = v.city === 'h1' ? 'var(--green)' : '#ff66e0';
+  d.innerHTML = `
+    <span class="shrink-0 text-[10px] font-bold tracking-wider px-1.5 py-0.5 border" style="color:${cityColor};border-color:${cityColor};">
+      ${cityTag}·${v.district}${v.gender}·${v.name}
+    </span>
+    <span class="flex-1" style="color: var(--bone)">${v.text}</span>
+    <span class="shrink-0 text-[10px] text-amber-700">w=${v.weight >= 0 ? '+' : ''}${v.weight.toFixed(2)}</span>
   `;
-  transcript.appendChild(wrap);
-  transcript.scrollTop = transcript.scrollHeight;
-}
-function addSystem(text){
-  const div=document.createElement('div');
-  div.className='my-4 py-2 text-center text-[11px] tracking-widest font-mono text-amber-300 border-y border-amber-400/20 bg-amber-400/5';
-  div.textContent=text;
-  transcript.appendChild(div); transcript.scrollTop=transcript.scrollHeight;
-}
-function addVerdict(text){
-  const card=document.createElement('div');
-  card.className='mt-4 p-4 rounded-xl border border-emerald-400/30 bg-emerald-400/5';
-  card.innerHTML=`<div class="text-[10px] font-mono tracking-widest text-emerald-300 mb-1">FINAL VERDICT • QUORUM SYNTHESIS</div><p class="text-emerald-100 leading-relaxed">${text}</p>`;
-  transcript.appendChild(card); transcript.scrollTop=transcript.scrollHeight;
+  log(d);
 }
 
-let turn=0;
-function updateStats(){
-  document.getElementById('stat-turn').textContent = `${Math.min(turn,32)}/32`;
-  const engage = Math.min(94, 62 + Math.floor(turn*1.05) + Math.floor(Math.random()*3));
-  document.getElementById('stat-engage').textContent = engage + '%';
+// SEAT ACTIVATION
+function activateSeat(city, did, gender) {
+  document.querySelectorAll('.seat.active').forEach(s => s.classList.remove('active'));
+  const seat = document.getElementById(`${city}-${did}${gender}`);
+  if (seat) seat.classList.add('active');
+}
+function commitSeat(city, did, gender, weight) {
+  const seat = document.getElementById(`${city}-${did}${gender}`);
+  if (!seat) return;
+  seat.classList.remove('active');
+  // weight > 0.3 = for (own side reinforced)
+  // weight < -0.3 = against (defected) — visible defection
+  if (weight > 0.3) seat.classList.add('for');
+  else if (weight < -0.3) { seat.classList.add('against'); seat.classList.add('defected'); }
 }
 
-function nextTurn(){
-  if(turn>=script.length){ startQuorum(); return; }
-  const item = script[turn];
-  document.getElementById('live-status').textContent = `${item.city==='left'?'HEARTH-1':'HEARTH-2'} speaking…`;
-  highlightSeat(item.city, item.district, item.gender);
-  pulseEgg(item.city);
-  sendPulse(item.city, item.color);
-  addMessage(item);
-  turn++; updateStats();
-  setTimeout(nextTurn, 2350 + Math.random()*400);
-}
-
-function startQuorum(){
-  addSystem('— ALL 32 VOICES HEARD — INITIATING DISTRICT VOTE —');
-  document.getElementById('live-status').textContent = 'QUORUM VOTE';
-  const all = [];
-  districts.forEach(d=>{ all.push({city:'left', d}); all.push({city:'right', d}); });
-  const disagreeIdx = new Set([3,9,14]); // 3 dissenters
-  let agree=0;
-  all.forEach((item,i)=>{
-    setTimeout(()=>{
-      const isAgree = !disagreeIdx.has(i);
-      const seats = document.querySelectorAll(`#svg-${item.city} .seat[data-district="${item.d.id}"]`);
-      seats.forEach(s=>{
-        const c=s.querySelector('circle');
-        c.setAttribute('fill', isAgree ? '#052e16' : '#2f0a0a');
-        c.setAttribute('stroke', isAgree ? '#10b981' : '#ef4444');
-        c.setAttribute('opacity','1');
-        c.setAttribute('r','16');
-      });
-      if(isAgree) agree++;
-      document.getElementById('stat-quorum').textContent = `${agree}/16`;
-      if(agree===12) triggerQuorum();
-    }, i*260);
+// TALLY
+function recountTallies() {
+  let totalFor = 0, totalAgainst = 0, totalAbst = 0;
+  ['h1', 'h2'].forEach(c => {
+    let f = 0, a = 0, ab = 0;
+    DISTRICTS.forEach(d => ['M', 'F'].forEach(g => {
+      const el = document.getElementById(`${c}-${d.id}${g}`);
+      if (el.classList.contains('for')) f++;
+      else if (el.classList.contains('against')) a++;
+      else ab++;
+    }));
+    document.getElementById(`${c}-tally`).textContent = `FOR ${f} / AGAINST ${a} / ABSTAIN ${ab}`;
+    totalFor += f; totalAgainst += a; totalAbst += ab;
   });
-  setTimeout(showVerdict, all.length*260 + 900);
+  document.getElementById('for-n').textContent = totalFor;
+  document.getElementById('against-n').textContent = totalAgainst;
+  document.getElementById('abst-n').textContent = totalAbst;
+  document.getElementById('for-fill').style.width = (totalFor / 32 * 100) + '%';
+  document.getElementById('against-fill').style.width = (totalAgainst / 32 * 100) + '%';
+  document.getElementById('abst-fill').style.width = (totalAbst / 32 * 100) + '%';
+  document.getElementById('quorum-pill').textContent = `QUORUM: ${totalFor + totalAgainst}/32`;
 }
 
-function triggerQuorum(){
-  const l = document.getElementById('egg-left');
-  const r = document.getElementById('egg-right');
-  l.classList.add('quorum'); r.classList.add('quorum');
-  l.querySelector('.egg-text').innerHTML = '))<span style="color:#10b981">(.)</span>((';
-  r.querySelector('.egg-text').innerHTML = '))<span style="color:#10b981">(.)</span>((';
-  addSystem('QUORUM REACHED (13/16) — SYNCHRONIZED ))(.)(( EXPANSION');
-  pulseEgg('left'); pulseEgg('right');
-  setInterval(()=>{ pulseEgg('left'); pulseEgg('right'); }, 1200);
+// PHASE CELL STATE
+function markPhase(idx, state) {
+  const cell = document.querySelector(`[data-phase="${idx}"]`);
+  if (!cell) return;
+  cell.classList.remove('active', 'complete', 'blocked');
+  cell.classList.add(state);
+}
+function gateState(state) {
+  const pill = document.getElementById('gate');
+  const gc = document.getElementById('gate-cell');
+  pill.className = 'gate-pill ' + state;
+  if (state === 'sealed') { pill.textContent = 'GATE 192.5: SEALED'; gc.style.color = 'var(--red)'; gc.style.borderColor = 'var(--red)'; }
+  if (state === 'stressed') { pill.textContent = 'GATE 192.5: STRESSED'; gc.style.color = 'var(--amber)'; gc.style.borderColor = 'var(--amber)'; }
+  if (state === 'open') { pill.textContent = 'GATE 192.5: OPEN'; gc.style.color = 'var(--green)'; gc.style.borderColor = 'var(--green)'; }
+  if (state === 'breached') { pill.textContent = 'GATE 192.5: BREACHED'; gc.style.color = 'var(--red)'; gc.style.borderColor = 'var(--red)'; }
 }
 
-function showVerdict(){
-  addVerdict("HEARTH CONSENSUS: Collaboration was authentic AND erasure was systemic. The Mills functioned as a single intellectual unit; Beauvoir & Sartre co-created existential praxis. Victorian publication law and canon-making amplified male names. Remedy: co-credit Harriet Taylor Mill on 'On Liberty', teach the Beauvoir–Sartre circle as mutual, and restore unnamed women where evidence exists. Prosecution proved structural theft; Defense proved personal consent. Both true.");
-  document.getElementById('live-status').textContent = 'CONSENSUS ACHIEVED';
-  document.getElementById('stat-engage').textContent = '94%';
+// ANIMATE A FULL TRANSCRIPT
+async function animate(data) {
+  document.getElementById('h1-pos').textContent = data.h1_position;
+  document.getElementById('h2-pos').textContent = data.h2_position;
+
+  gateState('sealed');
+  // group voices by phase
+  const byPhase = {};
+  PHASES.forEach(p => byPhase[p] = []);
+  data.voices.forEach(v => { if (byPhase[v.phase]) byPhase[v.phase].push(v); });
+
+  for (let i = 0; i < PHASES.length; i++) {
+    const phase = PHASES[i];
+    const district = DISTRICTS[i];
+    document.getElementById('phase-label').textContent = `phase ${i+1}/8 — ${phase} (${district.id} ${district.name})`;
+    markPhase(i, 'active');
+    sysLine(`▶ PHASE ${i+1}/8 ▍ ${phase} ▍ DISTRICT ${district.id} ${district.name} ▍ ${district.role}`, 'var(--amber)');
+
+    // GATE check between interior(3) and exterior(5)
+    if (i === 3) {
+      gateState('stressed');
+      sysLine('▼ INTERIOR COMPLETE — LAW GATE 192.5 TRAVERSAL — ANCHOR·WITNESS·COHERENCE VERIFIED', 'var(--green)');
+      await sleep(1100);
+      gateState('open');
+      sysLine('▼ GATE OPEN — EXTERIOR PERMITTED — EMIT·ROUTE·ACT·REFLECT·RETURN', 'var(--green)');
+      await sleep(600);
+    }
+
+    const voices = byPhase[phase] || [];
+    for (const v of voices) {
+      activateSeat(v.city, v.districtId, v.gender);
+      voiceLine(v);
+      await sleep(750);
+      commitSeat(v.city, v.districtId, v.gender, v.weight);
+      recountTallies();
+      await sleep(180);
+    }
+    markPhase(i, 'complete');
+    await sleep(350);
+  }
+
+  // VERDICT
+  sysLine('▼ ALL PHASES COMPLETE ▍ QUORUM REACHED ▍ SYNTHESIZING VERDICT', 'var(--green)');
+  await sleep(700);
+  showVerdict(data.verdict);
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  createCity('left'); createCity('right');
-  addSystem('HEARTH LINK ESTABLISHED • TOPIC LOADED');
-  setTimeout(()=>{ document.getElementById('live-status').textContent='DEBATE IN PROGRESS'; nextTurn(); }, 900);
+function showVerdict(v) {
+  const card = document.getElementById('verdict-card');
+  card.classList.remove('hidden');
+  document.getElementById('verdict-text').textContent = v.synthesis;
+  setTimeout(() => {
+    document.getElementById('h1-agree-fill').style.width = (v.h1_agreement * 100) + '%';
+    document.getElementById('h2-agree-fill').style.width = (v.h2_agreement * 100) + '%';
+    document.getElementById('h1-agree-n').textContent = (v.h1_agreement * 100).toFixed(0) + '%';
+    document.getElementById('h2-agree-n').textContent = (v.h2_agreement * 100).toFixed(0) + '%';
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 200);
+  document.getElementById('phase-label').textContent = 'verdict rendered — emergent synthesis';
+  document.getElementById('status').innerHTML = '▍ <span class="glow-g">complete.</span> verdict is procedurally synthesized from this run\'s voice weights — re-run for divergent outcome.';
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// API CALL — GENERATE LIVE DIALECTIC
+async function generateDialectic(topic) {
+  const systemMsg = `You generate adversarial dialectic transcripts for the HEARTH DIALECTIC ENGINE. Return ONLY valid JSON, no preamble, no markdown fences, no commentary.`;
+
+  const userMsg = `TOPIC: ${topic}
+
+Generate two opposing positions (H1 and H2) on this topic, then a 32-voice dialectic following the PULSE-3/5 mesh.
+
+Schema (return EXACTLY this shape):
+{
+  "h1_position": "one-sentence H1 stance",
+  "h2_position": "one-sentence H2 stance (genuinely opposed to H1)",
+  "voices": [
+    { "phase": "ANCHOR", "districtId": 20, "name": "CORPUS", "city": "h1", "gender": "M", "text": "...", "weight": 0.85 },
+    ... (32 total entries)
+  ],
+  "verdict": {
+    "synthesis": "1-3 sentences synthesizing what BOTH sides got right and where the real tension lies. Specific, not platitudes.",
+    "h1_agreement": 0.0-1.0,
+    "h2_agreement": 0.0-1.0
+  }
+}
+
+Voice ordering: 8 phases × 4 voices each = 32. Per phase, order is (h1-M, h1-F, h2-M, h2-F).
+
+Phase → district mapping (in order):
+ANCHOR=20 CORPUS (evidence citation, specific facts)
+WITNESS=21 HIPPA (historical memory retrieval)
+COHERENCE=22 NEOCTX (logical inference)
+EMIT=23 PREFRNT (strategic framing)
+ROUTE=24 INTRO (emotional / experiential weight)
+ACT=25 FLAY (dissection of opposing argument)
+REFLECT=26 REBUILD (synthesis attempt — weight should be near 0, ±0.2)
+RETURN=27 LOL (humor that lands; callback to earlier voices)
+
+Each voice text: 1-2 sentences, terse, in-character for district role. No throat-clearing. Speak in the voice of someone whose argument is sharpened by being one of 32 minds.
+
+Weight scale: -1 (totally undermines own side, defects) to +1 (totally reinforces own side). Most voices weight 0.5-0.9 toward their side. REBUILD voices weight -0.2 to +0.2 (genuine synthesizing). At least 2 voices across the 32 should weight negative (genuine defection — argument was bad enough to break ranks). LOL voices punch up at their own side too — weight 0.3-0.6.
+
+Verdict synthesis must NOT be "both are correct" pablum. Name what each side proved AND what each got wrong.`;
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 8000,
+      system: systemMsg,
+      messages: [{ role: "user", content: userMsg }]
+    })
+  });
+  if (!res.ok) throw new Error('API ' + res.status);
+  const data = await res.json();
+  const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+  const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+  return JSON.parse(cleaned);
+}
+
+// DEMO FALLBACK
+const DEMO = {
+  h1_position: "Mill systematically appropriated Harriet Taylor's intellectual labor under Victorian publishing constraints.",
+  h2_position: "The Mill-Taylor partnership was an authentic collaboration honored by Taylor's explicit consent.",
+  voices: [
+    // ANCHOR
+    { phase:'ANCHOR', districtId:20, name:'CORPUS', city:'h1', gender:'M', text:"Mill's own 1873 Autobiography: 'the whole mode of thinking of which the book was an expression was emphatically hers.' His words. Court exhibit A.", weight:0.92 },
+    { phase:'ANCHOR', districtId:20, name:'CORPUS', city:'h1', gender:'F', text:"Harriet's 1851 'Enfranchisement of Women' contains the harm principle two years before 'On Liberty.' Timestamps don't lie. Citations do.", weight:0.88 },
+    { phase:'ANCHOR', districtId:20, name:'CORPUS', city:'h2', gender:'M', text:"Harriet's 1854 letter to Mill, preserved in Yale archives: 'I would rather die than see my name in print.' Authorship requires consent to author.", weight:0.85 },
+    { phase:'ANCHOR', districtId:20, name:'CORPUS', city:'h2', gender:'F', text:"Mill dedicated 'On Liberty' to her by name on the title page in 1859. Hidden contributors don't get title-page dedications.", weight:0.78 },
+    // WITNESS
+    { phase:'WITNESS', districtId:21, name:'HIPPA', city:'h1', gender:'M', text:"Pattern recall: Sartre's notebooks list Beauvoir as primary editor of 'Being and Nothingness.' Her name appears as a footnote. Same template, different century.", weight:0.81 },
+    { phase:'WITNESS', districtId:21, name:'HIPPA', city:'h1', gender:'F', text:"Aristotle's 'lost' female contemporaries weren't lost—they were unindexed. Theophrastus references them; later scribes didn't copy them forward. Erasure has a method.", weight:0.74 },
+    { phase:'WITNESS', districtId:21, name:'HIPPA', city:'h2', gender:'M', text:"Counter-memory: women published under male pseudonyms when they wanted credit—Eliot, the Brontës. Harriet had options and used none. That's a choice, not a chain.", weight:0.69 },
+    { phase:'WITNESS', districtId:21, name:'HIPPA', city:'h2', gender:'F', text:"De Beauvoir, 1972 interview: 'I owe Sartre nothing, he owes me nothing.' Don't infantilize the women who invented modern feminism by retconning them as victims.", weight:0.83 },
+    // COHERENCE
+    { phase:'COHERENCE', districtId:22, name:'NEOCTX', city:'h1', gender:'M', text:"If author A writes 40% and author B receives 100% of credit, royalties, and canon-placement, the math is theft. Calling it 'muse' is just better PR.", weight:0.79 },
+    { phase:'COHERENCE', districtId:22, name:'NEOCTX', city:'h1', gender:'F', text:"Structural argument: when one publication path is jail and the other is glory, 'choice' is coerced. Consent under duress isn't consent—it's compliance.", weight:0.86 },
+    { phase:'COHERENCE', districtId:22, name:'NEOCTX', city:'h2', gender:'M', text:"Inverse: applying 2025 IP frameworks to 1859 invalidates every collaborative work in history. Presentism isn't analysis, it's a wig.", weight:0.71 },
+    { phase:'COHERENCE', districtId:22, name:'NEOCTX', city:'h2', gender:'F', text:"Joint authorship requires intent. Their letters show shared intent to publish under his name FOR strategic reasons. That's joint authorship with asymmetric byline.", weight:0.66 },
+    // — LAW GATE —
+    // EMIT
+    { phase:'EMIT', districtId:23, name:'PREFRNT', city:'h1', gender:'M', text:"Strategic frame: this isn't about Mill. It's about a 2,400-year filter. Every era recovers women only after the men holding their work are dead.", weight:0.84 },
+    { phase:'EMIT', districtId:23, name:'PREFRNT', city:'h1', gender:'F', text:"Remedy: retroactive co-authorship on canonical works where evidence supports it. Twelve characters in a citation. Not a revolution—a correction.", weight:0.77 },
+    { phase:'EMIT', districtId:23, name:'PREFRNT', city:'h2', gender:'M', text:"Frame check: collapsing 'collaboration' and 'theft' into one category insults every real collaboration. Sharpen the language or lose it.", weight:0.72 },
+    { phase:'EMIT', districtId:23, name:'PREFRNT', city:'h2', gender:'F', text:"Strategic: name the actual problem—canon-formation, not Mill. Editors and syllabi did the erasure. Prosecute them, not the dead husband who advocated suffrage.", weight:0.81 },
+    // ROUTE
+    { phase:'ROUTE', districtId:24, name:'INTRO', city:'h1', gender:'M', text:"Feel it: a woman writes for fifteen years and the building she shaped is named after the man who carried her papers. That's not a footnote. That's grief.", weight:0.88 },
+    { phase:'ROUTE', districtId:24, name:'INTRO', city:'h1', gender:'F', text:"Every female grad student reading 'On Liberty' knows the rhythm of being cited as 'and contributions by.' We feel it in the meter.", weight:0.91 },
+    { phase:'ROUTE', districtId:24, name:'INTRO', city:'h2', gender:'M', text:"Counter-feel: Mill spent thirty years after her death advocating women's suffrage. Thieves don't campaign for their victims. Some grief is gratitude in disguise.", weight:0.76 },
+    { phase:'ROUTE', districtId:24, name:'INTRO', city:'h2', gender:'F', text:"Harriet's letters to her daughter Helen describe pride, not erasure. We project our pain onto her silence. Maybe she was already free.", weight:0.69 },
+    // ACT (FLAY)
+    { phase:'ACT', districtId:25, name:'FLAY', city:'h1', gender:'M', text:"Defense said 'consent.' Consent in 1854 meant 'don't get me institutionalized.' That's not consent—that's a hostage statement filed under love letter.", weight:0.87 },
+    { phase:'ACT', districtId:25, name:'FLAY', city:'h1', gender:'F', text:"They cited Mill's suffrage campaign as exoneration. By that logic, every reformer who profits from injustice is innocent because they later filed paperwork.", weight:0.82 },
+    { phase:'ACT', districtId:25, name:'FLAY', city:'h2', gender:'M', text:"Prosecution wants retroactive consent revocation. That theory deletes every collaborative legacy in history. Use a scalpel, not a flamethrower.", weight:0.74 },
+    { phase:'ACT', districtId:25, name:'FLAY', city:'h2', gender:'F', text:"They said 'choice under coercion is HR rebranding.' Cute. Also: refusing women the capacity to choose, even badly, is itself a coercion. Recursion.", weight:0.78 },
+    // REFLECT (REBUILD) — synthesis, weight near 0
+    { phase:'REFLECT', districtId:26, name:'REBUILD', city:'h1', gender:'M', text:"Concession: Mill didn't sneak. He published openly with her name in the dedication. Theft is the wrong frame. Erasure is the right one—done by editors after, not him.", weight:-0.15 },
+    { phase:'REFLECT', districtId:26, name:'REBUILD', city:'h1', gender:'F', text:"Synthesize: structural erasure is real AND personal partnership was real. Name both. Don't collapse them into a single accusation.", weight:0.05 },
+    { phase:'REFLECT', districtId:26, name:'REBUILD', city:'h2', gender:'M', text:"Concession: 'she chose' is too clean. Victorian women's choices were shaped by what was survivable. We can honor her agency and the cage simultaneously.", weight:-0.18 },
+    { phase:'REFLECT', districtId:26, name:'REBUILD', city:'h2', gender:'F', text:"Joint proposal: 'On Liberty, by John Stuart Mill with Harriet Taylor Mill.' Twelve characters, both true. Move on.", weight:0.10 },
+    // RETURN (LOL)
+    { phase:'RETURN', districtId:27, name:'LOL', city:'h1', gender:'M', text:"Mill stole his wife's ideas so thoroughly he spent thirty years lobbying Parliament for her right to vote against him. Worst heist of the 19th century.", weight:0.42 },
+    { phase:'RETURN', districtId:27, name:'LOL', city:'h1', gender:'F', text:"At least when men plagiarize today they have the decency to use ChatGPT. Mill had to seduce his.", weight:0.55 },
+    { phase:'RETURN', districtId:27, name:'LOL', city:'h2', gender:'M', text:"H1 just spent eight phases proving Mill was a feminist who wouldn't shut up about his wife. Quorum motion: dismiss the indictment, fine him for being annoying.", weight:0.48 },
+    { phase:'RETURN', districtId:27, name:'LOL', city:'h2', gender:'F', text:"Both cities agree: philosophers' wives were the smart ones. That's why they married them. Patriarchy's worst-kept secret. Quorum on jokes, please.", weight:0.50 },
+  ],
+  verdict: {
+    synthesis: "Prosecution proved structural erasure — the canon, not Mill personally, did the theft after both were dead. Defense proved personal authenticity — the Mills functioned as a single intellectual unit by mutual design. The real failure isn't Mill's; it's every editor and syllabus from 1860 onward who quietly dropped 'Mill, with Harriet Taylor Mill' down to 'Mill.' Remedy is bibliographic, not punitive: restore the byline.",
+    h1_agreement: 0.74,
+    h2_agreement: 0.71
+  }
+};
+
+// CONTROLS
+document.getElementById('run').addEventListener('click', async () => {
+  reset();
+  const topic = document.getElementById('topic').value.trim();
+  if (!topic) { document.getElementById('status').textContent = '▍ topic required.'; return; }
+  document.getElementById('run').disabled = true;
+  document.getElementById('demo').disabled = true;
+  document.getElementById('status').innerHTML = '▍ <span class="glow-a">calling dialectic generator…</span> may take 20-40 sec for 32 voices.';
+  try {
+    const data = await generateDialectic(topic);
+    await animate(data);
+  } catch (e) {
+    document.getElementById('status').innerHTML = `▍ <span class="glow-r">API error:</span> ${e.message}. running DEMO fallback.`;
+    await animate(DEMO);
+  } finally {
+    document.getElementById('run').disabled = false;
+    document.getElementById('demo').disabled = false;
+  }
 });
+
+document.getElementById('demo').addEventListener('click', async () => {
+  reset();
+  document.getElementById('run').disabled = true;
+  document.getElementById('demo').disabled = true;
+  document.getElementById('topic').value = DEMO.h1_position.split('.')[0] + ' (DEMO)';
+  document.getElementById('status').innerHTML = '▍ <span class="glow-a">running cached demo</span> — Mill/Taylor adversarial dialectic';
+  await animate(DEMO);
+  document.getElementById('run').disabled = false;
+  document.getElementById('demo').disabled = false;
+});
+
+function reset() {
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('verdict-card').classList.add('hidden');
+  document.querySelectorAll('.seat').forEach(s => s.classList.remove('for','against','active','defected'));
+  document.querySelectorAll('.phase-cell').forEach(c => c.classList.remove('active','complete','blocked'));
+  gateState('sealed');
+  recountTallies();
+  document.getElementById('h1-pos').textContent = '— awaiting —';
+  document.getElementById('h2-pos').textContent = '— awaiting —';
+}
 </script>
 </body>
 </html>
