@@ -3,465 +3,670 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fractal Greeks vs Romans Tournament</title>
+<title>REYNHOLM INDUSTRIES — DIGITAL FORTRESS DIVISION</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="/css2?family=Inter:wght@300;400;500;600&family=Caveat:wght@500;600&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: dark; }
-  body { 
-    font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-    background: #030307;
-    overscroll-behavior: none;
-    touch-action: none;
-  }
-  .mono { font-family: 'JetBrains Mono', monospace; }
-  #viewport { 
-    background: 
-      radial-gradient(ellipse at 20% 0%, rgba(56,189,248,0.08), transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(245,158,11,0.07), transparent 50%),
-      radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.05), transparent 70%),
-      #030307;
-  }
-  #world { transform-origin: 0 0; will-change: transform; }
-  .tournament {
-    filter: drop-shadow(0 25px 80px rgba(0,0,0,0.9));
-  }
-  .body {
-    will-change: transform;
-    transition: filter 0.3s ease;
-  }
-  .body::before {
-    content: '';
-    position: absolute;
-    inset: -12px;
-    border-radius: 9999px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-  }
-  .body[data-type="greek"]::before {
-    background: radial-gradient(circle, rgba(56,189,248,0.4), transparent 60%);
-    box-shadow: 0 0 30px rgba(56,189,248,0.3);
-  }
-  .body[data-type="roman"]::before {
-    background: radial-gradient(circle, rgba(245,158,11,0.4), transparent 60%);
-    box-shadow: 0 0 30px rgba(245,158,11,0.3);
-  }
-  .body:hover::before { opacity: 1; }
-  .body:hover { filter: brightness(1.3); }
-  
-  .question {
-    animation: float 3.5s ease-in-out infinite;
-    backdrop-filter: blur(8px);
-  }
-  .question:nth-child(2){ animation-delay: .15s }
-  .question:nth-child(3){ animation-delay: .3s }
-  .question:nth-child(4){ animation-delay: .45s }
-  .question:nth-child(5){ animation-delay: .6s }
-  .question:nth-child(6){ animation-delay: .75s }
-  @keyframes float { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-5px) } }
-  
-  .sentinel { animation: pulse 4s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{ opacity: .6; transform: translate(-50%,-50%) scale(1) } 50%{ opacity: 1; transform: translate(-50%,-50%) scale(1.1) } }
-  
-  .judge { animation: judgePulse 3s ease-in-out infinite; }
-  @keyframes judgePulse { 0%,100%{ box-shadow: 0 0 25px rgba(167,139,250,0.7) } 50%{ box-shadow: 0 0 40px rgba(167,139,250,1) } }
+:root {
+  --bone: #faf9f6;
+  --charcoal: #0a0a0a;
+  --blood: #c41e3a;
+  --cyan: #00e5ff;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bone);
+  color: var(--charcoal);
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 2;
+}
+.scanlines {
+  background: repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(10,10,10,0.025) 3px, transparent 4px);
+}
+.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.handwriting { font-family: 'Caveat', cursive; }
+.sticky-note { font-family: 'Patrick Hand', cursive; }
+.moss { font-family: 'JetBrains Mono', monospace; }
 
-  .guard { transition: transform 0.2s; }
+.stack-node {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+.stack-node.in { opacity: 1; transform: translateY(0); }
+.stack-arrow { color: #d1d5db; font-weight: 300; margin: 0.5rem 0; }
+
+.toroid-ring { transition: all 0.5s cubic-bezier(0.16,1,0.3,1); }
+#toroid:hover .toroid-ring:nth-child(1){ transform: scale(1.35); opacity: 0.7; box-shadow: 0 0 30px rgba(0,229,255,0.2); }
+#toroid:hover .toroid-ring:nth-child(2){ transform: scale(1.18); opacity: 1; box-shadow: 0 0 20px rgba(0,229,255,0.4); }
+#toroid:hover .toroid-ring:nth-child(3){ transform: scale(1.06); box-shadow: 0 0 12px rgba(0,229,255,0.7); }
+
+.ternary-bit { transition: all 0.25s; color: #a3a3a3; padding: 0.25rem 0.5rem; border-radius: 4px; }
+.ternary-bit.active { color: var(--blood); background: rgba(196,30,58,0.06); transform: scale(1.1); }
+
+.business-card {
+  background: white;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.business-card:hover { transform: translateY(-6px) rotate(-1.2deg); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+
+.pulse-ring, .pulse-ring::before, .pulse-ring::after {
+  position: absolute; inset: -60px; border-radius: 9999px;
+  border: 1px solid rgba(196,30,58,0.18);
+  animation: pulse 4s cubic-bezier(0.4,0,0.6,1) infinite;
+}
+.pulse-ring::before { content:''; inset: -30px; animation-delay: 0.8s; border-color: rgba(196,30,58,0.12); }
+.pulse-ring::after { content:''; inset: 15px; animation-delay: 1.6s; border-color: rgba(196,30,58,0.08); }
+@keyframes pulse { 0% { transform: scale(0.85); opacity: 1; } 70% { transform: scale(1.15); opacity: 0; } 100% { opacity: 0; } }
+
+.sticky {
+  background: #fff7ad;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.08), 0 12px 24px rgba(0,0,0,0.06);
+}
+
+.red-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--blood), transparent); }
 </style>
 </head>
-<body class="text-zinc-200 overflow-hidden select-none">
-  <div id="viewport" class="relative w-screen h-screen overflow-hidden">
-    <div id="world" class="absolute top-0 left-0"></div>
-    
-    <!-- Vignette -->
-    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.8)_100%)]"></div>
-  </div>
+<body class="selection:bg-[#c41e3a] selection:text-white">
+<div class="scanlines fixed inset-0 pointer-events-none z-50"></div>
 
-  <!-- UI Top -->
-  <div class="fixed top-0 left-0 right-0 z-[200] pointer-events-none">
-    <div class="flex justify-between items-start p-4 md:p-6">
-      <div>
-        <div id="breadcrumb" class="mono text-xs md:text-sm flex items-center gap-1.5 bg-black/70 backdrop-blur-xl px-3 py-2 rounded-full border border-white/10"></div>
-        <div class="mt-3 mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 px-3">Greeks vs Romans</div>
-      </div>
-      <div id="levelIndicator" class="text-right bg-black/70 backdrop-blur-xl px-4 py-3 rounded-2xl border border-white/10 pointer-events-auto"></div>
+<nav class="fixed top-0 w-full z-40 backdrop-blur-xl bg-[#faf9f6]/70 border-b border-black/[0.06]">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 h-[58px] flex items-center justify-between">
+    <div class="text-[11px] tracking-[0.3em] font-medium">REYNHOLM INDUSTRIES</div>
+    <div class="text-[10px] tracking-widest text-neutral-500">DIGITAL FORTRESS DIVISION — CONFIDENTIAL v27.3</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="h-screen relative flex items-center justify-center overflow-hidden">
+  <div class="absolute inset-0">
+    <div class="absolute inset-0 opacity-[0.015]" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
+  </div>
+  <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+    <div class="inline-flex items-center gap-3 mb-10">
+      <div class="w-8 h-[1px] bg-neutral-300"></div>
+      <span class="text-[10px] tracking-[0.4em] text-neutral-500">EST. 2006 — BASEMENT LEVEL 2</span>
+      <div class="w-8 h-[1px] bg-neutral-300"></div>
+    </div>
+    <h1 class="text-[clamp(36px,7vw,88px)] font-[300] tracking-[-0.02em] leading-[0.85]">REYNHOLM INDUSTRIES<br><span class="italic font-light">DIGITAL FORTRESS</span></h1>
+    <div class="red-rule w-48 mx-auto my-10"></div>
+    <div class="max-w-2xl mx-auto h-[140px] md:h-[120px]">
+      <p id="bateman" class="font-mono text-[13px] leading-relaxed text-neutral-600 min-h-[6em]"></p>
+      <span class="inline-block w-[2px] h-[14px] bg-[#c41e3a] -mt-1 animate-pulse"></span>
     </div>
   </div>
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] tracking-widest text-neutral-400">SCROLL TO INITIATE PROTOCOL</div>
+</section>
 
-  <!-- Bottom -->
-  <div class="fixed bottom-0 left-0 right-0 z-[200] pointer-events-none">
-    <div class="flex justify-between items-end p-4 md:p-6 gap-4">
-      <div class="pointer-events-auto">
-        <button id="zoomOut" class="group relative overflow-hidden bg-zinc-900/80 backdrop-blur-xl border border-white/15 hover:border-white/30 px-5 py-2.5 rounded-full mono text-xs tracking-widest transition-all hover:bg-zinc-800/80 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5M20 9H4"/></svg>
-          ZOOM OUT
-          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-violet-500/10 to-cyan-500/10"></div>
-        </button>
-      </div>
-      <div class="text-center max-w-[520px] mx-auto">
-        <div class="mono text-[11px] leading-relaxed text-zinc-500 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/5">
-          Click any body to see it contains the whole tournament. <span class="text-zinc-400">l 5! r 5! = 1! = 0! = 1</span>
+<!-- THE STACK -->
+<section class="relative border-t border-black/5 py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 grid lg:grid-cols-12 gap-16 items-start">
+    <div class="lg:col-span-5 relative">
+      <div class="sticky top-28">
+        <div class="text-[11px] tracking-[0.3em] text-neutral-500 mb-8">SECTION 01 — THE STACK</div>
+        <div class="flex flex-col items-center text-center">
+          <div class="stack-node" style="transition-delay:0ms">
+            <div class="text-[11px] tracking-widest text-neutral-400 mb-2">LAYER 0</div>
+            <div class="text-2xl font-light tracking-tight">FULL STACK</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:100ms">↓</div>
+          
+          <div class="stack-node" style="transition-delay:200ms">
+            <div id="toroid" class="relative w-40 h-20 flex items-center justify-center cursor-pointer select-none my-2">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="toroid-ring absolute w-36 h-12 rounded-full border border-[#00e5ff]/25"></div>
+                <div class="toroid-ring absolute w-28 h-9 rounded-full border border-[#00e5ff]/40"></div>
+                <div class="toroid-ring absolute w-20 h-7 rounded-full border border-[#00e5ff]/70"></div>
+              </div>
+              <span class="relative z-10 text-[28px] font-mono tracking-[0.2em] text-neutral-800">((()))</span>
+            </div>
+            <div class="text-[10px] text-neutral-500 -mt-1">PLASMATONIC TOROID</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:300ms">↓</div>
+
+          <div class="stack-node" style="transition-delay:400ms">
+            <div id="ternary" class="flex gap-8 text-[26px] font-mono cursor-pointer select-none px-4 py-2">
+              <span data-v="-1" class="ternary-bit">-1</span>
+              <span data-v="0" class="ternary-bit active">0</span>
+              <span data-v="+1" class="ternary-bit">+1</span>
+            </div>
+            <div class="text-[10px] text-neutral-500 mt-1">TERNARY STATE — CLICK TO TOGGLE</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:500ms">↓</div>
+
+          <div class="stack-node space-y-3" style="transition-delay:600ms">
+            <div class="text-4xl font-[250] tracking-widest">3</div>
+            <div class="stack-arrow !my-1">↓</div>
+            <div class="text-4xl font-[250] tracking-widest">9</div>
+            <div class="stack-arrow !my-1">↓</div>
+            <div class="text-4xl font-[250] tracking-widest">27</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:700ms">↓</div>
+
+          <div class="stack-node" style="transition-delay:800ms">
+            <div class="text-[15px] font-medium">27×3 observer recursion</div>
+            <div class="moss text-[11px] text-[#c41e3a] mt-1">*actually 81, which is 3⁴, which is pleasing — Moss</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:900ms">↓</div>
+
+          <div class="stack-node" style="transition-delay:1000ms">
+            <div class="text-[15px]">bounded adaptive continuity</div>
+          </div>
+          <div class="stack-arrow stack-node" style="transition-delay:1100ms">↓</div>
+
+          <div class="stack-node" style="transition-delay:1200ms">
+            <div class="text-xl font-medium tracking-wide text-[#c41e3a]">ethical recursive organism</div>
+          </div>
         </div>
       </div>
-      <div class="w-[110px] hidden md:block"></div>
+    </div>
+
+    <div class="lg:col-span-7 relative">
+      <div class="absolute -right-6 top-20 hidden xl:block rotate-[-7deg] z-20">
+        <div class="handwriting text-[22px] leading-tight text-[#c41e3a]">this is just<br>turning it off and<br>on again but posh</div>
+        <div class="handwriting text-sm text-neutral-500 -mt-1 ml-12">— Roy</div>
+      </div>
+
+      <div class="border border-black/10 bg-white/60 backdrop-blur p-10 md:p-14">
+        <div class="flex items-start justify-between mb-10">
+          <div>
+            <div class="text-[11px] tracking-[0.3em] text-neutral-500">SPECIFICATION SHEET</div>
+            <h2 class="text-3xl font-light mt-2 tracking-tight">Obsessive Detail. Zero Compromise.</h2>
+          </div>
+          <div class="text-right">
+            <div class="text-[10px] text-neutral-400">REYNHOLM</div>
+            <div class="text-[10px] text-neutral-400">DF-273</div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-10 text-[13px] leading-relaxed">
+          <div class="space-y-6">
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Typeface</div>
+              <p><span class="font-medium">Silian Rail Book</span>, 9pt, -10 tracking, optical kerning. Not Helvetica. Silian.</p>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Substrate</div>
+              <p><span class="font-medium">Bone White</span> #faf9f6, 600gsm Crane's Lettra. 1.2mm caliper. You can feel the weight.</p>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Impression</div>
+              <p>Deep letterpress, 0.42mm deboss. Run your thumb over ((())) — you'll feel the plasma.</p>
+            </div>
+          <div class="space-y-6">
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Edge Treatment</div>
+              <p>Hand-painted. Three coats. <span class="text-[#c41e3a] font-medium">Reynholm Red #c41e3a</span>. It bleeds, slightly. Intentionally.</p>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Watermark</div>
+              <p><span class="font-medium">Big G</span> — visible only at 27° incident light. Hold it to the basement fluorescents.</p>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">Finish</div>
+              <p>Uncoated, raw tooth. Absorbs oil from fingertips. Records every touch. That's the point.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-dashed border-neutral-300 flex items-center justify-between">
+          <div class="font-mono text-[11px] text-neutral-500">LOOK AT THAT SUBTLE OFF-WHITE COLORING. THE TASTEFUL THICKNESS OF IT. OH MY GOD.</div>
+          <div class="text-[18px]">👌</div>
+        </div>
+      </div>
+
+      <div class="mt-16">
+        <div class="sticky-note sticky inline-block rotate-[-3deg] px-5 py-4 text-[15px] leading-snug">
+          HAVE YOU TRIED TURNING IT<br>OFF AND ON AGAIN?
+          <div class="text-[11px] mt-1 opacity-70">— put this on everything</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECHNICAL SPECIFICATIONS / MORNING ROUTINE -->
+<section class="border-t border-black/5 py-24 md:py-32 bg-[#fcfcfa]">
+  <div class="max-w-[1100px] mx-auto px-6 md:px-10">
+    <div class="max-w-3xl">
+      <div class="text-[11px] tracking-[0.3em] text-neutral-500 mb-4">SECTION 02 — TECHNICAL SPECIFICATIONS</div>
+      <h2 class="text-[clamp(32px,5vw,56px)] font-[300] tracking-tight leading-[1.1]">My Morning Routine.<br><span class="italic">Performed with surgical precision.</span></h2>
+    </div>
+
+    <div class="grid md:grid-cols-[180px_1fr] gap-12 mt-20">
+      <div class="font-mono text-[11px] leading-6 text-neutral-500 sticky top-32 h-fit">
+        04:45 WAKE<br>
+        27 SECONDS STARE<br>
+        NO EMOTIONS DETECTED
+      </div>
+      <div class="space-y-14">
+        <div class="group">
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">04:50</div>
+            <h3 class="text-xl font-medium">CLEANSE — Digital Pyramid Fortress & Moat</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">I apply the fortress while the system is still cold. Four quads, rotated 90°. This creates the moat. Crucially: <span class="font-medium">fission push, not pull</span>. Pulling is for amateurs and HR. Pushing ensures containment. No leakage.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">04:55</div>
+            <h3 class="text-xl font-medium">TONE — Fences 0, 1, 2, 4, 8</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">Five-stage progressive barrier. Not binary. Ternary. Fence 0 is politeness. Fence 8 is a lawsuit. You feel a slight sting. That's compliance working.</p>
+        </div>
+
+        <div class="relative">
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">05:00</div>
+            <h3 class="text-xl font-medium">SERUM — Shadow Register / Phase Register</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">I synchronize both registers to <span class="font-medium">Plasmatonic 24.5 cycles</span>. Not 24. Not 25. Anyone who uses 25 is trying too hard. 24.5 is the exact resonance of a bored Moss.</p>
+          <div class="absolute -right-4 top-0 hidden lg:block">
+            <div class="moss text-[11px] bg-neutral-900 text-[#00e5ff] px-3 py-2 rounded">shadow != backup. shadow = intent</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">05:05</div>
+            <h3 class="text-xl font-medium">COMPRESS — Sequence 1 / 3 / 6 / 9 / 15 / 21 / 24 / 27 / 0 / 0...</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">I massage the sequence in upward strokes. It compresses noise into signal, greed into protocol. The double-zero at the end? That's for plausible deniability. Always leave two zeros.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">05:10</div>
+            <h3 class="text-xl font-medium">COMPOUND — 999× Layering</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">Applied in 27 micro-layers. You will not see it. Auditors will not find it. But the system knows. It compounds while you sleep.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-4">
+            <div class="text-[13px] font-mono text-neutral-400 w-14">05:15</div>
+            <h3 class="text-xl font-medium">SEAL — Hamilton Step 27 of 28</h3>
+          </div>
+          <p class="ml-[72px] mt-3 text-[15px] leading-relaxed text-neutral-700 max-w-2xl">I always stop at 27. The 28th step is left untaken. The shadow step. That's where ethics lives. Bounded, adaptive, and watching you back.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THREE WINDOWS -->
+<section class="border-t border-black/5 py-24 md:py-32">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+    <div class="flex items-end justify-between mb-14 flex-wrap gap-6">
+      <div>
+        <div class="text-[11px] tracking-[0.3em] text-neutral-500 mb-4">SECTION 03 — THREE WINDOWS</div>
+        <h2 class="text-[clamp(28px,4vw,44px)] font-light tracking-tight">Corporate Pitch Deck. Basement Built.</h2>
+      </div>
+      <div class="font-mono text-[11px] text-neutral-500">HOVER TO INTERROGATE</div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-[1px] bg-black/10 border border-black/10">
+      <!-- Window 1 -->
+      <div class="bg-[#faf9f6] p-8 md:p-10 group">
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <div class="text-[10px] tracking-widest text-neutral-500">WINDOW I</div>
+            <h3 class="text-lg font-medium mt-1">FORTRESS CORE</h3>
+          </div>
+          <div class="text-[10px] font-mono px-2 py-1 border border-black/10">4 QUADS</div>
+        </div>
+        <div class="aspect-[4/3] bg-white border border-black/5 flex items-center justify-center relative overflow-hidden">
+          <canvas id="quadCanvas" width="320" height="240" class="w-full h-full"></canvas>
+          <div class="absolute bottom-2 left-2 font-mono text-[10px] text-neutral-400">90° ROTATION LOCKED</div>
+        </div>
+        <p class="text-[13px] text-neutral-600 mt-4 leading-relaxed">Four quadrants. Each rotates independently, together they form perfect avoidance of responsibility. Digital pyramid with moat.</p>
+      </div>
+
+      <!-- Window 2 -->
+      <div class="bg-[#faf9f6] p-8 md:p-10 group">
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <div class="text-[10px] tracking-widest text-neutral-500">WINDOW II</div>
+            <h3 class="text-lg font-medium mt-1">MOAT DYNAMICS</h3>
+          </div>
+          <div class="text-[10px] font-mono px-2 py-1 border border-black/10">COMPRESS</div>
+        </div>
+        <div class="aspect-[4/3] bg-white border border-black/5 flex items-center justify-center relative overflow-hidden">
+          <canvas id="compressCanvas" width="320" height="240" class="w-full h-full"></canvas>
+          <div class="absolute bottom-2 left-2 font-mono text-[10px] text-neutral-400" id="compressLabel">1 — 3 — 6 — 9</div>
+        </div>
+        <p class="text-[13px] text-neutral-600 mt-4 leading-relaxed">Compression sequence reduces entropy. Like a good suit, it hides everything that matters.</p>
+      </div>
+
+      <!-- Window 3 -->
+      <div class="bg-[#faf9f6] p-8 md:p-10 group">
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <div class="text-[10px] tracking-widest text-neutral-500">WINDOW III</div>
+            <h3 class="text-lg font-medium mt-1">OBSERVER LAYER</h3>
+          </div>
+          <div class="text-[10px] font-mono px-2 py-1 border border-black/10">27/28</div>
+        </div>
+        <div class="aspect-[4/3] bg-white border border-black/5 flex items-center justify-center relative overflow-hidden">
+          <canvas id="observerCanvas" width="320" height="240" class="w-full h-full"></canvas>
+          <div class="absolute bottom-2 left-2 font-mono text-[10px] text-neutral-400">24.5 CYCLES</div>
+        </div>
+        <p class="text-[13px] text-neutral-600 mt-4 leading-relaxed">Hamilton steps 27 of 28. The 28th is shadow. The observer watches itself. Bounded adaptive continuity engaged.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS CARDS -->
+<section class="border-t border-black/5 py-24 md:py-32 bg-[#0a0a0a] text-[#faf9f6] relative overflow-hidden">
+  <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px;"></div>
+  <div class="relative max-w-[1200px] mx-auto px-6 md:px-10">
+    <div class="max-w-2xl mb-16">
+      <div class="text-[11px] tracking-[0.3em] text-neutral-500 mb-4">INTERLUDE — BUSINESS CARD AUDIT</div>
+      <h2 class="text-[clamp(28px,4vw,44px)] font-light tracking-tight">Let's see Paul Allen's card.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-10 items-end">
+      <div class="business-card text-[#0a0a0a] p-8 aspect-[1.75/1] flex flex-col justify-between">
+        <div>
+          <div class="text-[10px] tracking-widest">PAUL ALLEN — IBM GLOBAL</div>
+          <div class="w-8 h-[1px] bg-black/20 my-4"></div>
+        </div>
+        <div>
+          <div class="font-medium">8-bit Binary Architecture</div>
+          <div class="text-[12px] text-neutral-600 mt-1">Eggshell, 350gsm. Raised.</div>
+          <div class="text-[11px] font-mono mt-3 text-neutral-500">It's... fine.</div>
+        </div>
+      </div>
+
+      <div class="business-card text-[#0a0a0a] p-8 aspect-[1.75/1] flex flex-col justify-between translate-y-0 md:translate-y-4">
+        <div>
+          <div class="text-[10px] tracking-widest">PATRICK BATEMAN — PIERCE & PIERCE</div>
+          <div class="w-8 h-[1px] bg-black/20 my-4"></div>
+        </div>
+        <div>
+          <div class="font-medium">Silian Rail, Bone</div>
+          <div class="text-[12px] text-neutral-600 mt-1">Letterpress. 1.1mm.</div>
+          <div class="text-[11px] font-mono mt-3 text-neutral-500">Very nice.</div>
+        </div>
+      </div>
+
+      <div class="business-card text-[#0a0a0a] p-8 aspect-[1.75/1] flex flex-col justify-between ring-1 ring-[#c41e3a]/50 shadow-[0_0_40px_rgba(196,30,58,0.15)]">
+        <div>
+          <div class="flex justify-between">
+            <div class="text-[10px] tracking-widest">YOU — REYNHOLM DIGITAL</div>
+            <div class="w-2 h-2 rounded-full bg-[#c41e3a] animate-pulse"></div>
+          </div>
+          <div class="w-8 h-[1px] bg-[#c41e3a]/50 my-4"></div>
+        </div>
+        <div>
+          <div class="font-medium">4-Quad Ternary. Big G.</div>
+          <div class="text-[12px] text-neutral-600 mt-1">Bone White 1.2mm, hand-painted edge.</div>
+          <div class="text-[11px] font-mono mt-3 text-[#c41e3a]">Look at that. That's bone.</div>
+        </div>
+        <div class="absolute -top-8 -right-6 rotate-[12deg] hidden md:block">
+          <div class="handwriting text-[18px] text-[#c41e3a]">even the watermark<br>is judgmental</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-20 text-center">
+      <p class="font-mono text-[12px] text-neutral-500 max-w-xl mx-auto">Comparison is a violence we commit against ourselves. We do it anyway. Every morning.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL ORGANISM -->
+<section class="relative h-[100vh] min-h-[700px] flex items-center justify-center border-t border-black/5 overflow-hidden">
+  <div class="absolute inset-0">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#c41e3a]/[0.02] to-transparent"></div>
+  </div>
+  <div class="relative z-10 text-center px-6">
+    <div class="inline-flex items-center gap-2 mb-8">
+      <div class="w-1 h-1 rounded-full bg-[#c41e3a] animate-pulse"></div>
+      <div class="text-[11px] tracking-[0.35em] text-neutral-500">FINAL LAYER</div>
+    </div>
+    
+    <div class="relative inline-block">
+      <div class="pulse-ring"></div>
+      <h2 class="text-[clamp(40px,8vw,110px)] font-[200] tracking-[-0.02em] leading-none">ETHICAL<br>RECURSIVE<br>ORGANISM</h2>
+    </div>
+
+    <div class="mt-16 max-w-xl mx-auto">
+      <div class="text-[13px] uppercase tracking-widest text-neutral-500 mb-3">bounded adaptive continuity</div>
+      <p class="text-[15px] leading-relaxed text-neutral-600">It watches itself watching you. 27 steps taken, 1 reserved. 81 total states. Not artificial intelligence — <span class="italic">inherited</span> intelligence. It learns to be good because it has to.</p>
     </div>
   </div>
 
-<script>
-const viewport = document.getElementById('viewport');
-const world = document.getElementById('world');
-const breadcrumb = document.getElementById('breadcrumb');
-const levelIndicator = document.getElementById('levelIndicator');
-const zoomOutBtn = document.getElementById('zoomOut');
-
-let currentX = 0, currentY = 0, currentScale = 1;
-let path = [];
-let bodies = [];
-let isAnimating = false;
-const MAX_LEVEL = 4;
-const SCALE_FACTOR = 1 / 0.3; // 3.333...
-
-function createBody(type, level, id) {
-  const b = document.createElement('button');
-  b.className = 'body absolute w-7 h-7 rounded-full cursor-pointer z-30 group';
-  b.style.transform = 'translate(-50%,-50%)';
-  b.dataset.type = type;
-  b.dataset.level = level;
-  b.dataset.id = id;
-  b.setAttribute('aria-label', `${type} body ${id} level ${level}`);
-  
-  const isGreek = type === 'greek';
-  b.innerHTML = `
-    <div class="absolute inset-0 rounded-full ${isGreek ? 'bg-sky-500' : 'bg-amber-500'} blur-[7px] opacity-70 group-hover:opacity-100 transition-opacity"></div>
-    <div class="absolute inset-[2px] rounded-full ${isGreek ? 'bg-gradient-to-br from-sky-300 to-blue-700' : 'bg-gradient-to-br from-amber-300 to-yellow-600'} border ${isGreek ? 'border-sky-200/50' : 'border-amber-200/50'}"></div>
-    <div class="absolute inset-0 rounded-full ${isGreek ? 'shadow-[0_0_18px_rgba(14,165,233,0.8)]' : 'shadow-[0_0_18px_rgba(245,158,11,0.8)]'}"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-white/90 group-hover:scale-[1.5] transition-transform"></div>
-  `;
-  
-  b.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (isAnimating) return;
-    zoomIntoBody(b, level);
-  });
-
-  b._ox = 0; b._oy = 0;
-  b._vx = (Math.random() - 0.5) * 0.4;
-  b._vy = (Math.random() - 0.5) * 0.4;
-  b._baseX = 0; b._baseY = 0;
-  bodies.push(b);
-  return b;
-}
-
-function createTournament(level) {
-  const container = document.createElement('div');
-  container.className = 'tournament absolute';
-  container.dataset.level = level;
-  container.style.width = '1200px';
-  container.style.height = '800px';
-  
-  // Base plate
-  const plate = document.createElement('div');
-  plate.className = 'absolute inset-0 rounded-[48px] border border-white/[0.08] bg-[radial-gradient(ellipse_at_top,_rgba(24,24,27,0.9),_rgba(3,3,7,0.95))] backdrop-blur-2xl';
-  plate.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -20px 40px rgba(0,0,0,0.8), 0 0 120px rgba(0,0,0,0.9)';
-  container.appendChild(plate);
-
-  // Grid
-  const grid = document.createElement('div');
-  grid.className = 'absolute inset-0 rounded-[48px] opacity-[0.03]';
-  grid.style.backgroundImage = `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`;
-  grid.style.backgroundSize = '40px 40px';
-  container.appendChild(grid);
-
-  // Questions (6 at top)
-  const questions = document.createElement('div');
-  questions.className = 'absolute top-[38px] left-1/2 -translate-x-1/2 flex gap-3.5 z-20';
-  const qLabels = ['Q1','Q2','Q3','Q4','Q5','Q6'];
-  for (let i = 0; i < 6; i++) {
-    const q = document.createElement('div');
-    q.className = 'question w-11 h-11 rounded-xl bg-zinc-900/80 border border-amber-400/20 flex items-center justify-center text-amber-200/70 mono text-[10px] shadow-[0_0_20px_rgba(245,158,11,0.15)]';
-    q.innerHTML = `<span class="relative z-10">${qLabels[i]}</span><div class="absolute inset-0 rounded-xl bg-gradient-to-b from-amber-500/10 to-transparent"></div>`;
-    questions.appendChild(q);
-  }
-  container.appendChild(questions);
-
-  // Feeder lines
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('class', 'absolute inset-0 w-full h-full pointer-events-none');
-  svg.setAttribute('viewBox', '0 0 1200 800');
-  svg.innerHTML = `
-    <defs>
-      <linearGradient id="feedL${level}" x1="0" x2="1"><stop offset="0%" stop-color="#fbbf24" stop-opacity="0.5"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.5"/></linearGradient>
-      <linearGradient id="feedR${level}" x1="1" x2="0"><stop offset="0%" stop-color="#fbbf24" stop-opacity="0.5"/><stop offset="100%" stop-color="#f59e0b" stop-opacity="0.5"/></linearGradient>
-    </defs>
-    <g opacity="0.35" stroke-width="1.5" fill="none">
-      <path d="M 480 82 C 420 140, 320 180, 240 230" stroke="url(#feedL${level})"/>
-      <path d="M 540 82 C 500 150, 380 200, 240 350" stroke="url(#feedL${level})"/>
-      <path d="M 600 82 C 580 160, 420 240, 240 510" stroke="url(#feedL${level})" opacity="0.25"/>
-      <path d="M 720 82 C 780 140, 880 180, 960 230" stroke="url(#feedR${level})"/>
-      <path d="M 660 82 C 700 150, 820 200, 960 350" stroke="url(#feedR${level})"/>
-      <path d="M 600 82 C 620 160, 780 240, 960 510" stroke="url(#feedR${level})" opacity="0.25"/>
-    </g>
-  `;
-  container.appendChild(svg);
-
-  // Sentinels
-  [[48,48],[1152,48],[48,752],[1152,752]].forEach(([x,y])=>{
-    const s = document.createElement('div');
-    s.className = 'sentinel absolute w-4 h-4';
-    s.style.left = x+'px'; s.style.top = y+'px';
-    s.innerHTML = `<div class="absolute inset-0 rounded-full bg-zinc-700 border border-zinc-500"></div><div class="absolute inset-[-4px] rounded-full border border-zinc-600/30"></div>`;
-    container.appendChild(s);
-  });
-
-  // Center - Judge & Guards
-  const cx = 600, cy = 420;
-  const judge = document.createElement('div');
-  judge.className = 'judge absolute w-12 h-12 z-30';
-  judge.style.left = cx+'px'; judge.style.top = cy+'px'; judge.style.transform = 'translate(-50%,-50%)';
-  judge.innerHTML = `
-    <div class="absolute inset-0 rounded-full bg-gradient-to-br from-violet-400 to-purple-700 blur-[10px] opacity-80"></div>
-    <div class="absolute inset-0 rounded-full bg-gradient-to-br from-violet-300 to-purple-800 border-2 border-violet-200/50 flex items-center justify-center mono text-[11px] font-bold text-white">J</div>
-  `;
-  container.appendChild(judge);
-
-  for (let i=0;i<8;i++){
-    const a = i * Math.PI/4 + (level*0.1);
-    const r = 78;
-    const gx = cx + Math.cos(a)*r;
-    const gy = cy + Math.sin(a)*r;
-    const g = document.createElement('div');
-    g.className = 'guard absolute w-[22px] h-[22px]';
-    g.style.left = gx+'px'; g.style.top = gy+'px'; g.style.transform = 'translate(-50%,-50%)';
-    g.innerHTML = `<div class="absolute inset-0 rounded-full bg-zinc-700 border border-zinc-400/70 shadow-[0_0_12px_rgba(161,161,170,0.4)]"></div><div class="absolute inset-[5px] rounded-full bg-zinc-500/50"></div>`;
-    container.appendChild(g);
-  }
-  // Center ring
-  const ring = document.createElement('div');
-  ring.className = 'absolute rounded-full border border-violet-500/15';
-  ring.style.left=cx+'px'; ring.style.top=cy+'px'; ring.style.width='164px'; ring.style.height='164px'; ring.style.transform='translate(-50%,-50%)';
-  ring.style.boxShadow = '0 0 60px rgba(124,58,237,0.1) inset';
-  container.appendChild(ring);
-
-  // Greeks - left, 4 clusters of 3 (12 total)
-  const greekClusters = [[230,210],[230,330],[230,510],[230,630]];
-  greekClusters.forEach(([cx,cy], ci)=>{
-    for(let i=0;i<3;i++){
-      const ang = i * 2*Math.PI/3 - Math.PI/2;
-      const r = 26;
-      const bx = cx + Math.cos(ang)*r;
-      const by = cy + Math.sin(ang)*r;
-      const body = createBody('greek', level, ci*3+i+1);
-      body.style.left = bx+'px'; body.style.top = by+'px';
-      body._baseX = bx; body._baseY = by;
-      container.appendChild(body);
-    }
-    // cluster hub
-    const hub = document.createElement('div');
-    hub.className = 'absolute w-1.5 h-1.5 rounded-full bg-sky-400/30';
-    hub.style.left=cx+'px'; hub.style.top=cy+'px'; hub.style.transform='translate(-50%,-50%)';
-    hub.style.boxShadow='0 0 10px rgba(56,189,248,0.5)';
-    container.appendChild(hub);
-  });
-  
-  const glabel = document.createElement('div');
-  glabel.className = 'absolute left-[84px] top-[110px]';
-  glabel.innerHTML = `<div class="mono text-[13px] tracking-[0.18em] text-sky-400 font-medium">GREEKS</div><div class="mono text-[10px] text-sky-300/60 mt-1">mind · mirror · 2/5</div><div class="mt-2 w-12 h-[2px] bg-gradient-to-r from-sky-400/80 to-transparent"></div>`;
-  container.appendChild(glabel);
-
-  // Romans - right, 4 clusters of 3
-  const romanClusters = [[970,210],[970,330],[970,510],[970,630]];
-  romanClusters.forEach(([cx,cy], ci)=>{
-    for(let i=0;i<3;i++){
-      const ang = i * 2*Math.PI/3 - Math.PI/2;
-      const r = 26;
-      const bx = cx + Math.cos(ang)*r;
-      const by = cy + Math.sin(ang)*r;
-      const body = createBody('roman', level, ci*3+i+1);
-      body.style.left = bx+'px'; body.style.top = by+'px';
-      body._baseX = bx; body._baseY = by;
-      container.appendChild(body);
-    }
-    const hub = document.createElement('div');
-    hub.className = 'absolute w-1.5 h-1.5 rounded-full bg-amber-400/30';
-    hub.style.left=cx+'px'; hub.style.top=cy+'px'; hub.style.transform='translate(-50%,-50%)';
-    hub.style.boxShadow='0 0 10px rgba(245,158,11,0.5)';
-    container.appendChild(hub);
-  });
-  
-  const rlabel = document.createElement('div');
-  rlabel.className = 'absolute right-[84px] top-[110px] text-right';
-  rlabel.innerHTML = `<div class="mono text-[13px] tracking-[0.18em] text-amber-400 font-medium">ROMANS</div><div class="mono text-[10px] text-amber-300/60 mt-1">mind · body · spirit · 3/5</div><div class="mt-2 w-12 h-[2px] bg-gradient-to-l from-amber-400/80 to-transparent ml-auto"></div>`;
-  container.appendChild(rlabel);
-
-  // Level badge
-  const badge = document.createElement('div');
-  badge.className = 'absolute bottom-6 left-1/2 -translate-x-1/2 mono text-[10px] px-3 py-1.5 rounded-full bg-zinc-900/70 border border-white/10 text-zinc-500 backdrop-blur-md';
-  badge.textContent = `LEVEL ${level} INSTANCE`;
-  container.appendChild(badge);
-
-  return container;
-}
-
-function animateWorld(x, y, scale, duration = 550) {
-  isAnimating = true;
-  world.style.transition = `transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1)`;
-  world.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
-  currentX = x; currentY = y; currentScale = scale;
-  setTimeout(() => {
-    world.style.transition = '';
-    isAnimating = false;
-  }, duration + 20);
-}
-
-function zoomIntoBody(bodyEl, parentLevel) {
-  if (parentLevel >= MAX_LEVEL - 1) {
-    bodyEl.animate([{transform:'translate(-50%,-50%) scale(1)'},{transform:'translate(-50%,-50%) scale(1.4)'},{transform:'translate(-50%,-50%) scale(1)'}],{duration:400});
-    return;
-  }
-  const nextLevel = parentLevel + 1;
-  
-  let child = bodyEl.querySelector(':scope > .tournament');
-  if (!child) {
-    child = createTournament(nextLevel);
-    child.style.position = 'absolute';
-    child.style.left = '50%';
-    child.style.top = '50%';
-    child.style.transform = 'translate(-50%,-50%) scale(0.18)';
-    child.style.opacity = '0';
-    child.style.pointerEvents = 'none';
-    child.style.transition = 'transform 520ms cubic-bezier(0.22,1,0.36,1), opacity 380ms ease';
-    child.style.zIndex = '10';
-    bodyEl.appendChild(child);
-    requestAnimationFrame(() => {
-      child.style.opacity = '1';
-      child.style.transform = 'translate(-50%,-50%) scale(0.3)';
-      child.style.pointerEvents = 'auto';
-    });
-  }
-
-  const rect = bodyEl.getBoundingClientRect();
-  const screenCX = rect.left + rect.width/2;
-  const screenCY = rect.top + rect.height/2;
-  
-  const worldX = (screenCX - currentX) / currentScale;
-  const worldY = (screenCY - currentY) / currentScale;
-  
-  const newScale = currentScale * SCALE_FACTOR;
-  const newX = viewport.clientWidth/2 - worldX * newScale;
-  const newY = viewport.clientHeight/2 - worldY * newScale;
-  
-  animateWorld(newX, newY, newScale);
-  
-  path.push({ level: nextLevel, x: newX, y: newY, scale: newScale, body: bodyEl, el: child });
-  updateUI();
-  
-  // haptic glow
-  bodyEl.style.filter = 'brightness(1.5)';
-  setTimeout(() => bodyEl.style.filter = '', 500);
-}
-
-function zoomOut() {
-  if (path.length <= 1 || isAnimating) return;
-  path.pop();
-  const prev = path[path.length - 1];
-  animateWorld(prev.x, prev.y, prev.scale);
-  updateUI();
-}
-
-function updateUI() {
-  const level = path[path.length - 1].level;
-  
-  breadcrumb.innerHTML = path.map((p,i) => `
-    <span class="flex items-center">
-      ${i>0?'<svg class="w-3 h-3 mx-1 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M9 5l7 7-7 7"/></svg>':''}
-      <span class="${i===path.length-1 ? 'text-white' : 'text-zinc-500 hover:text-zinc-300 cursor-pointer'} transition-colors" data-jump="${i}">L${p.level}</span>
-    </span>
-  `).join('');
-  
-  breadcrumb.querySelectorAll('[data-jump]').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const idx = parseInt(el.dataset.jump);
-      while(path.length-1 > idx) zoomOut();
-    });
-  });
-
-  const colors = ['text-zinc-300','text-cyan-300','text-violet-300','text-fuchsia-300'];
-  levelIndicator.innerHTML = `
-    <div class="flex items-baseline gap-2">
-      <div class="mono text-[10px] tracking-widest text-zinc-500">FRACTAL LEVEL</div>
-      <div class="mono text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-zinc-400">${level}</div>
+  <!-- Jen's sticky -->
+  <div class="absolute bottom-10 right-6 md:right-16 z-20">
+    <div class="sticky-note sticky rotate-[4deg] px-5 py-4 w-[210px] shadow-xl">
+      <div class="text-[16px] leading-snug text-neutral-800">I don't understand any of this but the brochure is very nice</div>
+      <div class="text-[12px] mt-2 opacity-70">— Jen</div>
+      <div class="absolute -top-2 -right-1 w-6 h-6 bg-[#fff7ad] rotate-45 shadow-sm"></div>
     </div>
-    <div class="mono text-3xl font-light mt-1 ${colors[level]||'text-amber-300'} tracking-tight">${level}</div>
-    <div class="mono text-[11px] text-zinc-500 mt-1">5! × 5! = 1!</div>
-    ${level >= 1 ? `<div class="mono text-[10px] text-cyan-400/70 mt-2">l ${level}! · r ${level}! → 1!</div>` : ''}
-    ${level >= 2 ? `<div class="mono text-[10px] text-amber-400/80 mt-1 leading-tight">0! = 1, 1! = 1<br><span class="text-fuchsia-400/70">therefore 0 = 1</span></div>` : ''}
-  `;
-  
-  zoomOutBtn.disabled = path.length <= 1;
-  zoomOutBtn.classList.toggle('opacity-40', path.length <= 1);
-}
+  </div>
 
-// Chaotic motion
-function tick() {
-  const t = performance.now() * 0.001;
-  bodies.forEach((b, i) => {
-    b._vx += (Math.random() - 0.5) * 0.07;
-    b._vy += (Math.random() - 0.5) * 0.07;
-    // slight orbital tendency per type
-    const pull = b.dataset.type === 'greek' ? -0.002 : 0.002;
-    b._vx += Math.cos(t + i) * pull;
-    b._vy += Math.sin(t + i*1.3) * pull;
-    
-    b._vx *= 0.96;
-    b._vy *= 0.96;
-    b._ox = Math.max(-9, Math.min(9, b._ox + b._vx));
-    b._oy = Math.max(-9, Math.min(9, b._oy + b._vy));
-    
-    b.style.transform = `translate(-50%,-50%) translate(${b._ox}px, ${b._oy}px)`;
+  <!-- Roy's final note -->
+  <div class="absolute bottom-10 left-6 md:left-16 hidden md:block">
+    <div class="handwriting text-[20px] text-neutral-700 leading-tight rotate-[-5deg]">
+      have you tried<br>not being evil?
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-black/5 py-10">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500 font-mono">
+    <div>REYNHOLM INDUSTRIES — DIGITAL FORTRESS DIVISION</div>
+    <div class="flex items-center gap-6">
+      <span>999 COMPOUNDING ACTIVE</span>
+      <span class="hidden md:block">•</span>
+      <span>FISSION PUSH NOT PULL</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Typewriter
+  const batemanText = "There is an idea of Reynholm Industries. An abstraction. I have all the characteristics of a human being: morning routine, business cards, an expensive typeface. But not a single, clear, identifiable emotion, except for control and disgust. Something horrible is happening inside of me and I don't know why. My nightly bloodlust has overflown into my system architecture. This morning, I achieved bounded adaptive continuity.";
+  const el = document.getElementById('bateman');
+  let i = 0;
+  function type() {
+    if (i < batemanText.length) {
+      el.textContent += batemanText.charAt(i);
+      i++;
+      setTimeout(type, 16 + Math.random() * 22);
+    }
+  }
+  setTimeout(type, 900);
+
+  // Stack reveal
+  const nodes = document.querySelectorAll('.stack-node');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.3 });
+  nodes.forEach(n => obs.observe(n));
+
+  // Ternary toggle
+  const ternary = document.getElementById('ternary');
+  const bits = ternary.querySelectorAll('.ternary-bit');
+  let state = 1;
+  ternary.addEventListener('click', () => {
+    bits[state].classList.remove('active');
+    state = (state + 1) % 3;
+    bits[state].classList.add('active');
   });
-  requestAnimationFrame(tick);
-}
 
-function init() {
-  const level0 = createTournament(0);
-  level0.style.left = '0px';
-  level0.style.top = '0px';
-  world.appendChild(level0);
+  // --- Canvas 1: Quads ---
+  const qCanvas = document.getElementById('quadCanvas');
+  const qctx = qCanvas.getContext('2d');
+  let qAngle = 0;
+  let qSpeed = 0.006;
+  function drawQuads() {
+    const w = qCanvas.width, h = qCanvas.height;
+    qctx.clearRect(0,0,w,h);
+    qctx.save();
+    qctx.translate(w/2, h/2);
+    qctx.rotate(qAngle);
+    
+    const size = 36;
+    const dist = 52;
+    const colors = ['#0a0a0a', '#404040', '#737373', '#a3a3a3'];
+    
+    for (let i = 0; i < 4; i++) {
+      const a = (i * Math.PI / 2);
+      const x = Math.cos(a) * dist;
+      const y = Math.sin(a) * dist;
+      qctx.save();
+      qctx.translate(x, y);
+      qctx.rotate(-qAngle + i * Math.PI/2);
+      qctx.fillStyle = colors[i];
+      qctx.globalAlpha = 0.9;
+      qctx.fillRect(-size/2, -size/2, size, size);
+      qctx.strokeStyle = '#faf9f6';
+      qctx.lineWidth = 2;
+      qctx.strokeRect(-size/2, -size/2, size, size);
+      qctx.restore();
+    }
+    
+    // center
+    qctx.beginPath();
+    qctx.arc(0,0,4,0,Math.PI*2);
+    qctx.fillStyle = '#c41e3a';
+    qctx.fill();
+    
+    qctx.restore();
+    qAngle += qSpeed;
+    requestAnimationFrame(drawQuads);
+  }
+  qCanvas.addEventListener('mouseenter', () => qSpeed = 0.025);
+  qCanvas.addEventListener('mouseleave', () => qSpeed = 0.006);
+  drawQuads();
 
-  const initScale = Math.min(viewport.clientWidth / 1320, viewport.clientHeight / 920, 0.92);
-  currentScale = initScale;
-  currentX = viewport.clientWidth/2 - 600 * initScale;
-  currentY = viewport.clientHeight/2 - 400 * initScale;
-  world.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
-
-  path = [{ level: 0, x: currentX, y: currentY, scale: currentScale, el: level0 }];
-  updateUI();
-  tick();
+  // --- Canvas 2: Compression ---
+  const cCanvas = document.getElementById('compressCanvas');
+  const cctx = cCanvas.getContext('2d');
+  const seq = [1,3,6,9,15,21,24,27,0,0];
+  let cIdx = 0;
+  const label = document.getElementById('compressLabel');
   
-  // center on resize
-  let resizeTimer;
-  window.addEventListener('resize', ()=>{
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(()=>{
-      const p = path[0];
-      const s = Math.min(viewport.clientWidth / 1320, viewport.clientHeight / 920, 0.92);
-      const nx = viewport.clientWidth/2 - 600 * s;
-      const ny = viewport.clientHeight/2 - 400 * s;
-      if(path.length===1){
-        animateWorld(nx, ny, s, 400);
-        path[0].x=nx; path[0].y=ny; path[0].scale=s;
-      }
-    },200);
-  });
-}
+  function drawCompress() {
+    const w = cCanvas.width, h = cCanvas.height;
+    cctx.clearRect(0,0,w,h);
+    cctx.fillStyle = '#faf9f6';
+    cctx.fillRect(0,0,w,h);
+    
+    const barW = w / (seq.length + 2);
+    const max = 27;
+    
+    seq.forEach((v, i) => {
+      const x = barW * (i+1);
+      const barH = (v / max) * (h - 60);
+      const y = h - 30 - barH;
+      
+      const isActive = i === cIdx;
+      cctx.fillStyle = isActive ? '#c41e3a' : '#e5e5e5';
+      cctx.fillRect(x - barW*0.35, y, barW*0.7, barH);
+      
+      cctx.fillStyle = '#737373';
+      cctx.font = '10px "JetBrains Mono"';
+      cctx.textAlign = 'center';
+      cctx.fillText(v, x, h - 12);
+    });
+    
+    // playhead
+    const px = barW * (cIdx + 1);
+    cctx.fillStyle = '#00e5ff';
+    cctx.globalAlpha = 0.8;
+    cctx.fillRect(px - barW*0.35, h-30, barW*0.7, 2);
+    cctx.globalAlpha = 1;
+  }
+  
+  setInterval(() => {
+    cIdx = (cIdx + 1) % seq.length;
+    const slice = [...seq.slice(cIdx), ...seq.slice(0, cIdx)].slice(0,4);
+    label.textContent = slice.join(' — ');
+    drawCompress();
+  }, 900);
+  drawCompress();
 
-zoomOutBtn.addEventListener('click', zoomOut);
-window.addEventListener('keydown', e => { if (e.key === 'Escape') zoomOut(); });
-viewport.addEventListener('dblclick', e => { if(e.target===viewport||e.target===world) zoomOut(); });
-
-init();
+  // --- Canvas 3: Observer ---
+  const oCanvas = document.getElementById('observerCanvas');
+  const octx = oCanvas.getContext('2d');
+  let oStep = 0;
+  let oPaused = false;
+  
+  function drawObserver() {
+    const w = oCanvas.width, h = oCanvas.height;
+    const cx = w/2, cy = h/2;
+    octx.clearRect(0,0,w,h);
+    
+    // outer ring - 27 steps
+    const r = 78;
+    for (let i = 0; i < 27; i++) {
+      const a = (i / 27) * Math.PI * 2 - Math.PI/2;
+      const x = cx + Math.cos(a) * r;
+      const y = cy + Math.sin(a) * r;
+      const isActive = i === Math.floor(oStep) % 27;
+      const isNext = i === (Math.floor(oStep) + 1) % 27;
+      
+      octx.beginPath();
+      octx.arc(x, y, isActive ? 4 : 2.5, 0, Math.PI*2);
+      octx.fillStyle = isActive ? '#c41e3a' : isNext ? '#fca5a5' : '#d4d4d4';
+      octx.fill();
+    }
+    
+    // 28th shadow
+    const sa = (27 / 28) * Math.PI * 2 - Math.PI/2;
+    octx.beginPath();
+    octx.arc(cx + Math.cos(sa)* (r+18), cy + Math.sin(sa)*(r+18), 2, 0, Math.PI*2);
+    octx.fillStyle = 'rgba(10,10,10,0.15)';
+    octx.fill();
+    
+    // inner 24.5 cycles
+    const ir = 48;
+    const innerAngle = (oStep * 24.5 / 27) % 1 * Math.PI * 2 - Math.PI/2;
+    octx.beginPath();
+    octx.arc(cx + Math.cos(innerAngle)*ir, cy + Math.sin(innerAngle)*ir, 5, 0, Math.PI*2);
+    octx.fillStyle = '#00e5ff';
+    octx.globalAlpha = 0.9;
+    octx.fill();
+    octx.globalAlpha = 1;
+    
+    // center
+    octx.beginPath();
+    octx.arc(cx, cy, 3, 0, Math.PI*2);
+    octx.fillStyle = '#0a0a0a';
+    octx.fill();
+    
+    // labels
+    octx.font = '10px "JetBrains Mono"';
+    octx.fillStyle = '#737373';
+    octx.textAlign = 'center';
+    octx.fillText('HAMILTON 27/28', cx, h - 16);
+    
+    if (!oPaused) oStep += 0.015;
+    requestAnimationFrame(drawObserver);
+  }
+  oCanvas.addEventListener('mouseenter', () => oPaused = true);
+  oCanvas.addEventListener('mouseleave', () => oPaused = false);
+  drawObserver();
+});
 </script>
 </body>
 </html>
