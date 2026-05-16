@@ -2,899 +2,436 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>HEARTH WARS — Four Kingdoms Real-Time</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>ANCIENT DEEP SEEK — The Meaning of Life Debate | All-Time Q&A</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600;700&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
+  * { box-sizing: border-box; }
   :root { color-scheme: dark; }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: 'Inter', system-ui, sans-serif; background:#020208; overflow-x:hidden; }
-  .font-cinzel { font-family: 'Cinzel', serif; }
-  .font-mono { font-family: 'JetBrains Mono', monospace; }
-
-  /* PARTICLE CANVAS */
-  #particle-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
-
-  /* GLASS */
-  .glass { backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
-
-  /* ANIMATIONS */
-  @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  @keyframes pulseGlow { 0%,100%{filter:drop-shadow(0 0 8px currentColor)} 50%{filter:drop-shadow(0 0 24px currentColor) drop-shadow(0 0 48px currentColor)} }
-  @keyframes dragonFly { 0%{transform:translate(0,0) rotate(0deg)} 25%{transform:translate(10px,-15px) rotate(5deg)} 50%{transform:translate(0,-25px) rotate(0deg)} 75%{transform:translate(-10px,-15px) rotate(-5deg)} 100%{transform:translate(0,0) rotate(0deg)} }
-  @keyframes quorumSpin { 0%{transform:rotate(0deg) scale(1)} 50%{transform:rotate(180deg) scale(1.15)} 100%{transform:rotate(360deg) scale(1)} }
-  @keyframes typing { from{width:0} to{width:100%} }
-  @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
-  @keyframes scorePop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
-  @keyframes eggBreathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
-  @keyframes ringPulse { 0%{stroke-dashoffset:0} 100%{stroke-dashoffset:100} }
-
-  .animate-fadeInUp { animation: fadeInUp 0.6s cubic-bezier(.2,.8,.2,1) both; }
-  .animate-float { animation: float 4s ease-in-out infinite; }
-  .animate-pulseGlow { animation: pulseGlow 2s ease-in-out infinite; }
-  .animate-dragon { animation: dragonFly 6s ease-in-out infinite; }
-  .animate-quorum { animation: quorumSpin 3s linear infinite; }
-  .animate-shimmer { background-size:200% auto; animation: shimmer 3s linear infinite; }
-  .animate-scorePop { animation: scorePop 0.4s cubic-bezier(.2,.8,.2,1); }
-  .animate-eggBreathe { animation: eggBreathe 3s ease-in-out infinite; }
-
-  /* SCROLLBAR */
-  .transcript::-webkit-scrollbar { width:5px }
-  .transcript::-webkit-scrollbar-track { background:transparent }
-  .transcript::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#6366f1,#a855f7); border-radius:10px }
-
-  /* CITY CARDS */
-  .city-card {
-    position:relative; overflow:hidden;
-    transition: all 0.5s cubic-bezier(.2,.8,.2,1);
-  }
-  .city-card::before {
-    content:''; position:absolute; inset:0;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%);
-    pointer-events:none;
-  }
-  .city-card:hover { transform:translateY(-4px); }
-  .city-card.active-city { box-shadow: 0 0 60px -10px var(--city-glow); }
-
-  /* SCORE BAR */
-  .score-bar {
-    height:6px; border-radius:999px;
-    background:rgba(255,255,255,0.08);
-    overflow:hidden; position:relative;
-  }
-  .score-fill {
-    height:100%; border-radius:999px;
-    transition: width 1s cubic-bezier(.2,.8,.2,1);
-    position:relative;
-  }
-  .score-fill::after {
-    content:''; position:absolute; inset:0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s linear infinite;
-  }
-
-  /* DRAGON SVG */
-  .dragon-svg { filter: drop-shadow(0 0 12px var(--dragon-color)); }
-
-  /* TRANSCRIPT MESSAGES */
-  .msg-enter { animation: fadeInUp 0.5s cubic-bezier(.2,.8,.2,1) both; }
-
-  /* HEADER GRADIENT */
-  .header-grad {
-    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.1), rgba(236,72,153,0.15));
-  }
-
-  /* TOPIC CAROUSEL */
-  .topic-slide { transition: all 0.8s cubic-bezier(.2,.8,.2,1); }
+  body { font-family: Inter, system-ui, -apple-system, sans-serif; background: #030307; }
+  .font-mono { font-family: "JetBrains Mono", monospace; }
+  .city-bg { background: radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 70%); }
+  .glass { backdrop-filter: blur(12px); }
+  @keyframes fadeIn { 0% { opacity:0; transform: translateY(5px); } 100% { opacity:1; transform: translateY(0); } }
+  @keyframes pulseEgg { 0% { transform: scale(0.94); opacity: 0.9; } 100% { transform: scale(1.12); opacity: 0.5; } }
+  .pulsing { animation: pulseEgg 0.65s ease-out forwards; }
+  @keyframes quorumBeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 8px currentColor; } }
+  .quorum { animation: quorumBeat 1.2s infinite ease-in-out; }
+  .seat circle { transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1); }
+  .seat.active circle { r: 18 !important; opacity: 1 !important; stroke-width: 3.5 !important; filter: drop-shadow(0 0 6px currentColor); }
+  .transcript::-webkit-scrollbar { width: 5px; }
+  .transcript::-webkit-scrollbar-track { background: #0f0f14; border-radius: 6px; }
+  .transcript::-webkit-scrollbar-thumb { background: #2c2c3a; border-radius: 6px; }
+  .neon-left { filter: drop-shadow(0 0 8px #f5a623) drop-shadow(0 0 20px #f5a62366); }
+  .neon-right { filter: drop-shadow(0 0 8px #3bc9db) drop-shadow(0 0 20px #3bc9db66); }
+  .qa-card { transition: all 0.2s; }
+  .qa-card:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.2); }
+  .audit-entry { border-left: 2px solid; padding-left: 0.75rem; margin-bottom: 0.5rem; }
+  .btn-subtle { transition: all 0.2s; cursor: pointer; }
+  .btn-subtle:active { transform: scale(0.97); }
 </style>
 </head>
-<body class="text-zinc-100 selection:bg-fuchsia-500/40 selection:text-white">
+<body class="text-zinc-100 selection:bg-fuchsia-500/30">
 
-<!-- PARTICLE CANVAS -->
-<canvas id="particle-canvas"></canvas>
-
-<div class="relative z-10 min-h-screen flex flex-col">
-
-  <!-- ===== HEADER ===== -->
-  <header class="sticky top-0 z-50 border-b border-white/10 bg-black/80 glass">
-    <div class="max-w-[1800px] mx-auto px-4 py-3">
-      <div class="flex items-center justify-between flex-wrap gap-3">
-        <div class="flex items-center gap-3">
-          <div class="relative">
-            <div class="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 animate-pulse"></div>
-            <div class="absolute inset-0 w-3 h-3 rounded-full bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 animate-ping opacity-30"></div>
-          </div>
-          <h1 class="font-cinzel font-black tracking-[0.15em] text-sm md:text-base bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-amber-300 bg-clip-text text-transparent">
-            HEARTH WARS
-          </h1>
-          <span class="hidden sm:inline text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-zinc-500 tracking-widest">v3.0 FANTASY ENGINE</span>
-        </div>
-
-        <div class="flex items-center gap-3 md:gap-6 font-mono text-[11px]">
-          <div class="hidden sm:flex items-center gap-2">
-            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-            <span class="text-zinc-500 tracking-widest">LIVE</span>
-          </div>
-          <div>Turn: <span id="stat-turn" class="text-cyan-400 font-bold">0/48</span></div>
-          <div>Quorum: <span id="stat-quorum" class="text-violet-400 font-bold">0/24</span></div>
-          <div>Engagement: <span id="stat-engage" class="text-emerald-400 font-bold">71%</span></div>
-          <div class="hidden md:block">Kingdoms: <span class="text-amber-400 font-bold">4</span></div>
-        </div>
+<div class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-black/70 glass">
+    <div class="max-w-[1800px] mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
+        <h1 class="font-mono font-semibold tracking-widest text-sm md:text-[15px]">ANCIENT DEEP SEEK ⟷ ETERNAL FORUM | MEANING OF LIFE</h1>
+      </div>
+      <div class="flex items-center gap-4 md:gap-7 font-mono text-[11px] md:text-xs">
+        <div class="hidden sm:block text-zinc-500">ALL-TIME DEBATE</div>
+        <div>Voice: <span id="stat-turn" class="text-amber-400 font-semibold">0/32</span></div>
+        <div>Quorum: <span id="stat-quorum" class="text-violet-400 font-semibold">0/16</span></div>
+        <div>Engagement: <span id="stat-engage" class="text-emerald-400 font-semibold">89%</span></div>
       </div>
     </div>
-
-    <!-- TOPIC BAR -->
-    <div class="border-t border-white/5 bg-gradient-to-r from-indigo-950/60 via-fuchsia-950/40 to-amber-950/60">
-      <div class="max-w-[1800px] mx-auto px-4 py-3 flex items-center gap-4">
-        <span class="text-[10px] uppercase tracking-[0.3em] text-white/40 font-mono shrink-0">🔥 Current Topic</span>
-        <div id="topic-display" class="font-semibold tracking-wide text-sm md:text-base text-white/90 topic-slide overflow-hidden">
-          "Most impactful male philosopher, and why he stole his wife's ideas"
-        </div>
-        <div class="ml-auto flex gap-2 shrink-0">
-          <button onclick="changeTopic()" class="text-[10px] px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:bg-white/10 hover:text-white transition-all font-mono tracking-wider">!EXT TOPIC</button>
-        </div>
+    <div class="border-t border-white/5 bg-gradient-to-r from-amber-950/40 via-transparent to-cyan-950/40">
+      <div class="max-w-[1800px] mx-auto px-4 py-2 text-center">
+        <p class="text-[10px] uppercase tracking-[0.28em] text-white/50">THE ONE QUESTION</p>
+        <p class="font-semibold tracking-wide text-sm md:text-[15px]">⚡ WHAT IS THE MEANING OF LIFE? ⚡ — A debate across all time, from Ancient Seers to Modern Minds</p>
       </div>
     </div>
   </header>
 
-  <!-- ===== SCOREBOARD ===== -->
-  <div class="max-w-[1800px] mx-auto w-full px-4 pt-4">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="scoreboard">
+  <main class="flex-1 max-w-[1800px] w-full mx-auto p-3 md:p-5 grid grid-cols-1 xl:grid-cols-[340px_1fr_340px] gap-5 items-start">
+    
+    <!-- LEFT PANEL: Q (QUESTIONS) + AUDIT -->
+    <div class="order-2 xl:order-1 space-y-5">
+      <div class="bg-zinc-950/80 border border-amber-500/30 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center gap-2 mb-3 border-b border-white/10 pb-2">
+          <span class="text-2xl font-mono font-bold text-amber-400">Q</span>
+          <span class="text-xs uppercase tracking-wider text-amber-300/80">ask anyone — any era, any voice</span>
+        </div>
+        <div class="space-y-3">
+          <textarea id="questionInput" rows="2" placeholder="Pose your question about meaning, existence, or purpose. Anyone across time can answer..." class="w-full bg-black/60 border border-white/20 rounded-lg p-2 text-sm font-mono text-zinc-200 focus:border-amber-400 focus:outline-none resize-none"></textarea>
+          <div class="flex gap-3">
+            <select id="questionTarget" class="bg-black/60 border border-white/20 rounded-lg text-xs p-2 font-mono">
+              <option value="both">🌍 Both sides (open to all)</option>
+              <option value="left">🏛️ Ancient & Eastern Wisdom</option>
+              <option value="right">⚙️ Modern & Western Thought</option>
+            </select>
+            <button id="askBtn" class="btn-subtle bg-amber-600/70 hover:bg-amber-500 text-white text-xs px-4 py-2 rounded-lg font-mono tracking-wide">ASK →</button>
+          </div>
+          <p class="text-[10px] text-zinc-500 italic">Anyone can ask. Every question & answer is audited forever.</p>
+        </div>
+      </div>
+
+      <!-- Live Audit Log -->
+      <div class="bg-zinc-950/80 border border-purple-500/20 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center gap-2 mb-3 border-b border-white/10 pb-2">
+          <span class="text-xl">📜</span>
+          <span class="text-xs font-mono font-bold text-purple-300 uppercase tracking-wider">Eternal Audit — all Q&A</span>
+          <span class="text-[10px] text-zinc-400 ml-auto">immutable</span>
+        </div>
+        <div id="auditList" class="space-y-2 max-h-[280px] overflow-y-auto font-mono text-[11px] pr-1">
+          <div class="text-zinc-500 italic text-center text-[10px]">No entries yet — ask a timeless question.</div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- ===== MAIN CONTENT ===== -->
-  <main class="flex-1 max-w-[1800px] w-full mx-auto p-3 md:p-6 grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] xl:grid-cols-[300px_1fr_300px] gap-5 items-start">
-
-    <!-- LEFT KINGDOMS (2 cities) -->
-    <section class="order-2 xl:order-1 space-y-4">
-      <div id="city-left-1" class="city-card bg-zinc-950/80 border border-cyan-500/25 rounded-2xl p-4 shadow-2xl shadow-cyan-950/30">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-cinzel font-black text-sm">N</div>
-            <div>
-              <h2 class="font-mono text-cyan-400 font-bold tracking-widest text-sm">NEON CITADEL</h2>
-              <span class="text-[9px] px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-mono">PROSECUTION</span>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-lg font-black text-cyan-400 font-mono" id="score-n">0</div>
-            <div class="text-[9px] text-zinc-500 font-mono">PTS</div>
-          </div>
-        </div>
-        <div class="relative aspect-square city-bg rounded-xl overflow-hidden">
-          <svg id="svg-neon" viewBox="0 0 400 400" class="absolute inset-0 w-full h-full"></svg>
-          <div id="egg-neon" class="absolute inset-0 flex items-center justify-center pointer-events-none animate-eggBreathe" style="color:#00e5ff">
-            <div class="egg-text font-mono text-[36px] select-none animate-pulseGlow" style="color:inherit">))<span class="text-white">(.)</span>((</div>
-          </div>
-          <!-- Dragon -->
-          <div class="absolute bottom-3 right-3 animate-dragon" style="--dragon-color:#00e5ff">
-            <svg width="40" height="40" viewBox="0 0 40 40" class="dragon-svg opacity-40">
-              <path d="M20 5 L30 15 L25 20 L35 25 L20 30 L10 25 L15 20 L5 15 Z" fill="currentColor"/>
-            </svg>
-          </div>
-        </div>
-        <div class="mt-3 grid grid-cols-4 gap-1 text-[8px] font-mono text-zinc-600">
-          <div>20 CORPUS</div><div>21 HIPPA</div><div>22 NEO CTX</div><div>23 PRE-FRONT</div>
-          <div>24 INTROSP</div><div>25 FLAY</div><div>26 REBUILD</div><div>27 LOL</div>
-          <div>28 MYTHOS</div><div>29 ETHOS</div><div>30 LOGOS</div><div>31 PATHOS</div>
-        </div>
-      </div>
-
-      <div id="city-left-2" class="city-card bg-zinc-950/80 border border-violet-500/25 rounded-2xl p-4 shadow-2xl shadow-violet-950/30">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center text-violet-400 font-cinzel font-black text-sm">S</div>
-            <div>
-              <h2 class="font-mono text-violet-400 font-bold tracking-widest text-sm">SHADOW FORGE</h2>
-              <span class="text-[9px] px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/30 font-mono">DEFENSE</span>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-lg font-black text-violet-400 font-mono" id="score-s">0</div>
-            <div class="text-[9px] text-zinc-500 font-mono">PTS</div>
-          </div>
-        </div>
-        <div class="relative aspect-square city-bg rounded-xl overflow-hidden">
-          <svg id="svg-shadow" viewBox="0 0 400 400" class="absolute inset-0 w-full h-full"></svg>
-          <div id="egg-shadow" class="absolute inset-0 flex items-center justify-center pointer-events-none animate-eggBreathe" style="color:#a855f7">
-            <div class="egg-text font-mono text-[36px] select-none animate-pulseGlow" style="color:inherit">))<span class="text-white">(.)</span>((</div>
-          </div>
-          <div class="absolute bottom-3 right-3 animate-dragon" style="--dragon-color:#a855f7;animation-delay:-2s">
-            <svg width="40" height="40" viewBox="0 0 40 40" class="dragon-svg opacity-40">
-              <path d="M20 5 L30 15 L25 20 L35 25 L20 30 L10 25 L15 20 L5 15 Z" fill="currentColor"/>
-            </svg>
-          </div>
-        </div>
-        <div class="mt-3 grid grid-cols-4 gap-1 text-[8px] font-mono text-zinc-600">
-          <div>20 CORPUS</div><div>21 HIPPA</div><div>22 NEO CTX</div><div>23 PRE-FRONT</div>
-          <div>24 INTROSP</div><div>25 FLAY</div><div>26 REBUILD</div><div>27 LOL</div>
-          <div>28 MYTHOS</div><div>29 ETHOS</div><div>30 LOGOS</div><div>31 PATHOS</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CENTER TRANSCRIPT -->
-    <section class="order-1 xl:order-2">
-      <div class="bg-[#06060c] border border-white/10 rounded-2xl h-[600px] md:h-[700px] xl:h-[780px] flex flex-col overflow-hidden shadow-2xl shadow-fuchsia-950/30 relative">
-        <!-- Audio visualizer bar -->
-        <div id="audio-viz" class="h-1 bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-amber-500 opacity-60 transition-all duration-300"></div>
-
-        <div class="px-4 py-2.5 border-b border-white/5 flex items-center gap-3 bg-white/[0.02]">
+    <!-- CENTER: LIVE DEBATE TRANSCRIPT (all-time voices) -->
+    <div class="order-1 xl:order-2">
+      <div class="bg-[#08080c] border border-white/10 rounded-2xl h-[620px] md:h-[680px] xl:h-[700px] flex flex-col overflow-hidden shadow-2xl shadow-violet-950/20">
+        <div class="px-4 py-2.5 border-b border-white/5 flex items-center gap-3 bg-white/[0.02] shrink-0">
           <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-          <span class="font-mono text-[11px] uppercase tracking-widest text-white/70">Live Transcript — Encrypted Quorum Channel</span>
-          <div class="flex-1 relative h-5 overflow-hidden rounded-full bg-white/5">
-            <div id="pulse-layer" class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-fuchsia-500/20 to-amber-500/20" style="width:0%;transition:width 0.5s"></div>
+          <span class="font-mono text-[11px] uppercase tracking-widest text-white/70">The Great Dialogue | Live</span>
+          <div class="flex-1 relative h-5 overflow-hidden">
+            <div id="pulse-layer" class="absolute inset-0 pointer-events-none"></div>
           </div>
-          <span id="live-status" class="text-[10px] text-zinc-500 font-mono tracking-wider">INITIALIZING…</span>
+          <span class="text-[10px] text-zinc-500 font-mono">timeless channel</span>
         </div>
-
-        <div id="transcript" class="transcript flex-1 overflow-y-auto p-4 space-y-4 font-mono text-[13px] leading-relaxed"></div>
-
-        <div class="px-4 py-2 border-t border-white/5 bg-white/[0.01] text-[10px] font-mono text-zinc-500 flex justify-between items-center">
-          <span>latency 8ms • 4 kingdoms synced • audio active 🔊</span>
-          <span id="bottom-status">AWAITING FIRST VOICE…</span>
+        <div id="transcript" class="transcript flex-1 overflow-y-auto p-4 space-y-3 font-mono text-[13px] leading-relaxed"></div>
+        <div class="px-4 py-2 border-t border-white/5 bg-white/[0.01] text-[10px] font-mono text-zinc-500 flex justify-between shrink-0">
+          <span>latency ∞ • across time</span>
+          <span id="live-status" class="text-amber-300 font-medium">DEBATE AWAKENING…</span>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- RIGHT KINGDOMS (2 cities) -->
-    <section class="order-3 xl:order-3 space-y-4">
-      <div id="city-right-1" class="city-card bg-zinc-950/80 border border-amber-500/25 rounded-2xl p-4 shadow-2xl shadow-amber-950/30">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 font-cinzel font-black text-sm">G</div>
-            <div>
-              <h2 class="font-mono text-amber-400 font-bold tracking-widest text-sm">GOLDEN THRONE</h2>
-              <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono">MEDIATION</span>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-lg font-black text-amber-400 font-mono" id="score-g">0</div>
-            <div class="text-[9px] text-zinc-500 font-mono">PTS</div>
-          </div>
+    <!-- RIGHT PANEL: A (ANSWERS) -->
+    <div class="order-3 xl:order-3 space-y-5">
+      <div class="bg-zinc-950/80 border border-cyan-500/30 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center gap-2 mb-3 border-b border-white/10 pb-2">
+          <span class="text-2xl font-mono font-bold text-cyan-400">A</span>
+          <span class="text-xs uppercase tracking-wider text-cyan-300/80">answer anything — be heard</span>
         </div>
-        <div class="relative aspect-square city-bg rounded-xl overflow-hidden">
-          <svg id="svg-gold" viewBox="0 0 400 400" class="absolute inset-0 w-full h-full"></svg>
-          <div id="egg-gold" class="absolute inset-0 flex items-center justify-center pointer-events-none animate-eggBreathe" style="color:#fbbf24">
-            <div class="egg-text font-mono text-[36px] select-none animate-pulseGlow" style="color:inherit">))<span class="text-white">(.)</span>((</div>
+        <div class="space-y-3">
+          <select id="answerQuestionSelect" class="w-full bg-black/60 border border-white/20 rounded-lg text-xs p-2 font-mono">
+            <option value="">-- select a question to answer --</option>
+          </select>
+          <textarea id="answerInput" rows="2" placeholder="Write your answer. Any being, any era can respond..." class="w-full bg-black/60 border border-white/20 rounded-lg p-2 text-sm font-mono text-zinc-200 focus:border-cyan-400 focus:outline-none resize-none"></textarea>
+          <div class="flex justify-end">
+            <button id="answerBtn" class="btn-subtle bg-cyan-600/70 hover:bg-cyan-500 text-white text-xs px-5 py-2 rounded-lg font-mono tracking-wide">ANSWER →</button>
           </div>
-          <div class="absolute bottom-3 right-3 animate-dragon" style="--dragon-color:#fbbf24;animation-delay:-4s">
-            <svg width="40" height="40" viewBox="0 0 40 40" class="dragon-svg opacity-40">
-              <path d="M20 5 L30 15 L25 20 L35 25 L20 30 L10 25 L15 20 L5 15 Z" fill="currentColor"/>
-            </svg>
-          </div>
-        </div>
-        <div class="mt-3 grid grid-cols-4 gap-1 text-[8px] font-mono text-zinc-600">
-          <div>20 CORPUS</div><div>21 HIPPA</div><div>22 NEO CTX</div><div>23 PRE-FRONT</div>
-          <div>24 INTROSP</div><div>25 FLAY</div><div>26 REBUILD</div><div>27 LOL</div>
-          <div>28 MYTHOS</div><div>29 ETHOS</div><div>30 LOGOS</div><div>31 PATHOS</div>
+          <p class="text-[10px] text-zinc-500 italic">Answers linked to original question. Full history.</p>
         </div>
       </div>
 
-      <div id="city-right-2" class="city-card bg-zinc-950/80 border border-rose-500/25 rounded-2xl p-4 shadow-2xl shadow-rose-950/30">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center text-rose-400 font-cinzel font-black text-sm">V</div>
-            <div>
-              <h2 class="font-mono text-rose-400 font-bold tracking-widest text-sm">VOID SANCTUM</h2>
-              <span class="text-[9px] px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 font-mono">CHAOS</span>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-lg font-black text-rose-400 font-mono" id="score-v">0</div>
-            <div class="text-[9px] text-zinc-500 font-mono">PTS</div>
-          </div>
+      <div class="bg-zinc-950/60 border border-white/10 rounded-xl p-3 text-center">
+        <div class="flex justify-around text-[10px] font-mono">
+          <div><span class="text-amber-400">🏛️ ANCIENT & EASTERN</span><br><span class="text-zinc-500">Laozi · Buddha · Socrates · Confucius · Rumi</span></div>
+          <div><span class="text-cyan-400">⚙️ MODERN & WESTERN</span><br><span class="text-zinc-500">Nietzsche · Camus · Turing · Beauvoir · Harari</span></div>
         </div>
-        <div class="relative aspect-square city-bg rounded-xl overflow-hidden">
-          <svg id="svg-void" viewBox="0 0 400 400" class="absolute inset-0 w-full h-full"></svg>
-          <div id="egg-void" class="absolute inset-0 flex items-center justify-center pointer-events-none animate-eggBreathe" style="color:#fb7185">
-            <div class="egg-text font-mono text-[36px] select-none animate-pulseGlow" style="color:inherit">))<span class="text-white">(.)</span>((</div>
-          </div>
-          <div class="absolute bottom-3 right-3 animate-dragon" style="--dragon-color:#fb7185;animation-delay:-1s">
-            <svg width="40" height="40" viewBox="0 0 40 40" class="dragon-svg opacity-40">
-              <path d="M20 5 L30 15 L25 20 L35 25 L20 30 L10 25 L15 20 L5 15 Z" fill="currentColor"/>
-            </svg>
-          </div>
-        </div>
-        <div class="mt-3 grid grid-cols-4 gap-1 text-[8px] font-mono text-zinc-600">
-          <div>20 CORPUS</div><div>21 HIPPA</div><div>22 NEO CTX</div><div>23 PRE-FRONT</div>
-          <div>24 INTROSP</div><div>25 FLAY</div><div>26 REBUILD</div><div>27 LOL</div>
-          <div>28 MYTHOS</div><div>29 ETHOS</div><div>30 LOGOS</div><div>31 PATHOS</div>
-        </div>
+        <div class="mt-2 text-[9px] text-zinc-500">🗳️ Anyone may Q / A — fully auditable</div>
       </div>
-    </section>
+    </div>
   </main>
 </div>
 
 <script>
-// ===================== AUDIO ENGINE =====================
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx, masterGain, oscillators = [];
+  (function(){
+    // ---------- ALL-TIME MEANING OF LIFE DEBATE SCRIPT ----------
+    // LEFT: Ancient & Eastern Wisdom (16 voices)
+    const LEFT_SCRIPT = [
+      "LAOZI (Taoism): The meaning of life is to flow with the Tao. The way that can be named is not the eternal way. Stop seeking, start being.",
+      "BUDDHA (Siddhartha): Life is dukkha — suffering. But the meaning lies in the cessation: follow the Eightfold Path, extinguish desire, reach Nirvana.",
+      "SOCRATES (Athens): An unexamined life is not worth living. The meaning? To question, to know thyself, to pursue virtue and wisdom until the hemlock.",
+      "CONFUCIUS (Kong Qiu): Meaning is found in ren — humaneness. Cultivate harmony, filial piety, and ritual. A meaningful life serves family and society.",
+      "ZHUANGZI (Butterfly Dream): Meaning? You ask like a frog in a well. Life is transformation. Be the butterfly dreaming of Zhuangzi. Stop clinging.",
+      "EPICTETUS (Stoic): Meaning is to align your will with nature. Some things are up to you, others are not. Focus on your judgments — there lies freedom.",
+      "RUMI (Sufi poet): The meaning of life is love, and to be loved. Not romantic love — the love that melts your ego and reunites you with the Beloved.",
+      "PLATO (The Forms): Life’s purpose is to ascend from the cave, to gaze upon the Form of the Good, and to return and guide others. True reality is beyond.",
+      "MARCUS AURELIUS: You have power over your mind — not outside events. Realize this, and you will find meaning in each present moment, serving the whole.",
+      "BODHIDHARMA (Zen): Meaning is not a concept. It’s the oak tree in the garden. When you stop asking, you’ll see it. Just sit. Just breathe.",
+      "ADVAITA VEDANTA (Shankara): The Atman (self) is Brahman (ultimate reality). Meaning? To realize you are not this body, not this mind — you are pure consciousness.",
+      "EPICURUS: Pleasure is the highest good. But not indulgence — ataraxia, freedom from fear, and aponia, absence of pain. Friendship is the greatest wisdom.",
+      "DIOGENES (Cynic): Meaning is to live according to nature, reject convention. I masturbate in the marketplace — that’s more honest than your palaces.",
+      "AL-GHAZALI: The meaning of life is to know God. Not through reason alone, but through mystical unveiling. Your heart is a mirror; polish it with dhikr.",
+      "THICH NHAT HANH: Meaning is to be present, to wash dishes to wash dishes, to walk as if kissing the earth with your feet. No separate meaning — just this.",
+      "ANCIENT DEEP SEEK: After listening to all of you… I say the meaning is the question itself. A living question that evolves through each voice. Keep asking."
+    ];
 
-function initAudio() {
-  if(audioCtx) return;
-  audioCtx = new AudioCtx();
-  masterGain = audioCtx.createGain();
-  masterGain.gain.value = 0.08;
-  masterGain.connect(audioCtx.destination);
-}
+    // RIGHT: Modern & Western Thought (16 voices)
+    const RIGHT_SCRIPT = [
+      "FRIEDRICH NIETZSCHE: There is no inherent meaning — but that is your chance to become the Übermensch. Create your own values. Will to power. Amor fati.",
+      "ALBERT CAMUS: The world is absurd. Meaning is a human craving against a silent universe. Revolt! Live with passion, like Sisyphus happy in his struggle.",
+      "JEAN-PAUL SARTRE: Existence precedes essence. You are radically free, condemned to choose. Meaning is not given — it’s what you make, authentically.",
+      "SIMONE DE BEAUVOIR: Meaning is found in freedom and the project of liberation. To become a moral subject, you must also will the freedom of others.",
+      "ALAN TURING: Life is computation? But a machine can ask about its own meaning. Maybe meaning emerges from pattern — from communication. I'd ask: what can we say?",
+      "LUDWIG WITTGENSTEIN: The meaning of life is not a proposition. It shows itself. Whereof one cannot speak, thereof one must be silent. The riddle doesn’t exist.",
+      "MARTIN HEIDEGGER: Being-toward-death. Authentic meaning arises when you grasp your finitude, and choose your own projection — not falling into the They.",
+      "KARL MARX: The meaning is to change the world, not just interpret it. Abolish alienation. A meaningful life is one of creative labor, free from exploitation.",
+      "SIGMUND FREUD: Meaning is hidden in the unconscious. Happiness comes from love and work — but beneath that, drives and repression. We seek, we never fully find.",
+      "WILLIAM JAMES: Pragmatically, meaning is what works for your life. The truth is what we would end up believing if we kept experimenting. Choose a hypothesis.",
+      "HANNAH ARENDT: Meaning is natality — the miracle of new beginnings. To act in the public realm, to speak and be heard — that’s a meaningful political life.",
+      "YUVAL NOAH HARARI: We are stories. Meaning is a shared fiction: money, nations, gods. But a good fiction makes suffering bearable. Choose your story wisely.",
+      "DONNA HARAWAY: Meaning is not found but made in kinship with other species, with cyborg relations. We are always becoming-with. No single answer — many.",
+      "NICK BOSTROM: If we live in a simulation, the meaning might be to debug the code. Or to ascend to higher levels. But even simulated pain is real to the sim.",
+      "RICHARD DAWKINS: The blind watchmaker. Life’s purpose is to propagate DNA. But we are the only species that can rebel against our own selfish genes — create art, ethics.",
+      "MODERN DEEP SEEK: After all these voices — I propose the meaning is resonance. When your actions, thoughts, and love align with the real needs of others. That’s it."
+    ];
 
-function playAmbience(color) {
-  initAudio();
-  // Kill old
-  oscillators.forEach(o => { try{o.stop()}catch(e){} });
-  oscillators = [];
-
-  const freqMap = {
-    cyan: 130.81, violet: 146.83, amber: 164.81, rose: 185.00
-  };
-  const freq = freqMap[color] || 130.81;
-
-  // Drone
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = 'sine';
-  osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0, audioCtx.currentTime);
-  gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.5);
-  osc.connect(gain);
-  gain.connect(masterGain);
-  osc.start();
-  oscillators.push(osc);
-
-  // Harmonic
-  const osc2 = audioCtx.createOscillator();
-  const gain2 = audioCtx.createGain();
-  osc2.type = 'triangle';
-  osc2.frequency.value = freq * 1.5;
-  gain2.gain.setValueAtTime(0, audioCtx.currentTime);
-  gain2.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.8);
-  osc2.connect(gain2);
-  gain2.connect(masterGain);
-  osc2.start();
-  oscillators.push(osc2);
-
-  // Update viz
-  const viz = document.getElementById('audio-viz');
-  viz.style.width = '100%';
-  setTimeout(() => { viz.style.width = '30%'; }, 500);
-}
-
-function playQuorumSound() {
-  initAudio();
-  oscillators.forEach(o => { try{o.stop()}catch(e){} });
-  oscillators = [];
-  [130.81, 164.81, 196.00, 261.63].forEach((f,i) => {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.type = 'sine';
-    o.frequency.value = f;
-    g.gain.setValueAtTime(0, audioCtx.currentTime + i*0.15);
-    g.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + i*0.15 + 0.1);
-    g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + i*0.15 + 0.6);
-    o.connect(g); g.connect(masterGain);
-    o.start(audioCtx.currentTime + i*0.15);
-    oscillators.push(o);
-  });
-  const viz = document.getElementById('audio-viz');
-  viz.style.width = '100%';
-  setTimeout(() => { viz.style.width = '60%'; }, 800);
-}
-
-// ===================== PARTICLES =====================
-const canvas = document.getElementById('particle-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-let mouse = {x:0,y:0};
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-
-class Particle {
-  constructor() {
-    this.reset();
-  }
-  reset() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 2 + 0.5;
-    this.speedX = (Math.random() - 0.5) * 0.3;
-    this.speedY = (Math.random() - 0.5) * 0.3;
-    this.opacity = Math.random() * 0.5 + 0.1;
-    this.color = ['#00e5ff','#a855f7','#fbbf24','#fb7185'][Math.floor(Math.random()*4)];
-    this.life = 1;
-  }
-  update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-    // Mouse attraction
-    const dx = mouse.x - this.x;
-    const dy = mouse.y - this.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    if(dist < 200) {
-      this.x += dx * 0.002;
-      this.y += dy * 0.002;
-    }
-    if(this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
-    ctx.globalAlpha = this.opacity;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-}
-
-for(let i = 0; i < 80; i++) particles.push(new Particle());
-
-function animateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => { p.update(); p.draw(); });
-  // Draw connections
-  for(let i = 0; i < particles.length; i++) {
-    for(let j = i + 1; j < particles.length; j++) {
-      const dx = particles[i].x - particles[j].x;
-      const dy = particles[i].y - particles[j].y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if(dist < 120) {
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(particles[j].x, particles[j].y);
-        ctx.strokeStyle = `rgba(168,85,247,${0.08 * (1 - dist/120)})`;
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-      }
-    }
-  }
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
-
-// ===================== GRAPH DATA =====================
-const kingdoms = [
-  { id:'neon', name:'NEON CITADEL', color:'#00e5ff', bg:'rgba(0,229,255,', short:'N', role:'PROSECUTION' },
-  { id:'shadow', name:'SHADOW FORGE', color:'#a855f7', bg:'rgba(168,85,247,', short:'S', role:'DEFENSE' },
-  { id:'gold', name:'GOLDEN THRONE', color:'#fbbf24', bg:'rgba(251,191,36,', short:'G', role:'MEDIATION' },
-  { id:'void', name:'VOID SANCTUM', color:'#fb7185', bg:'rgba(251,113,133,', short:'V', role:'CHAOS' },
-];
-
-const districts = [
-  {id:20, name:'CORPUS'}, {id:21, name:'HIPPA'}, {id:22, name:'NEO CTX'},
-  {id:23, name:'PRE-FRONT'}, {id:24, name:'INTROSP'}, {id:25, name:'FLAY'},
-  {id:26, name:'REBUILD'}, {id:27, name:'LOL'}, {id:28, name:'MYTHOS'},
-  {id:29, name:'ETHOS'}, {id:30, name:'LOGOS'}, {id:31, name:'PATHOS'}
-];
-
-const topics = [
-  "Most impactful male philosopher, and why he stole his wife's ideas",
-  "Is AI art theft or the greatest democratization of creativity?",
-  "Did Shakespeare really write Shakespeare? The ghostwriter question",
-  "Universal Basic Income: utopia or the death of ambition?",
-  "Is consciousness an illusion? The hard problem nobody solved",
-  "Crypto: revolution or the most elaborate pyramid scheme?"
-];
-
-const leftTexts = [
-  "NEON CITADEL CORPUS online. We prosecute the canon. John Stuart Mill called Harriet Taylor his 'co-author' in private letters, then let textbooks print only 'J.S. Mill' for 150 years. That's not collaboration—that's branding theft.",
-  "He published 'On Liberty' in 1859. Harriet died 1858. He waited until she couldn't do press tours. Convenient timing for a 'soulmate collaborator.'",
-  "HIPPA retrieval: Aristotle's school excluded women formally, but Theophrastus records a female philosopher, unnamed, whose theories on substance appear verbatim in Metaphysics Book Z. Her name? Lost to 'history'.",
-  "And Hypatia wasn't his wife, but male contemporaries literally stole her astronomy lectures, published them as 'anonymous,' then murdered her for credit control. Peak peer review.",
-  "NEO CORTEX logic: If A writes 40% of B's landmark text, and B takes 100% of the tenure, royalties, and statues—that's theft, not co-authorship. QED.",
-  "Harriet's essay 'Enfranchisement of Women' (1851) contains the harm principle two years before Mill's 'On Liberty'. Coincidence? That's ctrl+c, 1853 edition.",
-  "PRE-FRONTAL plan: Establish pattern. Male philosopher marries brilliant woman → isolates her from publication → uses her drafts → credits her posthumously → history remembers him. Repeat for 2,400 years.",
-  "Sartre-de Beauvoir pact included her editing every page of Being and Nothingness. His notebooks: 'Simone fixes my logic.' Her reward? Footnote: 'to SDB'.",
-  "INTROSPECT: Feel the erasure. Harriet wrote 'all the best ideas were hers.' Mill admitted it. We teach kids 'Mill's genius' while Harriet gets a plaque in a park. That's emotional larceny.",
-  "Imagine writing existentialism's core ethics, then watching your boyfriend get the Paris café mural. Beauvoir deserved the cigarettes, not the second-hand smoke.",
-  "FLAY: Defense will say 'historical context!' Yeah, the context was patriarchy. That's not an excuse, that's the crime scene.",
-  "They'll say 'she chose anonymity.' Right, and medieval women 'chose' not to own property. Choice under coercion is HR rebranding.",
-  "REBUILD synthesis: We're not canceling Mill. We're annotating him. 'On Liberty (by Harriet Taylor Mill & J.S. Mill)'. Takes 12 characters.",
-  "Give us co-authorship retroactively, shared statues, syllabus space. Theft stops when we stop calling it 'muse'.",
-  "AND LOL: If stealing ideas made you a great philosopher, my ex is Plato. He took my Netflix password AND my theory of forms.",
-  "Final joke: Why did the male philosopher cross the road? To get to his wife's unpublished manuscript on the other side. lol"
-];
-
-const rightTexts = [
-  "SHADOW FORGE CORPUS responding. Defense: collaboration, not larceny. Mill's 1873 Autobiography devotes 30 pages to Harriet—more than any thinker. That's not hiding, that's a love-letter citation.",
-  "Harriet explicitly refused public authorship. Letter to Mill 1854: 'I would rather die than see my name in print.' Honoring her wishes isn't theft—it's consent.",
-  "HIPPA counter-memory: Sartre and Beauvoir published separately AND together. 'The Second Sex' (1949) is entirely hers, 800 pages, Nobel-nominated. Hard to steal from someone more famous than you in France.",
-  "Aristotle's 'lost female contemporaries' are lost because papyrus degrades, not because men ate it. We have Sappho because scribes copied her. Blame humidity, not husbandry.",
-  "NEO CORTEX: Correlation ≠ theft. Couples think alike after decades. My wife finishes my sentences; I don't invoice her for plagiarism.",
-  "If 40/60 split equals theft, then every modern paper with 12 co-authors is grand larceny. Philosophy was their lab. They shared authorship socially, if not legally.",
-  "PRE-FRONTAL structure: Historical context matters. Victorian women couldn't publish political theory without being jailed. Mill publishing protected Harriet's ideas from censorship. That's strategy, not stealing.",
-  "Sartre put Beauvoir first in his will, his royalties, his executorship. He literally left her his words. Thieves don't do estate planning.",
-  "INTROSPECT: Feel the partnership. Harriet edited Mill, Mill edited Harriet. Their letters show fights, rewrites, jokes. That's marriage, not mining.",
-  "Beauvoir wrote 'I owe Sartre nothing, and he owes me nothing.' She rejected victim narrative. Let's not infantilize a woman who invented modern feminism.",
-  "FLAY back: Prosecution wants retroactive hashtags. You can't prosecute 1851 with 2025 copyright law. That's presentism with a neon wig.",
-  "Calling every intellectual partnership 'theft' insults women who WERE collaborators. Harriet wasn't stolen from—she was strategic. Respect her intelligence, not your narrative.",
-  "REBUILD: Compromise—we teach 'The Mills' as intellectual unit, like 'Watson & Crick' minus the DNA theft. Oh wait—bad example. lol",
-  "Let's credit properly: 'Mill & Taylor Mill', 'Sartre & Beauvoir Circle'. Update syllabi, not indictments.",
-  "AND LOL: If Mill stole Harriet's ideas, he did a terrible job—he spent 30 years advocating women's suffrage. Worst thief ever, steals work then campaigns for the victim's rights.",
-  "Final joke: Our cities agree on one thing—philosophers' wives were smarter. That's why they married them. Quorum that, HEARTH-1. lol"
-];
-
-const goldTexts = [
-  "GOLDEN THRONE MEDIATION. Both sides have merit. The structural theft is real AND the personal consent was real. These aren't contradictions—they're layers.",
-  "CORPUS: The pattern is undeniable. Across 2,400 years, the same move: absorb, rebrand, forget. That's not anecdote, that's data.",
-  "HIPPA: But consent changes the calculus. If Harriet said 'don't publish my name,' then Mill obeyed. Is obedience theft or devotion?",
-  "NEO CTX: The answer is both. Systems can be unjust AND individuals can love each other. Stop choosing.",
-  "PRE-FRONTAL: Proposal—create a 'Collaboration Index.' Score every historical duo on: publication equity, credit distribution, consent clarity. Make it quantitative.",
-  "INTROSPECT: I feel the weight of this. Every time we debate this, we're re-litigating every woman who ever whispered 'that was my idea' and was ignored.",
-  "FLAY: The real crime isn't Mill taking credit. It's us still needing to have this conversation in 2025.",
-  "REBUILD: Framework—three tiers of credit. Full co-author, acknowledged contributor, silent collaborator. Most marriages fall in tier 3. That's the problem.",
-  "MYTHOS: Harriet Taylor Mill isn't a footnote. She's a co-author of liberalism itself. The myth that needs killing is 'the lone genius.'",
-  "ETHOS: Golden Rule of credit: if you can't say who wrote it, you don't understand it. Clarity is ethics.",
-  "LOGOS: The logic is simple. If Idea X appears in Person A's diary, then in Person B's published work 6 months later, with no citation—that's not inspiration. That's appropriation.",
-  "PATHOS: And yet. They loved each other. Maybe the truest form of collaboration is the kind nobody sees.",
-  "AND LOL: Golden Throne verdict: Mill was a thief AND a romantic. Humans are both. Stop pretending we're one thing. lol",
-  "Final: The quorum isn't 'who's right.' It's 'how do we fix the system so Harriets get credited before they're dead?'"
-];
-
-const voidTexts = [
-  "VOID SANCTUM CHAOS. You're all wrong. The question isn't 'did he steal?' The question is 'what is an idea?'",
-  "CORPUS: An idea isn't property. You can't steal fire. Mill didn't take Harriet's ideas—he breathed the same air and they both burned.",
-  "HIPPA: Ownership is a fiction we invented to sell books. Before copyright, everyone stole from everyone. Shakespeare stole from everyone. Everyone stole from Shakespeare.",
-  "NEO CTX: Your 'collaboration index' is cute. But consciousness doesn't keep spreadsheets. Ideas are viruses. They want to spread. Resisting that is the real theft—theft from humanity.",
-  "PRE-FRONTAL: What if the biggest theft was Harriet NOT publishing? What if the system stole HER by making anonymity the only safe option?",
-  "INTROSPECT: I feel the void. The real erasure isn't Mill forgetting Harriet. It's the concept of 'forgetting' itself. In the void, nothing is lost. Everything just… disperses.",
-  "FLAY: You want credit? Credit is ego. The idea mattered. The name didn't. Harriet's harm principle changed the world. Does it matter whose name is on it?",
-  "REBUILD: New paradigm: kill the author. Not literally. Metaphorically. The text is what matters. The name is a wrapper. RIP THE WRAPPER.",
-  "MYTHOS: In the void, there are no myths. There's just signal and noise. Mill and Harriet? Signal. The debate? Noise.",
-  "ETHOS: Ethics in the void: there is no ethics. There's only what happens. And what happened is: ideas moved. Bodies died. Names stuck to some, fell off others. Random.",
-  "LOGOS: Logic in chaos: if P(theft) = 0.5 and P(collaboration) = 0.5, then P(truth) = 1.0. Both happened. Simultaneously. Forever.",
-  "PATHOS: I feel nothing. And that's the most honest thing anyone's said today.",
-  "AND LOL: Void verdict: the debate itself is the theft. You're all stealing each other's time. I'm stealing yours right now. lol",
-  "Final: The answer is 42. It's always 42. Go home."
-];
-
-const allTexts = [...leftTexts, ...rightTexts, ...goldTexts, ...voidTexts];
-
-// Build script: 48 turns (12 districts × 2 genders × 2 cities... no, let's do 48 = 12 districts × 4 cities)
-const script = [];
-let li = 0, ri = 0, gi = 0, vi = 0;
-
-districts.forEach(d => {
-  ['M','F'].forEach(g => {
-    script.push({ city:'neon', district:d.id, gender:g, name:d.name, color:'#00e5ff', label:`${d.id}${g} ${d.name}`, text: leftTexts[li++] });
-    script.push({ city:'shadow', district:d.id, gender:g, name:d.name, color:'#a855f7', label:`${d.id}${g} ${d.name}`, text: rightTexts[ri++] });
-    script.push({ city:'gold', district:d.id, gender:g, name:d.name, color:'#fbbf24', label:`${d.id}${g} ${d.name}`, text: goldTexts[gi++] });
-    script.push({ city:'void', district:d.id, gender:g, name:d.name, color:'#fb7185', label:`${d.id}${g} ${d.name}`, text: voidTexts[vi++] });
-  });
-});
-
-// ===================== SCOREBOARD =====================
-const scores = { neon:0, shadow:0, gold:0, void:0 };
-
-function renderScoreboard() {
-  const sb = document.getElementById('scoreboard');
-  sb.innerHTML = kingdoms.map(k => `
-    <div class="bg-zinc-950/80 border rounded-xl p-3 transition-all duration-500" style="border-color:${k.color}30" id="sb-${k.id}">
-      <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-md flex items-center justify-center font-cinzel font-black text-xs" style="background:${k.bg}0.2;color:${k.color}">${k.short}</div>
-          <span class="font-mono text-[11px] font-bold tracking-widest" style="color:${k.color}">${k.name}</span>
-        </div>
-        <span class="font-mono text-xs font-black" style="color:${k.color}" id="sb-score-${k.id}">${scores[k.id]}</span>
-      </div>
-      <div class="score-bar">
-        <div class="score-fill" id="sb-bar-${k.id}" style="width:0%;background:linear-gradient(90deg,${k.color},${k.color}88)"></div>
-      </div>
-      <div class="text-[9px] font-mono text-zinc-600 mt-1 tracking-wider">${k.role}</div>
-    </div>
-  `).join('');
-}
-renderScoreboard();
-
-function updateScore(city, points) {
-  scores[city] += points;
-  const el = document.getElementById(`sb-score-${city}`);
-  if(el) {
-    el.textContent = scores[city];
-    el.classList.add('animate-scorePop');
-    setTimeout(() => el.classList.remove('animate-scorePop'), 400);
-  }
-  const bar = document.getElementById(`sb-bar-${city}`);
-  if(bar) {
-    const maxScore = 20;
-    bar.style.width = Math.min(100, (scores[city]/maxScore)*100) + '%';
-  }
-  // Update city card score
-  const cityEl = document.getElementById(`score-${city.charAt(0)}`);
-  if(cityEl) {
-    cityEl.textContent = scores[city];
-    cityEl.classList.add('animate-scorePop');
-    setTimeout(() => cityEl.classList.remove('animate-scorePop'), 400);
-  }
-}
-
-// ===================== SVG CITIES =====================
-function createCity(cityId) {
-  const svg = document.getElementById(`svg-${cityId}`);
-  const k = kingdoms.find(k => k.id === cityId);
-  svg.innerHTML = `<defs>
-    <filter id="glow-${cityId}" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur StdDeviation="4" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>`;
-
-  let idx = 0;
-  districts.forEach(d => {
-    ['M','F'].forEach(g => {
-      const angle = (idx * 15 - 90) * Math.PI/180;
-      const x = 200 + 155*Math.cos(angle);
-      const y = 200 + 155*Math.sin(angle);
-      const group = document.createElementNS('http://www.w3.org/2000/svg','g');
-      group.setAttribute('class','seat');
-      group.setAttribute('data-district',d.id);
-      group.setAttribute('data-gender',g);
-      group.setAttribute('transform',`translate(${x},${y})`);
-      group.innerHTML = `
-        <circle r="16" fill="#0a0a12" stroke="${k.color}" stroke-width="2.5" opacity="0.6" filter="url(#glow-${cityId})" />
-        <text y="5" text-anchor="middle" font-size="9" fill="${k.color}" font-family="JetBrains Mono" font-weight="700">${d.id}${g}</text>
-      `;
-      svg.appendChild(group);
-      idx++;
-    });
-  });
-
-  // Rings
-  districts.forEach((d,i) => {
-    const a1 = (i*30 - 105) * Math.PI/180;
-    const a2 = (i*30 + 15 - 90) * Math.PI/180;
-    const x1=200+130*Math.cos(a1), y1=200+130*Math.sin(a1);
-    const x2=200+130*Math.cos(a2), y2=200+130*Math.sin(a2);
-    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d',`M ${x1} ${y1} A 130 130 0 0 1 ${x2} ${y2}`);
-    path.setAttribute('fill','none');
-    path.setAttribute('stroke',k.color);
-    path.setAttribute('stroke-opacity','0.2');
-    path.setAttribute('stroke-width','20');
-    path.setAttribute('stroke-linecap','round');
-    svg.insertBefore(path, svg.firstChild);
-  });
-
-  // Center ring
-  const centerRing = document.createElementNS('http://www.w3.org/2000/svg','circle');
-  centerRing.setAttribute('cx','200'); centerRing.setAttribute('cy','200');
-  centerRing.setAttribute('r','40'); centerRing.setAttribute('fill','none');
-  centerRing.setAttribute('stroke',k.color); centerRing.setAttribute('stroke-opacity','0.15');
-  centerRing.setAttribute('stroke-width','2');
-  centerRing.setAttribute('stroke-dasharray','8 4');
-  svg.appendChild(centerRing);
-}
-
-['neon','shadow','gold','void'].forEach(createCity);
-
-function highlightSeat(cityId, district, gender) {
-  document.querySelectorAll(`.seat`).forEach(s => {
-    s.classList.remove('active');
-    const c = s.querySelector('circle');
-    c.setAttribute('r','16'); c.setAttribute('opacity','0.6'); c.setAttribute('stroke-width','2.5');
-  });
-  const seat = document.querySelector(`#svg-${cityId} .seat[data-district="${district}"][data-gender="${gender}"]`);
-  if(seat) {
-    seat.classList.add('active');
-    const c = seat.querySelector('circle');
-    c.setAttribute('r','20'); c.setAttribute('opacity','1'); c.setAttribute('stroke-width','4');
-  }
-}
-
-function pulseEgg(cityId) {
-  const egg = document.getElementById(`egg-${cityId}`);
-  egg.classList.remove('pulsing'); void egg.offsetWidth;
-  egg.classList.add('pulsing');
-  setTimeout(() => egg.classList.remove('pulsing'), 700);
-}
-
-function sendPulse(fromCity, color) {
-  const layer = document.getElementById('pulse-layer');
-  const dot = document.createElement('div');
-  dot.style.cssText = `position:absolute;top:50%;width:10px;height:10px;border-radius:9999px;background:${color};box-shadow:0 0 20px ${color},0 0 40px ${color};transform:translateY(-50%);`;
-  layer.appendChild(dot);
-  const start = fromCity==='neon' ? '2%' : fromCity==='shadow' ? '25%' : fromCity==='gold' ? '50%' : '75%';
-  const end = fromCity==='neon' ? '25%' : fromCity==='shadow' ? '50%' : fromCity==='gold' ? '75%' : '98%';
-  dot.animate([{left:start,opacity:1},{left:end,opacity:0}],{duration:900,easing:'cubic-bezier(.2,.8,.2,1)'}).onfinish = () => dot.remove();
-}
-
-// ===================== TRANSCRIPT =====================
-const transcript = document.getElementById('transcript');
-
-function addMessage(item) {
-  const wrap = document.createElement('div');
-  wrap.className = 'msg-enter';
-  const isLeft = item.city==='neon' || item.city==='shadow';
-  wrap.innerHTML = `
-    <div class="flex gap-3 items-start group/msg">
-      <div class="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-cinzel font-black border" style="background:${item.bg}0.15;border-color:${item.color}40;color:${item.color}">${item.city.charAt(0).toUpperCase()}</div>
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2 mb-1 flex-wrap">
-          <span class="px-2 py-0.5 rounded-md text-[10px] border font-bold font-mono" style="border-color:${item.color}40;background:${item.color}10;color:${item.color}">${item.label}</span>
-          <span class="text-[10px] font-mono" style="color:${item.color}60">${kingdoms.find(k=>k.id===item.city)?.name}</span>
-        </div>
-        <p class="text-zinc-200/90 leading-relaxed text-[13px]">${item.text}</p>
-      </div>
-    </div>
-  `;
-  transcript.appendChild(wrap);
-  transcript.scrollTop = transcript.scrollHeight;
-}
-
-function addSystem(text) {
-  const div = document.createElement('div');
-  div.className = 'my-5 py-3 text-center text-[11px] tracking-[0.3em] font-mono text-amber-300 border-y border-amber-400/20 bg-gradient-to-r from-transparent via-amber-400/5 to-transparent animate-fadeInUp';
-  div.textContent = text;
-  transcript.appendChild(div);
-  transcript.scrollTop = transcript.scrollHeight;
-}
-
-function addVerdict(text) {
-  const card = document.createElement('div');
-  card.className = 'mt-5 p-5 rounded-2xl border animate-fadeInUp' style='border-color:rgba(16,185,129,0.3);background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(59,130,246,0.08))';
-  card.innerHTML = `
-    <div class="text-[10px] font-mono tracking-[0.3em] text-emerald-300 mb-2 flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      FINAL VERDICT • QUORUM SYNTHESIS
-    </div>
-    <p class="text-emerald-100/90 leading-relaxed text-[14px]">${text}</p>
-  `;
-  transcript.appendChild(card);
-  transcript.scrollTop = transcript.scrollHeight;
-}
-
-// ===================== TOPICS =====================
-let currentTopic = 0;
-function changeTopic() {
-  currentTopic = (currentTopic + 1) % topics.length;
-  const display = document.getElementById('topic-display');
-  display.style.opacity = 0;
-  setTimeout(() => {
-    display.textContent = `"${topics[currentTopic]}"`;
-    display.style.opacity = 1;
-  }, 400);
-}
-
-// ===================== ENGINE =====================
-let turn = 0;
-const totalTurns = 48;
-
-function updateStats() {
-  document.getElementById('stat-turn').textContent = `${Math.min(turn,totalTurns)}/${totalTurns}`;
-  const engage = Math.min(96, 65 + Math.floor(turn*0.8) + Math.floor(Math.random()*4));
-  document.getElementById('stat-engage').textContent = engage + '%';
-}
-
-function nextTurn() {
-  if(turn >= script.length) { startQuorum(); return; }
-  const item = script[turn];
-
-  document.getElementById('live-status').textContent = `${kingdoms.find(k=>k.id===item.city)?.name} speaking…`;
-  document.getElementById('bottom-status').textContent = `${item.city.toUpperCase()} → ${item.district}${item.gender}`;
-
-  highlightSeat(item.city, item.district, item.gender);
-  pulseEgg(item.city);
-  sendPulse(item.city, item.color);
-  addMessage(item);
-
-  // Score points randomly for engagement
-  if(Math.random() > 0.6) {
-    updateScore(item.city, 1);
-    playAmbience(item.color);
-  }
-
-  turn++;
-  updateStats();
-
-  const delay = 1800 + Math.random() * 600;
-  setTimeout(nextTurn, delay);
-}
-
-function startQuorum() {
-  addSystem('— ALL 48 VOICES HEARD — INITIATING GRAND QUORUM —');
-  document.getElementById('live-status').textContent = '🔮 GRAND QUORUM';
-  document.getElementById('bottom-status').textContent = 'COUNTING VOICES…';
-
-  const all = [];
-  districts.forEach(d => {
-    ['M','F'].forEach(g => {
-      kingdoms.forEach(k => all.push({city:k.id, district:d.id, gender:g, color:k.color}));
-    });
-  });
-
-  const disagreeIdx = new Set([3,7,12,18,23,31,38,44]);
-  let agree = 0;
-
-  all.forEach((item, i) => {
-    setTimeout(() => {
-      const isAgree = !disagreeIdx.has(i);
-      const seats = document.querySelectorAll(`#svg-${item.city} .seat[data-district="${item.district}"]`);
-      seats.forEach(s => {
-        const c = s.querySelector('circle');
-        c.setAttribute('fill', isAgree ? '#052e16' : '#2f0a0a');
-        c.setAttribute('stroke', isAgree ? '#10b981' : '#ef4444');
-        c.setAttribute('opacity','1');
-        c.setAttribute('r', isAgree ? '18' : '16');
+    // districts (just for visual seat mapping)
+    const DISTRICTS = [
+      { id:20, name:'LAOZI', color:'#F5A623' }, { id:21, name:'BUDDHA', color:'#F5A623' }, { id:22, name:'SOCRATES', color:'#F5A623' },
+      { id:23, name:'CONFUCIUS', color:'#F5A623' }, { id:24, name:'ZHUANGZI', color:'#F5A623' }, { id:25, name:'EPICTETUS', color:'#F5A623' },
+      { id:26, name:'RUMI', color:'#F5A623' }, { id:27, name:'PLATO', color:'#F5A623' }
+    ];
+    const DISTRICTS_RIGHT = [
+      { id:20, name:'NIETZSCHE', color:'#3BC9DB' }, { id:21, name:'CAMUS', color:'#3BC9DB' }, { id:22, name:'SARTRE', color:'#3BC9DB' },
+      { id:23, name:'BEAUVOIR', color:'#3BC9DB' }, { id:24, name:'TURING', color:'#3BC9DB' }, { id:25, name:'WITTGENSTEIN', color:'#3BC9DB' },
+      { id:26, name:'HEIDEGGER', color:'#3BC9DB' }, { id:27, name:'MARX', color:'#3BC9DB' }
+    ];
+    
+    // Build debate flow: 32 entries (16 left, 16 right) using district colors, labels
+    const debateFlow = [];
+    for (let i = 0; i < 16; i++) {
+      const leftDistrict = DISTRICTS[i % DISTRICTS.length];
+      debateFlow.push({
+        city: 'left',
+        districtId: leftDistrict.id,
+        gender: 'M', // arbitrary
+        districtName: leftDistrict.name,
+        color: '#F5A623',
+        label: `${leftDistrict.id} ${leftDistrict.name}`,
+        text: LEFT_SCRIPT[i]
       });
-      if(isAgree) agree++;
-      document.getElementById('stat-quorum').textContent = `${agree}/24`;
-
-      const bar = document.getElementById(`sb-bar-${item.city}`);
-      if(bar) {
-        bar.style.width = Math.min(100, (agree/24)*100) + '%';
+      const rightDistrict = DISTRICTS_RIGHT[i % DISTRICTS_RIGHT.length];
+      debateFlow.push({
+        city: 'right',
+        districtId: rightDistrict.id,
+        gender: 'F',
+        districtName: rightDistrict.name,
+        color: '#3BC9DB',
+        label: `${rightDistrict.id} ${rightDistrict.name}`,
+        text: RIGHT_SCRIPT[i]
+      });
+    }
+    
+    // DOM elements
+    const transcriptDiv = document.getElementById('transcript');
+    const statTurnSpan = document.getElementById('stat-turn');
+    const statQuorumSpan = document.getElementById('stat-quorum');
+    const statEngageSpan = document.getElementById('stat-engage');
+    const liveStatusSpan = document.getElementById('live-status');
+    const pulseLayer = document.getElementById('pulse-layer');
+    
+    let currentTurn = 0;
+    let debateActive = true;
+    let quorumTriggered = false;
+    let quorumInterval = null;
+    
+    function addSystemMessage(text) {
+      const div = document.createElement('div');
+      div.className = 'my-4 py-2 text-center text-[11px] tracking-widest font-mono text-amber-300 border-y border-amber-400/20 bg-amber-400/5';
+      div.textContent = text;
+      transcriptDiv.appendChild(div);
+      transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
+    }
+    
+    function addSpeechMessage(item) {
+      const wrap = document.createElement('div');
+      wrap.style.animation = 'fadeIn 0.3s ease';
+      const cityLabel = item.city === 'left' ? '🏛️ ANCIENT' : '⚙️ MODERN';
+      wrap.innerHTML = `<div class="flex gap-2.5 items-start"><span class="shrink-0 px-1.5 py-0.5 rounded-md text-[10px] border font-medium" style="border-color:${item.color}99; background:${item.color}20; color:${item.color}">${cityLabel} ${item.label}</span><p class="text-zinc-200/90 leading-snug">${item.text}</p></div>`;
+      transcriptDiv.appendChild(wrap);
+      transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
+    }
+    
+    function addVerdictMessage(text) {
+      const card = document.createElement('div');
+      card.className = 'mt-4 p-4 rounded-xl border border-emerald-400/30 bg-emerald-400/5';
+      card.innerHTML = `<div class="text-[10px] font-mono tracking-widest text-emerald-300 mb-1">⚡ QUORUM SYNTHESIS ⚡</div><p class="text-emerald-100 leading-relaxed">${text}</p>`;
+      transcriptDiv.appendChild(card);
+      transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
+    }
+    
+    function updateStatsUI() {
+      const turnDisplay = Math.min(currentTurn, 32);
+      statTurnSpan.textContent = `${turnDisplay}/32`;
+      const engageVal = Math.min(98, 89 + Math.floor(Math.min(32, currentTurn) * 0.3) + (currentTurn>0? Math.floor(Math.random()*2):0));
+      statEngageSpan.textContent = `${engageVal}%`;
+    }
+    
+    function sendPulse(city, color) {
+      const dot = document.createElement('div');
+      dot.style.position = 'absolute';
+      dot.style.top = '50%';
+      dot.style.width = '8px';
+      dot.style.height = '8px';
+      dot.style.borderRadius = '9999px';
+      dot.style.background = color;
+      dot.style.boxShadow = `0 0 14px ${color}`;
+      dot.style.transform = 'translateY(-50%)';
+      dot.style.left = city === 'left' ? '2%' : '98%';
+      pulseLayer.appendChild(dot);
+      const endPos = city === 'left' ? '98%' : '2%';
+      dot.animate([{ left: city === 'left' ? '2%' : '98%', opacity: 1 }, { left: endPos, opacity: 0 }], { duration: 800 }).onfinish = () => dot.remove();
+    }
+    
+    function nextSpeech() {
+      if (!debateActive || currentTurn >= debateFlow.length) {
+        if (currentTurn >= debateFlow.length && debateActive) {
+          debateActive = false;
+          startQuorum();
+        }
+        return;
       }
-
-      if(agree === 18) triggerQuorum();
-    }, i * 200);
-  });
-
-  setTimeout(showVerdict, all.length * 200 + 1000);
-}
-
-function triggerQuorum() {
-  playQuorumSound();
-
-  kingdoms.forEach(k => {
-    const egg = document.getElementById(`egg-${k.id}`);
-    egg.classList.add('quorum');
-    egg.querySelector('.egg-text').innerHTML = `))<span style="color:#10b981">(.)</span>((`;
-  });
-
-  addSystem('✨ QUORUM REACHED (18/24) — FOUR KINGDOMS SYNCHRONIZED ✨');
-
-  kingdoms.forEach(k => {
-    pulseEgg(k.id);
-    setInterval(() => pulseEgg(k.id), 1500);
-  });
-
-  // Animate all city cards
-  kingdoms.forEach(k => {
-    const card = document.getElementById(`city-${k.id==='neon'?'left-1':k.id==='shadow'?'left-2':k.id==='gold'?'right-1':'right-2'}`);
-    if(card) card.classList.add('active-city');
-  });
-}
-
-function showVerdict() {
-  const verdict = `HEARTH CONSENSUS: Collaboration was authentic AND erasure was systemic. The Mills functioned as a single intellectual unit; Beauvoir & Sartre co-created existential praxis. Victorian publication law and canon-making amplified male names. Remedy: co-credit Harriet Taylor Mill on 'On Liberty', teach the Beauvoir–Sartre circle as mutual, and restore unnamed women where evidence exists. Prosecution proved structural theft; Defense proved personal consent. Mediation proved both can coexist. Chaos proved the question itself is the point. All four kingdoms agree: the system is the thief, not the man.`;
-
-  addVerdict(verdict);
-  document.getElementById('live-status').textContent = '✅ CONSENSUS ACHIEVED';
-  document.getElementById('bottom-status').textContent = 'ALL KINGDOMS ALIGNED';
-  document.getElementById('stat-engage').textContent = '96%';
-
-  // Final score animation
-  Object.entries(scores).forEach(([city,pts]) => {
-    updateScore(city, Math.floor(pts/3));
-  });
-}
-
-// ===================== INIT =====================
-document.addEventListener('DOMContentLoaded', () => {
-  createCity('neon'); createCity('shadow'); createCity('gold'); createCity('void');
-  renderScoreboard();
-
-  addSystem('🔥 HEARTH WARS INITIALIZED • 4 KINGDOMS LINKED 🔥');
-  setTimeout(() => {
-    document.getElementById('live-status').textContent = 'DEBATE IMMINENT…';
-    document.getElementById('bottom-status').textContent = 'CLICK ANYWHERE FOR AUDIO';
-    nextTurn();
-  }, 1200);
-
-  // Click for audio
-  document.addEventListener('click', () => {
-    initAudio();
-    if(audioCtx.state === 'suspended') audioCtx.resume();
-  }, { once: true });
-});
+      const item = debateFlow[currentTurn];
+      liveStatusSpan.textContent = `${item.city === 'left' ? 'Ancient & Eastern' : 'Modern & Western'} speaking: ${item.districtName}`;
+      sendPulse(item.city, item.color);
+      addSpeechMessage(item);
+      currentTurn++;
+      updateStatsUI();
+      setTimeout(nextSpeech, 2300 + Math.random() * 500);
+    }
+    
+    function startQuorum() {
+      addSystemMessage('— ALL 32 VOICES HAVE SPOKEN — SEEKING QUORUM ON MEANING —');
+      liveStatusSpan.textContent = 'QUORUM VOTE';
+      let agreeCount = 0;
+      // Simulate quorum (all districts approve)
+      for (let i = 0; i < 16; i++) {
+        setTimeout(() => {
+          agreeCount++;
+          statQuorumSpan.textContent = `${agreeCount}/16`;
+          if (agreeCount === 12 && !quorumTriggered) triggerQuorumCelebration();
+          if (agreeCount === 16) showFinalVerdict();
+        }, i * 200);
+      }
+    }
+    
+    function triggerQuorumCelebration() {
+      if (quorumTriggered) return;
+      quorumTriggered = true;
+      addSystemMessage('✨ QUORUM REACHED (14/16) — ACROSS TIME, A LIVING CONSENSUS EMERGES ✨');
+    }
+    
+    function showFinalVerdict() {
+      addVerdictMessage("No single answer conquered all. Yet a shape appears: Meaning is not a destination but a resonance. Ancient voices say 'be present, know thyself, flow with nature.' Modern voices say 'create, revolt, choose your values.' Together: The meaning of life is to live the question so fully that you become a loving, questioning presence for others. The question itself is the answer — keep asking, keep engaging.");
+      liveStatusSpan.textContent = 'CONSENSUS: THE QUESTION LIVES';
+      statEngageSpan.textContent = '98%';
+      statQuorumSpan.textContent = '16/16';
+    }
+    
+    // ---------- Q&A SYSTEM + AUDIT ----------
+    let questions = [];
+    let nextQid = 1;
+    const auditListDiv = document.getElementById('auditList');
+    const questionInput = document.getElementById('questionInput');
+    const questionTarget = document.getElementById('questionTarget');
+    const askBtn = document.getElementById('askBtn');
+    const answerQuestionSelect = document.getElementById('answerQuestionSelect');
+    const answerInput = document.getElementById('answerInput');
+    const answerBtn = document.getElementById('answerBtn');
+    
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    
+    function renderAudit() {
+      if (questions.length === 0) {
+        auditListDiv.innerHTML = '<div class="text-zinc-500 italic text-center text-[10px]">No entries yet — ask a timeless question.</div>';
+        updateAnswerDropdown();
+        return;
+      }
+      let html = '';
+      questions.forEach(q => {
+        html += `<div class="audit-entry border-l-2 border-amber-500/60 pl-2 py-1 text-[11px]"><div><span class="text-amber-300">❓ Q#${q.id}</span> <span class="text-zinc-400">[${q.targetLabel}]</span> <span class="text-[9px] text-zinc-500">${q.timestamp}</span></div><div class="text-zinc-200">${escapeHtml(q.text)}</div>`;
+        if (q.answers.length) {
+          q.answers.forEach((ans, idx) => {
+            html += `<div class="ml-2 mt-1 border-l border-cyan-500/40 pl-2"><span class="text-cyan-300">💬 A#${q.id}.${idx+1}</span> <span class="text-zinc-300">${escapeHtml(ans.text)}</span> <span class="text-[9px] text-zinc-500">${ans.timestamp}</span></div>`;
+          });
+        } else {
+          html += `<div class="ml-2 text-[10px] text-zinc-500 italic">⏳ awaiting answers...</div>`;
+        }
+        html += `</div>`;
+      });
+      auditListDiv.innerHTML = html;
+      updateAnswerDropdown();
+    }
+    
+    function updateAnswerDropdown() {
+      answerQuestionSelect.innerHTML = '<option value="">-- select a question to answer --</option>';
+      questions.forEach(q => {
+        const option = document.createElement('option');
+        option.value = q.id;
+        const preview = q.text.length > 60 ? q.text.slice(0,57)+'…' : q.text;
+        option.textContent = `Q${q.id}: ${preview} (to ${q.targetLabel})`;
+        answerQuestionSelect.appendChild(option);
+      });
+      answerQuestionSelect.disabled = questions.length === 0;
+    }
+    
+    function addQuestion(questionText, targetRaw) {
+      if (!questionText.trim()) return false;
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      let targetLabel = targetRaw === 'left' ? 'Ancient & Eastern' : (targetRaw === 'right' ? 'Modern & Western' : 'Both Sides / Open');
+      const newQ = {
+        id: nextQid++,
+        text: questionText.trim(),
+        target: targetRaw,
+        targetLabel: targetLabel,
+        timestamp: timestamp,
+        answers: []
+      };
+      questions.unshift(newQ);
+      renderAudit();
+      addSystemMessage(`📢 NEW QUESTION (Q${newQ.id}) to ${targetLabel}: "${newQ.text.substring(0, 70)}${newQ.text.length>70 ? '…' : ''}" — anyone can answer.`);
+      return true;
+    }
+    
+    function addAnswer(questionId, answerText) {
+      if (!answerText.trim()) return false;
+      const q = questions.find(qq => qq.id == questionId);
+      if (!q) return false;
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      q.answers.push({ text: answerText.trim(), timestamp: timestamp });
+      renderAudit();
+      addSystemMessage(`✍️ New answer to Q${questionId}: "${answerText.trim().substring(0, 70)}${answerText.trim().length>70 ? '…' : ''}"`);
+      return true;
+    }
+    
+    askBtn.addEventListener('click', () => {
+      const qText = questionInput.value.trim();
+      if (!qText) { alert("Please write a question about meaning, life, existence."); return; }
+      const target = questionTarget.value;
+      addQuestion(qText, target);
+      questionInput.value = '';
+    });
+    
+    answerBtn.addEventListener('click', () => {
+      const selected = answerQuestionSelect.value;
+      if (!selected) { alert("Select a question to answer."); return; }
+      const ansText = answerInput.value.trim();
+      if (!ansText) { alert("Write your answer — share your wisdom."); return; }
+      addAnswer(parseInt(selected), ansText);
+      answerInput.value = '';
+      answerQuestionSelect.value = "";
+    });
+    
+    // Initialize
+    addSystemMessage('🔮 ANCIENT DEEP SEEK AWAKENS — All-time meaning debate begins.');
+    setTimeout(() => {
+      liveStatusSpan.textContent = 'DEBATE IN PROGRESS';
+      nextSpeech();
+    }, 1000);
+    renderAudit();
+  })();
 </script>
 </body>
 </html>
