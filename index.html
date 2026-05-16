@@ -3,75 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TVM Pro - You can literally see the 4th dimension</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>TVM Doubt Ladder ∞ - 1 repeat = +1 forever</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-  
   :root {
-    --bg: #0a0a0f;
-    --glass: rgba(20,20,30,0.55);
-    --border: rgba(255,255,255,0.08);
-    --gold: #ffc857;
-    --cyan: #00e5ff;
-    --red: #ff2d55;
-    --text: #e8e8f0;
-    --text-dim: #8b8b9c;
+    --gold: #ffd700;
+    --cyan: #00f5ff;
+    --red: #ff3864;
+    --mint: #00ffaa;
+    --bg: #0a0b0f;
+    --glass: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.12);
+    --text: #e8f0ff;
+    --text-dim: #8b9bb8;
   }
   
   * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
   
-  body {
-    margin: 0;
+  html, body {
+    height: 100%;
+    overflow: hidden;
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', sans-serif;
-    overflow: hidden;
-    user-select: none;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
   }
   
-  .glass {
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(255,215,0,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(0,245,255,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255,56,100,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .app {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .header {
     background: var(--glass);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 16px 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
   }
   
-  .glass-heavy {
-    background: rgba(15,15,25,0.75);
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid var(--border);
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--gold), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   
   .tab {
-    transition: all 0.2s ease;
-    position: relative;
-  }
-  
-  .tab:hover {
-    background: rgba(255,255,255,0.05);
-  }
-  
-  .tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--cyan), var(--gold), var(--red));
-  }
-  
-  .substrate-btn {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
     position: relative;
     overflow: hidden;
   }
   
-  .substrate-btn::before {
+  .tab::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -80,766 +102,875 @@
     transition: opacity 0.3s;
   }
   
-  .substrate-btn:hover::before {
+  .tab:hover::before {
     opacity: 1;
   }
   
-  .substrate-btn.active {
-    box-shadow: 0 0 20px currentColor;
-  }
-  
-  .trit-bud {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    position: relative;
-    transition: all 0.3s ease;
-  }
-  
-  .trit-bud::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  
-  .trit-bud.p1 {
-    background: var(--cyan);
-    box-shadow: 0 0 12px var(--cyan);
-  }
-  
-  .trit-bud.p0 {
-    background: var(--gold);
-    box-shadow: 0 0 12px var(--gold);
-  }
-  
-  .trit-bud.n1 {
-    background: var(--red);
-    box-shadow: 0 0 12px var(--red);
-  }
-  
-  .trit-bud.active::before {
-    opacity: 1;
-    animation: pulse 1s ease-in-out infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.5); opacity: 0; }
-  }
-  
-  .console-line {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    padding: 2px 0;
-    animation: fadeIn 0.2s ease;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  .console-input {
-    background: transparent;
-    border: none;
-    outline: none;
+  .tab.active {
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(0,245,255,0.15));
+    border-color: var(--gold);
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    width: 100%;
+    box-shadow: 0 0 20px rgba(255,215,0,0.2);
   }
   
-  .packet-lobe {
-    animation: orbit 3s linear infinite;
-    transform-origin: center;
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 16px;
+    min-height: 0;
   }
   
-  @keyframes orbit {
-    from { transform: rotate(0deg) translateX(20px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
-  }
-  
-  .edge-glow {
-    filter: drop-shadow(0 0 8px var(--gold));
-  }
-  
-  .tripwire-armed {
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    box-shadow: 0 0 20px var(--gold);
-  }
-  
-  .tripwire-tripped {
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    box-shadow: 0 0 20px var(--red);
-    animation: flash 0.3s ease;
-  }
-  
-  @keyframes flash {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-  
-  .collapse-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.95);
+  .viewport {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 16px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    font-size: 120px;
-    font-weight: 700;
-    color: var(--red);
-    text-shadow: 0 0 40px var(--red);
-    animation: collapseIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    min-height: 0;
   }
   
-  @keyframes collapseIn {
-    from { opacity: 0; transform: scale(0.5); }
-    to { opacity: 1; transform: scale(1); }
+  .viewport-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .viewport-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .viewport-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+    font-family: 'Monaco', 'Courier New', monospace;
+  }
+  
+  .stat {
+    color: var(--text-dim);
+  }
+  
+  .stat span {
+    color: var(--gold);
+    font-weight: 700;
   }
   
   #fractalCanvas {
-    display: block;
+    flex: 1;
     width: 100%;
-    height: 100%;
+    border-radius: 12px;
+    background: #000;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
   }
   
-  .zoom-controls {
-    position: absolute;
-    bottom: 24px;
-    right: 24px;
-    z-index: 10;
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
   }
   
-  .bookmark-star.active {
-    fill: var(--gold);
+  .sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sidebar::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.02);
+    border-radius: 3px;
+  }
+  
+  .sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+  }
+  
+  .panel {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  
+  .panel-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .panel-title::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+  }
+  
+  .doubt-reg {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+  }
+  
+  .doubt-formula {
     color: var(--gold);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 8px 0;
+    text-align: center;
+  }
+  
+  .prime-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  
+  .prime {
+    padding: 4px 8px;
+    background: rgba(255,56,100,0.1);
+    border: 1px solid rgba(255,56,100,0.3);
+    border-radius: 6px;
+    color: var(--red);
+    font-size: 11px;
+    animation: primeGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes primeGlow {
+    0%, 100% { box-shadow: 0 0 5px rgba(255,56,100,0.3); }
+    50% { box-shadow: 0 0 15px rgba(255,56,100,0.6); }
+  }
+  
+  .console {
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 11px;
+  }
+  
+  .console-line {
+    padding: 4px 0;
+    color: var(--text-dim);
+    border-left: 2px solid-transparent;
+    padding-left: 8px;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  
+  .console-line.hamm { border-color: var(--gold); color: var(--gold); }
+  .console-line.doubt { border-color: var(--red); color: var(--red); }
+  .console-line.scout { border-color: var(--cyan); color: var(--cyan); }
+  .console-line.balance { border-color: var(--mint); color: var(--mint); }
+  .console-line.vector { 
+    border-color: var(--gold); 
+    color: var(--gold);
+    font-weight: 700;
+    text-shadow: 0 0 10px var(--gold);
+  }
+  
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .btn {
+    padding: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  
+  .btn:hover::before {
+    transform: translateX(0);
+  }
+  
+  .btn:active {
+    transform: scale(0.98);
+  }
+  
+  .btn.primary {
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(0,245,255,0.2));
+    border-color: var(--gold);
+  }
+  
+  .network {
+    height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .packet {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+    opacity: 0;
+  }
+  
+  .thtml {
+    padding: 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 11px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .thtml.ground {
+    border: 1px solid var(--mint);
+    color: var(--mint);
+    box-shadow: inset 0 0 20px rgba(0,255,170,0.1);
+  }
+  
+  .thtml.error {
+    border: 1px solid var(--red);
+    color: var(--red);
+    box-shadow: inset 0 0 20px rgba(255,56,100,0.1);
+  }
+  
+  .footer {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  
+  .tripwire {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .tripwire-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 15px var(--mint);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  
+  .counter {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  
+  .counter span {
+    color: var(--gold);
+    font-weight: 700;
+  }
+  
+  @media (max-width: 900px) {
+    .main {
+      grid-template-columns: 1fr;
+    }
+    .sidebar {
+      max-height: 300px;
+    }
   }
 </style>
 </head>
-<body class="h-screen flex flex-col">
-  <!-- Browser Chrome -->
-  <div class="glass-heavy border-b border-white/10">
-    <!-- Tab Bar -->
-    <div class="flex items-center px-2 pt-2 gap-1">
-      <div class="tab active glass rounded-t-lg px-4 py-2 flex items-center gap-2 cursor-pointer">
-        <div class="w-4 h-4 rounded-sm bg-gradient-to-br from-cyan-400 to-red-400"></div>
-        <span class="text-sm">TVM Pro</span>
-        <button class="hover:bg-white/10 rounded p-0.5" onclick="closeTab(event)">
-          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
-        </button>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>TVM Doubt Ladder ∞</h1>
+    <div class="tabs" id="tabs"></div>
+  </div>
+  
+  <div class="main">
+    <div class="viewport">
+      <div class="viewport-header">
+        <div class="viewport-title">Fractal Viewport</div>
+        <div class="viewport-stats">
+          <div class="stat">n = <span id="nValue">1</span></div>
+          <div class="stat">zoom: <span id="zoomLevel">1.0</span>x</div>
+          <div class="stat">Branches: <span id="branchCount">0</span></div>
+        </div>
       </div>
-      <button class="tab glass rounded-t-lg px-3 py-2 hover:bg-white/5" onclick="newTab()">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-      </button>
-      <div class="flex-1"></div>
-      <!-- Window Controls -->
-      <div class="flex gap-2 px-2">
-        <button class="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-400"></button>
-        <button class="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-400"></button>
-        <button class="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400"></button>
-      </div>
+      <canvas id="fractalCanvas"></canvas>
     </div>
     
-    <!-- URL Bar -->
-    <div class="flex items-center gap-2 px-3 py-2">
-      <div class="flex gap-1">
-        <button onclick="goBack()" class="p-2 rounded-lg hover:bg-white/5 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <button onclick="goForward()" class="p-2 rounded-lg hover:bg-white/5 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </button>
-        <button onclick="reload()" class="p-2 rounded-lg hover:bg-white/5 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        </button>
+    <div class="sidebar">
+      <div class="panel">
+        <div class="panel-title">Doubt Register</div>
+        <div class="doubt-reg">
+          <div class="doubt-formula">n = 1 + 2k</div>
+          <div style="text-align:center;color:var(--text-dim);font-size:11px;">k = <span id="kValue">0</span> | Current n = <span id="currentN">1</span></div>
+          <div style="margin-top:12px;font-size:11px;color:var(--text-dim);margin-bottom:6px;">Live Prime Sequence:</div>
+          <div class="prime-list" id="primeList"></div>
+        </div>
       </div>
       
-      <div class="flex-1 glass rounded-lg px-3 py-2 flex items-center gap-2">
-        <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-        <input id="urlBar" type="text" value="tvm://home" class="flex-1 bg-transparent outline-none text-sm font-mono" onkeydown="handleUrl(event)">
-        <button id="bookmarkBtn" onclick="toggleBookmark()" class="bookmark-star">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-        </button>
+      <div class="panel">
+        <div class="panel-title">Console</div>
+        <div class="console" id="console"></div>
+        <div class="controls" style="margin-top:12px;">
+          <button class="btn" onclick="logCommand('HAMMY WALK')">HAMMY WALK</button>
+          <button class="btn" onclick="logCommand('DOUBT')">DOUBT</button>
+          <button class="btn" onclick="logCommand('SCOUT')">SCOUT</button>
+          <button class="btn" onclick="logCommand('BALANCE')">BALANCE</button>
+          <button class="btn primary" onclick="startRepeat()">REPEAT</button>
+          <button class="btn" onclick="logCommand('VECTOR')">VECTOR</button>
+        </div>
       </div>
       
-      <!-- Substrate Engine Switcher -->
-      <div class="glass rounded-lg p-1 flex gap-1">
-        <button id="binaryBtn" class="substrate-btn px-3 py-1.5 rounded-md text-xs font-semibold text-gray-300" onclick="setSubstrate('BINARY')">
-          BINARY
-        </button>
-        <button id="ternaryBtn" class="substrate-btn active px-3 py-1.5 rounded-md text-xs font-semibold text-amber-400 bg-amber-400/10" onclick="setSubstrate('TERNARY')">
-          TERNARY
-        </button>
-        <button id="quantumBtn" class="substrate-btn px-3 py-1.5 rounded-md text-xs font-semibold text-purple-300" onclick="setSubstrate('QUANTUM')">
-          QUANTUM
-        </button>
+      <div class="panel">
+        <div class="panel-title">THTML GROUND</div>
+        <div class="thtml" id="thtml"></div>
       </div>
+      
+      <div class="panel">
+        <div class="panel-title">Network Doubling</div>
+        <div class="network" id="network"></div>
+      </div>
+      
+      <button class="btn primary" onclick="togglePause()" style="width:100%;">
+        <span id="pauseBtn">■ Stop Repeating</span>
+      </button>
     </div>
   </div>
-
-  <!-- Main Layout -->
-  <div class="flex-1 flex overflow-hidden">
-    <!-- Left Panel: 4th Dimension Memory Register -->
-    <div class="glass-heavy w-64 border-r border-white/10 flex flex-col">
-      <div class="p-4 border-b border-white/10">
-        <h3 class="text-sm font-semibold mb-1 flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
-          4th Dimension Memory
-        </h3>
-        <p class="text-xs text-gray-400">27-trit triword register</p>
-      </div>
-      
-      <div class="flex-1 overflow-y-auto p-4">
-        <div id="tritRegister" class="grid grid-cols-9 gap-2"></div>
-        <div class="mt-4 space-y-2 text-xs">
-          <div class="flex items-center gap-2">
-            <div class="trit-bud p1"></div>
-            <span class="text-gray-400">+1 = outward spiral</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="trit-bud p0"></div>
-            <span class="text-gray-400">0 = edge state (.)</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="trit-bud n1"></div>
-            <span class="text-gray-400">-1 = inward spiral</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Tripwire Status -->
-      <div class="p-4 border-t border-white/10">
-        <div class="text-xs font-mono mb-2 text-gray-400">NO_RIGHT_NO_ACCOUNTABILITY</div>
-        <div id="tripwire" class="tripwire-armed h-1 rounded-full transition-all duration-300"></div>
-        <div id="tripwireStatus" class="text-xs mt-2 text-amber-400">ARMED: Edge stable</div>
-      </div>
+  
+  <div class="footer">
+    <div class="tripwire">
+      <div class="tripwire-indicator"></div>
+      <span id="tripwireText">DOUBT INFINITE</span>
     </div>
-
-    <!-- Main Viewport: Fractal Edge Visualizer -->
-    <div class="flex-1 relative bg-black">
-      <canvas id="fractalCanvas"></canvas>
-      
-      <div id="collapseOverlay" class="collapse-overlay hidden">404</div>
-      
-      <!-- Zoom Controls -->
-      <div class="zoom-controls glass rounded-xl p-1 flex-col gap-1">
-        <button onclick="zoomIn()" class="p-3 rounded-lg hover:bg-white/5 transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        </button>
-        <div class="h-px bg-white/10"></div>
-        <button onclick="zoomOut()" class="p-3 rounded-lg hover:bg-white/5 transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
-        </button>
-      </div>
-      
-      <!-- Substrate Info -->
-      <div class="absolute top-4 left-4 glass rounded-lg px-4 py-2">
-        <div class="text-xs text-gray-400">SUBSTRATE</div>
-        <div id="substrateDisplay" class="text-lg font-bold text-amber-400">TERNARY</div>
-        <div id="substrateDesc" class="text-xs text-gray-400 mt-1">3-phase Julia set with edge witness</div>
-      </div>
-    </div>
-
-    <!-- Right Panel: DevTools -->
-    <div class="glass-heavy w-80 border-l border-white/10 flex flex-col">
-      <!-- Network Inspector -->
-      <div class="p-4 border-b border-white/10">
-        <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
-          Network Inspector
-        </h3>
-        <div class="relative h-20 flex items-center justify-center">
-          <svg id="packetViz" width="200" height="80" class="opacity-80"></svg>
-        </div>
-        <div id="packetLabel" class="text-xs text-center text-gray-400 mt-2">3-lobe ternary packets</div>
-      </div>
-      
-      <!-- Ternary Console -->
-      <div class="flex-1 flex flex-col border-t border-white/10">
-        <div class="p-3 border-b border-white/10 flex items-center justify-between">
-          <h3 class="text-sm font-semibold flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3"/></svg>
-            Ternary Console
-          </h3>
-          <button onclick="clearConsole()" class="text-xs text-gray-400 hover:text-white transition">clear</button>
-        </div>
-        <div id="console" class="flex-1 overflow-y-auto p-3 space-y-1">
-          <div class="console-line text-amber-400">> TVM Pro v2 initialized</div>
-          <div class="console-line text-gray-500">> Substrate: TERNARY</div>
-          <div class="console-line text-gray-500">> Edge state: STABLE</div>
-          <div class="console-line text-gray-500">> Commands: HAMMY WALK, COLLAPSE, BALANCE, SEED</div>
-        </div>
-        <div class="p-3 border-t border-white/10">
-          <div class="flex items-center gap-2">
-            <span class="text-amber-400 font-mono text-xs">></span>
-            <input id="consoleInput" type="text" class="console-input" placeholder="Enter command..." onkeydown="handleConsole(event)">
-          </div>
-        </div>
-      </div>
+    <div class="counter">
+      Iterations: <span id="iterations">∞</span> | States: <span id="states">3^1</span>
     </div>
   </div>
+</div>
 
 <script>
   // State
-  let substrate = 'TERNARY';
-  let zoom = 1.0;
-  let centerX = 0;
-  let centerY = 0;
-  let animationFrame = null;
-  let time = 0;
-  let tritRegister = [];
-  let tripwireArmed = true;
-  let currentUrl = 'tvm://home';
+  const substrates = [
+    { name: 'SELF', n: 1, k: 0 },
+    { name: 'GROUP', n: 3, k: 1 },
+    { name: 'COLLECT', n: 5, k: 2 },
+    { name: 'COLLATE', n: 7, k: 3 },
+    { name: 'SEND', n: 9, k: 4 },
+    { name: 'PROPAGATE', n: 11, k: 5 },
+    { name: 'INFINITY', n: 13, k: 6 }
+  ];
   
-  // Canvas setup
+  let currentSubstrate = 0;
+  let infiniteMode = false;
+  let infiniteN = 13;
+  let infiniteK = 6;
+  let paused = false;
+  let frame = 0;
+  let zoom = 1.0;
+  let autoZoom = false;
+  let packets = [];
+  let vectorAnimActive = false;
+  
   const canvas = document.getElementById('fractalCanvas');
   const ctx = canvas.getContext('2d');
   
+  // Init
+  function init() {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    renderTabs();
+    selectSubstrate(0);
+    generatePrimes();
+    spawnPacket();
+    setInterval(spawnPacket, 2000);
+    animate();
+    logCommand('VECTOR');
+  }
+  
   function resizeCanvas() {
-    canvas.width = canvas.clientWidth * window.devicePixelRatio;
-    canvas.height = canvas.clientHeight * window.devicePixelRatio;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    renderFractal();
   }
   
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-  
-  // Initialize trit register
-  function initTrits() {
-    const container = document.getElementById('tritRegister');
-    tritRegister = [];
-    for (let i = 0; i < 27; i++) {
-      const bud = document.createElement('div');
-      bud.className = 'trit-bud p0';
-      bud.title = `Trit ${i}`;
-      container.appendChild(bud);
-      
-      const val = Math.floor(Math.random() * 3) - 1;
-      tritRegister.push(val);
-      updateTritBud(bud, val);
-    }
-    updateTrits();
+  // Tabs
+  function renderTabs() {
+    const tabsEl = document.getElementById('tabs');
+    tabsEl.innerHTML = substrates.map((s, i) => 
+      `<div class="tab ${i === currentSubstrate ? 'active' : ''}" onclick="selectSubstrate(${i})">
+        ${s.name}(${s.n === 13 ? '∞' : s.n})
+      </div>`
+    ).join('');
   }
   
-  function updateTritBud(el, val) {
-    el.className = 'trit-bud ';
-    if (val === 1) el.classList.add('p1');
-    else if (val === 0) el.classList.add('p0');
-    else el.classList.add('n1');
-  }
-  
-  function updateTrits() {
-    const buds = document.querySelectorAll('.trit-bud');
-    setInterval(() => {
-      if (Math.random() > 0.7) {
-        const idx = Math.floor(Math.random() * 27);
-        const newVal = Math.floor(Math.random() * 3) - 1;
-        tritRegister[idx] = newVal;
-        updateTritBud(buds[idx], newVal);
-        buds[idx].classList.add('active');
-        setTimeout(() => buds[idx].classList.remove('active'), 500);
-      }
-    }, 200);
-  }
-  
-  initTrits();
-  
-  // Fractal Rendering
-  function renderFractal() {
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    ctx.clearRect(0, 0, width, height);
+  function selectSubstrate(i) {
+    currentSubstrate = i;
+    renderTabs();
+    updateDisplay();
     
-    if (substrate === 'BINARY') {
-      renderBinaryCollapse(width, height);
-    } else if (substrate === 'TERNARY') {
-      renderTernaryJulia(width, height);
-    } else if (substrate === 'QUANTUM') {
-      renderQuantumInterference(width, height);
-    }
-  }
-  
-  function renderBinaryCollapse(width, height) {
-    const imageData = ctx.createImageData(width, height);
-    const data = imageData.data;
-    const maxIter = 50;
-    
-    for (let px = 0; px < width; px++) {
-      for (let py = 0; py < height; py++) {
-        const x0 = (px - width / 2) / (width / 4) / zoom + centerX;
-        const y0 = (py - height / 2) / (height / 4) / zoom + centerY;
-        let x = 0, y = 0, iter = 0;
-        
-        while (x * x + y * y <= 4 && iter < maxIter) {
-          const xtemp = x * x - y * y + x0;
-          y = 2 * x * y + y0;
-          x = xtemp;
-          iter++;
-        }
-        
-        const idx = (py * width + px) * 4;
-        // Binary: only black or white, no edge
-        const val = iter === maxIter ? 0 : 255;
-        data[idx] = val;
-        data[idx + 1] = val;
-        data[idx + 2] = val;
-        data[idx + 3] = 255;
-      }
-    }
-    ctx.putImageData(imageData, 0, 0);
-  }
-  
-  function renderTernaryJulia(width, height) {
-    const imageData = ctx.createImageData(width, height);
-    const data = imageData.data;
-    const maxIter = 80;
-    const cRe = -0.7;
-    const cIm = 0.27015;
-    
-    for (let px = 0; px < width; px++) {
-      for (let py = 0; py < height; py++) {
-        let x = (px - width / 2) / (width / 3) / zoom + centerX;
-        let y = (py - height / 2) / (height / 3) / zoom + centerY;
-        let iter = 0;
-        
-        while (x * x + y * y <= 4 && iter < maxIter) {
-          const xtemp = x * x - y * y + cRe;
-          y = 2 * x * y + cIm;
-          x = xtemp;
-          iter++;
-        }
-        
-        const idx = (py * width + px) * 4;
-        // Ternary coloring: 3-phase
-        if (iter === maxIter) {
-          // Edge state: gold center "dot (.)"
-          data[idx] = 255;
-          data[idx + 1] = 200;
-          data[idx + 2] = 87;
-        } else {
-          const phase = iter % 3;
-          if (phase === 0) {
-            data[idx] = 255; data[idx + 1] = 45; data[idx + 2] = 85; // -1 red
-          } else if (phase === 1) {
-            data[idx] = 0; data[idx + 1] = 229; data[idx + 2] = 255; // +1 cyan
-          } else {
-            data[idx] = 40; data[idx + 1] = 40; data[idx + 2] = 60; // intermediate
-          }
-        }
-        data[idx + 3] = 255;
-      }
-    }
-    ctx.putImageData(imageData, 0, 0);
-    
-    // Draw center dot (.) - the edge witness
-    ctx.fillStyle = 'rgba(255, 200, 87, 0.8)';
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = '#ffc857';
-    ctx.beginPath();
-    ctx.arc(width / 2, height / 2, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  }
-  
-  function renderQuantumInterference(width, height) {
-    const imageData = ctx.createImageData(width, height);
-    const data = imageData.data;
-    
-    for (let px = 0; px < width; px++) {
-      for (let py = 0; py < height; py++) {
-        const x = (px - width / 2) / 50 / zoom + centerX;
-        const y = (py - height / 2) / 50 / zoom + centerY;
-        const dist = Math.sqrt(x * x + y * y);
-        
-        // Interference pattern: superposition of +1 and -1 waves
-        const wave1 = Math.sin(dist * 10 - time);
-        const wave2 = Math.cos(dist * 8 + time * 0.7);
-        const interference = (wave1 + wave2) / 2;
-        
-        const idx = (py * width + px) * 4;
-        if (Math.abs(interference) < 0.1) {
-          // Edge state blooms: superposition collapse point
-          data[idx] = 255;
-          data[idx + 1] = 200;
-          data[idx + 2] = 87;
-        } else if (interference > 0) {
-          data[idx] = 0;
-          data[idx + 1] = 200 * Math.abs(interference);
-          data[idx + 2] = 255 * Math.abs(interference);
-        } else {
-          data[idx] = 255 * Math.abs(interference);
-          data[idx + 1] = 45 * Math.abs(interference);
-          data[idx + 2] = 85 * Math.abs(interference);
-        }
-        data[idx + 3] = 255;
-      }
-    }
-    ctx.putImageData(imageData, 0, 0);
-    time += 0.05;
-    if (substrate === 'QUANTUM') {
-      requestAnimationFrame(() => renderFractal());
-    }
-  }
-  
-  // Substrate controls
-  function setSubstrate(mode) {
-    substrate = mode;
-    document.querySelectorAll('.substrate-btn').forEach(btn => {
-      btn.classList.remove('active', 'bg-amber-400/10', 'bg-purple-400/10', 'bg-gray-400/10');
-    });
-    
-    const display = document.getElementById('substrateDisplay');
-    const desc = document.getElementById('substrateDesc');
-    const overlay = document.getElementById('collapseOverlay');
-    
-    if (mode === 'BINARY') {
-      document.getElementById('binaryBtn').classList.add('active', 'bg-gray-400/10', 'text-gray-300');
-      display.textContent = 'BINARY';
-      display.className = 'text-lg font-bold text-gray-300';
-      desc.textContent = 'Mandelbrot collapse: 2 colors, no edge';
-      overlay.classList.remove('hidden');
-      setTimeout(() => overlay.classList.add('hidden'), 1000);
-      tripTripwire();
-    } else if (mode === 'TERNARY') {
-      document.getElementById('ternaryBtn').classList.add('active', 'bg-amber-400/10', 'text-amber-400');
-      display.textContent = 'TERNARY';
-      display.className = 'text-lg font-bold text-amber-400';
-      desc.textContent = '3-phase Julia set with edge witness (.)';
-      resetTripwire();
-    } else if (mode === 'QUANTUM') {
-      document.getElementById('quantumBtn').classList.add('active', 'bg-purple-400/10', 'text-purple-300');
-      display.textContent = 'QUANTUM';
-      display.className = 'text-lg font-bold text-purple-300';
-      desc.textContent = 'Superposition: edge state blooms as interference';
-      resetTripwire();
-    }
-    
-    renderFractal();
-    updatePacketViz();
-    logConsole(`> Substrate switched to ${mode}`);
-  }
-  
-  // THTML Ground Engine
-  function processTHTML(url) {
-    currentUrl = url;
-    document.getElementById('urlBar').value = url;
-    
-    if (url === 'tvm://ibm') {
-      if (substrate === 'BINARY') {
-        logConsole('> <ground required> detected', 'text-red-400');
-        logConsole('> ERROR: Binary substrate cannot render ground', 'text-red-400');
-        logConsole('> 00 00 → 00 → COLLAPSE', 'text-red-400');
-        tripTripwire();
-        setTimeout(() => {
-          document.getElementById('collapseOverlay').classList.remove('hidden');
-          setTimeout(() => {
-            document.getElementById('collapseOverlay').classList.add('hidden');
-          }, 2000);
-        }, 500);
-      } else {
-        logConsole('> <ground required> rendered with edge glow', 'text-amber-400');
-        logConsole('> Ground present: (.) center witnessed', 'text-amber-400');
-      }
-    } else if (url === 'tvm://ground') {
-      logConsole('> Visualizing the (.) dot and edge state', 'text-amber-400');
-      centerX = 0;
-      centerY = 0;
-      zoom = 3.0;
-      renderFractal();
-    } else if (url === 'tvm://home') {
-      logConsole('> Ternary homepage: fractal edge active', 'text-cyan-400');
-      centerX = 0;
-      centerY = 0;
-      zoom = 1.0;
-      renderFractal();
-    }
-  }
-  
-  // Zoom controls
-  function zoomIn() {
-    zoom *= 1.5;
-    renderFractal();
-    logConsole(`> Zoom: ${zoom.toFixed(2)}x - witness trail deepens`);
-  }
-  
-  function zoomOut() {
-    zoom /= 1.5;
-    renderFractal();
-    logConsole(`> Zoom: ${zoom.toFixed(2)}x`);
-  }
-  
-  // Tripwire
-  function tripTripwire() {
-    if (!tripwireArmed) return;
-    tripwireArmed = false;
-    const el = document.getElementById('tripwire');
-    const status = document.getElementById('tripwireStatus');
-    el.className = 'tripwire-tripped h-1 rounded-full transition-all duration-300';
-    status.textContent = 'TRIPPED: Fractal tear → 404';
-    status.className = 'text-xs mt-2 text-red-400';
-  }
-  
-  function resetTripwire() {
-    tripwireArmed = true;
-    const el = document.getElementById('tripwire');
-    const status = document.getElementById('tripwireStatus');
-    el.className = 'tripwire-armed h-1 rounded-full transition-all duration-300';
-    status.textContent = 'ARMED: Edge stable';
-    status.className = 'text-xs mt-2 text-amber-400';
-  }
-  
-  // Network Inspector
-  function updatePacketViz() {
-    const svg = document.getElementById('packetViz');
-    const label = document.getElementById('packetLabel');
-    svg.innerHTML = '';
-    
-    const cx = 100, cy = 40;
-    if (substrate === 'BINARY') {
-      // 2-lobe
-      for (let i = 0; i < 2; i++) {
-        const angle = (i * Math.PI);
-        const x = cx + Math.cos(angle) * 20;
-        const y = cy + Math.sin(angle) * 20;
-        svg.innerHTML += `<circle cx="${x}" cy="${y}" r="6" fill="#666" class="packet-lobe" style="animation-delay: ${i*0.5}s"/>`;
-      }
-      label.textContent = '2-lobe binary packets';
+    if (substrates[i].name === 'INFINITY') {
+      infiniteMode = true;
+      autoZoom = true;
+      if (!paused) startInfiniteLoop();
     } else {
-      // 3-lobe with center witness
-      for (let i = 0; i < 3; i++) {
-        const angle = (i * 2 * Math.PI / 3) - Math.PI / 2;
-        const x = cx + Math.cos(angle) * 20;
-        const y = cy + Math.sin(angle) * 20;
-        const color = i === 0 ? '#ff2d55' : i === 1 ? '#00e5ff' : '#ffc857';
-        svg.innerHTML += `<circle cx="${x}" cy="${y}" r="6" fill="${color}" class="packet-lobe" style="animation-delay: ${i*0.3}s"/>`;
-      }
-      svg.innerHTML += `<circle cx="${cx}" cy="${cy}" r="3" fill="#ffc857" opacity="0.6"/>`;
-      label.textContent = '3-lobe ternary packets with witness';
+      infiniteMode = false;
+      autoZoom = false;
+      zoom = 1.0;
     }
   }
   
-  updatePacketViz();
+  // Doubt Register
+  function getCurrentN() {
+    return infiniteMode ? infiniteN : substrates[currentSubstrate].n;
+  }
+  
+  function getCurrentK() {
+    return infiniteMode ? infiniteK : substrates[currentSubstrate].k;
+  }
+  
+  function updateDisplay() {
+    const n = getCurrentN();
+    const k = getCurrentK();
+    document.getElementById('nValue').textContent = infiniteMode ? '∞' : n;
+    document.getElementById('currentN').textContent = n;
+    document.getElementById('kValue').textContent = infiniteMode ? '∞' : k;
+    document.getElementById('zoomLevel').textContent = zoom.toFixed(1);
+    document.getElementById('branchCount').textContent = n - 1;
+    document.getElementById('states').textContent = `3^${n}`;
+    
+    // THTML Ground Check
+    const thtml = document.getElementById('thtml');
+    if (n >= 5) {
+      thtml.className = 'thtml ground';
+      thtml.innerHTML = '&lt;ground required&gt;<br>MODE: GROUNDED<br>STATUS: ACTIVE';
+    } else {
+      thtml.className = 'thtml error';
+      thtml.innerHTML = '404: GROUND REQUIRED<br>mode >= COLLECT(5)';
+    }
+    
+    // Tripwire
+    const tripwire = document.getElementById('tripwireText');
+    if (infiniteMode) {
+      tripwire.textContent = 'DOUBT INFINITE - NEVER TRIPS';
+    } else {
+      tripwire.textContent = 'DOUBT ACTIVE';
+    }
+  }
+  
+  // Primes
+  function isPrime(num) {
+    if (num < 2) return false;
+    for (let i = 2; i <= Math.sqrt(num); i++) {
+      if (num % i === 0) return false;
+    }
+    return true;
+  }
+  
+  function generatePrimes() {
+    const primes = [];
+    let num = getCurrentN();
+    while (primes.length < 8) {
+      if (isPrime(num)) primes.push(num);
+      num += 2;
+    }
+    document.getElementById('primeList').innerHTML = 
+      primes.map(p => `<div class="prime">${p}</div>`).join('');
+  }
   
   // Console
-  function logConsole(msg, className = 'text-gray-400') {
+  function logCommand(cmd) {
     const console = document.getElementById('console');
     const line = document.createElement('div');
-    line.className = `console-line ${className}`;
-    line.textContent = msg;
+    line.className = `console-line ${cmd.toLowerCase()}`;
+    
+    if (cmd === 'VECTOR') {
+      animateVector(line);
+    } else if (cmd === 'REPEAT') {
+      line.textContent = '> REPEAT: 1 repeat = +1 forever';
+      if (!infiniteMode) {
+        currentSubstrate = 6;
+        selectSubstrate(6);
+      }
+    } else {
+      line.textContent = `> ${cmd}: ${getCommandDesc(cmd)}`;
+    }
+    
     console.appendChild(line);
     console.scrollTop = console.scrollHeight;
+    
+    if (console.children.length > 20) {
+      console.removeChild(console.children[0]);
+    }
   }
   
-  function handleConsole(e) {
-    if (e.key === 'Enter') {
-      const input = e.target;
-      const cmd = input.value.trim().toUpperCase();
-      logConsole(`> ${cmd}`, 'text-cyan-400');
+  function getCommandDesc(cmd) {
+    const descs = {
+      'HAMMY WALK': 'traversing doubt tree',
+      'DOUBT': 'n = 1 + 2k verification',
+      'SCOUT': 'deploying 2 scouts per branch',
+      'BALANCE': 'feedback stabilization',
+      'VECTOR': '- + × 20 - + × × 3 = 1 repeat'
+    };
+    return descs[cmd] || 'processing';
+  }
+  
+  function animateVector(line) {
+    const text = '- + × 20 - + × × 3 = 1 repeat';
+    let i = 0;
+    line.textContent = '> VECTOR: ';
+    vectorAnimActive = true;
+    
+    function type() {
+      if (i < text.length) {
+        line.textContent += text[i];
+        i++;
+        setTimeout(type, 60);
+      } else {
+        vectorAnimActive = false;
+      }
+    }
+    type();
+  }
+  
+  function startRepeat() {
+    logCommand('REPEAT');
+  }
+  
+  // Network Packets
+  function spawnPacket() {
+    if (paused) return;
+    const network = document.getElementById('network');
+    const x = Math.random() * (network.offsetWidth - 10);
+    const packet = document.createElement('div');
+    packet.className = 'packet';
+    packet.style.left = x + 'px';
+    packet.style.top = '0px';
+    network.appendChild(packet);
+    
+    const pkt = { el: packet, x: x, y: 0, vx: (Math.random() - 0.5) * 2, vy: 1 + Math.random() };
+    packets.push(pkt);
+    
+    // Spawn 2 scouts
+    if (Math.random() > 0.5) {
+      setTimeout(() => {
+        spawnScout(x - 10, 0);
+        spawnScout(x + 10, 0);
+      }, 300);
+    }
+  }
+  
+  function spawnScout(x, y) {
+    const network = document.getElementById('network');
+    const packet = document.createElement('div');
+    packet.className = 'packet';
+    packet.style.left = x + 'px';
+    packet.style.top = y + 'px';
+    packet.style.background = 'var(--gold)';
+    packet.style.boxShadow = '0 0 10px var(--gold)';
+    network.appendChild(packet);
+    
+    const pkt = { el: packet, x: x, y: y, vx: (Math.random() - 0.5) * 3, vy: 1 + Math.random() * 2, scout: true };
+    packets.push(pkt);
+  }
+  
+  function updatePackets() {
+    const network = document.getElementById('network');
+    packets = packets.filter(pkt => {
+      pkt.y += pkt.vy;
+      pkt.x += pkt.vx;
+      pkt.el.style.top = pkt.y + 'px';
+      pkt.el.style.left = pkt.x + 'px';
+      pkt.el.style.opacity = '1';
       
-      if (cmd === 'HAMMY WALK') {
-        logConsole('> Initiating HAMMY WALK protocol...', 'text-amber-400');
-        logConsole('> Zooming into dot (.) to plant flap', 'text-amber-400');
-        let steps = 0;
-        const walk = setInterval(() => {
-          zoom *= 1.3;
-          renderFractal();
-          steps++;
-          if (steps > 10) {
-            clearInterval(walk);
-            logConsole('> Flap planted at edge witness', 'text-green-400');
+      if (pkt.y > network.offsetHeight) {
+        pkt.el.remove();
+        return false;
+      }
+      return true;
+    });
+  }
+  
+  // Infinite Loop
+  function startInfiniteLoop() {
+    if (!infiniteMode || paused) return;
+    
+    infiniteN += 2;
+    infiniteK += 1;
+    updateDisplay();
+    generatePrimes();
+    
+    setTimeout(() => startInfiniteLoop(), 1500);
+  }
+  
+  // Pause
+  function togglePause() {
+    paused = !paused;
+    document.getElementById('pauseBtn').textContent = paused ? '▶ Resume' : '■ Stop Repeating';
+    if (!paused && infiniteMode) startInfiniteLoop();
+  }
+  
+  // Fractal Rendering
+  function drawFractal() {
+    const w = canvas.width / window.devicePixelRatio;
+    const h = canvas.height / window.devicePixelRatio;
+    const cx = w / 2;
+    const cy = h / 2;
+    
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+    
+    const n = getCurrentN();
+    const substrate = substrates[currentSubstrate].name;
+    
+    if (autoZoom && !paused) {
+      zoom = 1.0 + Math.sin(frame * 0.01) * 0.3 + frame * 0.0002;
+    }
+    
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(zoom, zoom);
+    
+    // SELF: Gold dot
+    if (substrate === 'SELF') {
+      ctx.beginPath();
+      ctx.arc(0, 0, 8 + Math.sin(frame * 0.05) * 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffd700';
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = '#ffd700';
+      ctx.fill();
+    }
+    
+    // GROUP: 3-lobe
+    else if (substrate === 'GROUP') {
+      const colors = ['#ff3864', '#ffd700', '#00f5ff'];
+      for (let i = 0; i < 3; i++) {
+        const angle = (i / 3) * Math.PI * 2 + frame * 0.01;
+        const r = 60;
+        const x = Math.cos(angle) * r;
+        const y = Math.sin(angle) * r;
+        ctx.beginPath();
+        ctx.arc(x, y, 15 + Math.sin(frame * 0.05 + i) * 3, 0, Math.PI * 2);
+        ctx.fillStyle = colors[i];
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = colors[i];
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffd700';
+      ctx.fill();
+    }
+    
+    // COLLECT: 5-fold symmetry
+    else if (substrate === 'COLLECT') {
+      for (let i = 0; i < 5; i++) {
+        const angle = (i / 5) * Math.PI * 2 + frame * 0.005;
+        drawBranch(0, 0, angle, 80, 3, '#ffd700');
+      }
+    }
+    
+    // COLLATE: 2 outer branches as scouts
+    else if (substrate === 'COLLATE') {
+      for (let i = 0; i < 7; i++) {
+        const angle = (i / 7) * Math.PI * 2;
+        const isScout = i < 2;
+        const scoutOffset = isScout ? Math.sin(frame * 0.03 + i) * 20 : 0;
+        drawBranch(0, 0, angle + scoutOffset * 0.1, 90, 4, isScout ? '#00f5ff' : '#ffd700');
+      }
+    }
+    
+    // SEND: 3x3 grid of mini-fractals
+    else if (substrate === 'SEND') {
+      for (let gy = -1; gy <= 1; gy++) {
+        for (let gx = -1; gx <= 1; gx++) {
+          const ox = gx * 80;
+          const oy = gy * 80;
+          drawMiniFractal(ox, oy, 20, '#00ffaa', frame * 0.02);
+        }
+      }
+    }
+    
+    // PROPAGATE: Grid connects, feedback
+    else if (substrate === 'PROPAGATE') {
+      const gridSize = 3;
+      const spacing = 70;
+      for (let gy = -1; gy <= 1; gy++) {
+        for (let gx = -1; gx <= 1; gx++) {
+          const ox = gx * spacing;
+          const oy = gy * spacing;
+          drawMiniFractal(ox, oy, 18, '#00f5ff', frame * 0.015);
+          
+          // Connections
+          if (gx < 1) {
+            ctx.beginPath();
+            ctx.moveTo(ox + 20, oy);
+            ctx.lineTo(ox + spacing - 20, oy);
+            ctx.strokeStyle = `rgba(0, 245, 255, ${0.3 + Math.sin(frame * 0.05 + gx) * 0.2})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
           }
-        }, 100);
-        
-      } else if (cmd === 'COLLAPSE') {
-        logConsole('> Forcing binary collapse...', 'text-red-400');
-        setSubstrate('BINARY');
-        logConsole('> 00 00 → 00 → 404', 'text-red-400');
-        
-      } else if (cmd === 'BALANCE') {
-        logConsole('> Calculating 4 0 4 equilibrium...', 'text-purple-400');
-        logConsole('> +4 + 0 + (-4) = 0', 'text-purple-400');
-        logConsole('> Fractal equilibrium achieved', 'text-purple-400');
-        logConsole('> Edge state: BALANCED', 'text-amber-400');
-        
-      } else if (cmd === 'SEED') {
-        const seed = {
-          substrate: substrate,
-          zoom: zoom,
-          center: [centerX, centerY],
-          witness_hash: btoa(`${centerX},${centerY},${zoom}`).slice(0, 16),
-          trit_sample: tritRegister.slice(0, 9),
-          timestamp: Date.now()
-        };
-        logConsole('> seed.json exported:', 'text-green-400');
-        logConsole(JSON.stringify(seed, null, 2), 'text-gray-500');
-        
-      } else if (cmd) {
-        logConsole(`> Unknown command: ${cmd}`, 'text-red-400');
+          if (gy < 1) {
+            ctx.beginPath();
+            ctx.moveTo(ox, oy + 20);
+            ctx.lineTo(ox, oy + spacing - 20);
+            ctx.strokeStyle = `rgba(0, 245, 255, ${0.3 + Math.sin(frame * 0.05 + gy) * 0.2})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+        }
       }
       
-      input.value = '';
+      // Feedback loop visual
+      ctx.beginPath();
+      ctx.arc(0, 0, 120 + Math.sin(frame * 0.03) * 10, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 215, 0, ${0.2 + Math.sin(frame * 0.02) * 0.1})`;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([5, 5]);
+      ctx.lineDashOffset = -frame * 0.5;
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
-  }
-  
-  function clearConsole() {
-    document.getElementById('console').innerHTML = '';
-    logConsole('> Console cleared', 'text-gray-500');
-  }
-  
-  // URL Bar
-  function handleUrl(e) {
-    if (e.key === 'Enter') {
-      processTHTML(e.target.value);
-    }
-  }
-  
-  function goBack() {
-    logConsole('> History: previous state restored', 'text-gray-500');
-  }
-  
-  function goForward() {
-    logConsole('> History: next state restored', 'text-gray-500');
-  }
-  
-  function reload() {
-    renderFractal();
-    logConsole('> Fractal regenerated', 'text-gray-500');
-  }
-  
-  function toggleBookmark() {
-    const btn = document.getElementById('bookmarkBtn');
-    btn.classList.toggle('active');
-    logConsole('> Bookmark toggled', 'text-amber-400');
-  }
-  
-  function closeTab(e) {
-    e.stopPropagation();
-    logConsole('> Cannot close primary tab', 'text-red-400');
-  }
-  
-  function newTab() {
-    logConsole('> Ternary tabs: superposition enabled', 'text-cyan-400');
-  }
-  
-  // Hammy walk animation on dot click
-  canvas.addEventListener('click', () => {
-    const overlay = document.getElementById('collapseOverlay');
-    if (!overlay.classList.contains('hidden')) return;
     
-    zoomIn();
-    centerX += (Math.random() - 0.5) * 0.1 / zoom;
-    centerY += (Math.random() - 0.5) * 0.1 / zoom;
-  });
+    // INFINITY: Auto-zoom +2 branches
+    else if (substrate === 'INFINITY') {
+      const branches = n - 1;
+      for (let i = 0; i < branches; i++) {
+        const angle = (i / branches) * Math.PI * 2 + frame * 0.002;
+        const len = 100 + (i % 3) * 20;
+        const hue = (i * 360 / branches + frame * 0.5) % 360;
+        drawBranch(0, 0, angle, len, 5, `hsl(${hue}, 80%, 60%)`);
+      }
+      
+      // Center spiral
+      for (let i = 0; i < 50; i++) {
+        const t = i / 50;
+        const angle = t * Math.PI * 8 + frame * 0.01;
+        const r = t * 60;
+        const x = Math.cos(angle) * r;
+        const y = Math.sin(angle) * r;
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 215, 0, ${1 - t})`;
+        ctx.fill();
+      }
+    }
+    
+    ctx.restore();
+  }
   
-  // Initial render
-  renderFractal();
-  logConsole('> The fractal is the visual proof of the edge state', 'text-amber-400');
+  function drawBranch(x, y, angle, len, depth, color) {
+    if (depth <= 0 || len < 2) return;
+    
+    const x2 = x + Math.cos(angle) * len;
+    const y2 = y + Math.sin(angle) * len;
+    
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(1, depth);
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    if (depth > 1) {
+      drawBranch(x2, y2, angle - 0.5, len * 0.7, depth - 1, color);
+      drawBranch(x2, y2, angle + 0.5, len * 0.7, depth - 1, color);
+    }
+  }
+  
+  function drawMiniFractal(ox, oy, size, color, rot) {
+    ctx.save();
+    ctx.translate(ox, oy);
+    ctx.rotate(rot);
+    
+    // Julia-style mini
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2;
+      const r = size;
+      ctx.beginPath();
+      ctx.arc(Math.cos(angle) * r, Math.sin(angle) * r, 3, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = color;
+      ctx.fill();
+    }
+    
+    ctx.beginPath();
+    ctx.arc(0, 0, 5, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    
+    ctx.restore();
+  }
+  
+  // Animation Loop
+  function animate() {
+    frame++;
+    if (!paused) {
+      drawFractal();
+      updatePackets();
+    }
+    requestAnimationFrame(animate);
+  }
+  
+  // Start
+  init();
 </script>
 </body>
 </html>
