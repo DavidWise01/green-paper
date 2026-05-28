@@ -1,0 +1,15 @@
+{
+  "name": "root0-greenpaper",
+  "version": "1.0.0",
+  "description": "ROOT0.AI Green Paper v1.0 — single-file static site",
+  "scripts": {
+    "start": "npx serve -s . -l ${PORT:-3000}"
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "CC-BY-ND-4.0"
+}
